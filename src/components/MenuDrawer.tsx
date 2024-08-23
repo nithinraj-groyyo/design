@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Divider, Drawer, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuTabs from './MenuTabs';
 import { useNavigate } from 'react-router-dom';
-import SubCategoriesList, { SubCategory } from './SubCategoriesList';
+import SubCategoriesList from './SubCategoriesList';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+import { setActiveCategoryTab } from '../redux/categoriesSlice';
+import { useFetchSubCategories } from '../hooks/useFetchCategories';
 
 interface MenuDrawerProps {
     open: boolean;
     onClose: () => void;
-    tabsData: { key: string; label: string; id: number }[];
-    selectedTab: { categoryId: number; categoryKey: string };
     onTabChange: (event: React.SyntheticEvent, categoryId: number | undefined) => void;
-    subCategories: SubCategory[];
-    isSubCategoryLoading: boolean;
-    setSelectedTab: React.Dispatch<React.SetStateAction<{ categoryId: number; categoryKey: string }>>;
+    
 }
 
-const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, tabsData, selectedTab, onTabChange, isSubCategoryLoading, subCategories, setSelectedTab }) => {
+const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, onTabChange }) => {
     const navigate = useNavigate();
    
     const handleMyAccounts = () => {
@@ -24,16 +24,15 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, tabsData, select
         onClose()
     }
 
-    useEffect(() => {
-        const mockEvent = {
-            currentTarget: {},
-            target: {},
-            preventDefault: () => {},
-            stopPropagation: () => {},
-            nativeEvent: new Event('change')
-        } as React.SyntheticEvent;
+    const {categories} = useSelector((state: RootState) => state.categories);
 
-        onTabChange(mockEvent, tabsData[0]?.id);
+    const dispatch = useDispatch();
+
+    const { fetchSubCategories } = useFetchSubCategories();
+
+    useEffect(() => {
+        dispatch(setActiveCategoryTab({ categoryId: categories[0]?.id || -1, categoryKey: categories[0]?.key }));
+        fetchSubCategories(categories[0]?.id )
     }, []);
 
     const navigateShoppingBag = () => {
@@ -50,6 +49,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, tabsData, select
         open={open}
         onClose={onClose}
         classes={{ paper: 'w-full h-full' }}
+        className='lg:hidden'
     >
         <div className="flex flex-col p-4">
             <div className='flex justify-between'>
@@ -64,15 +64,10 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, tabsData, select
             </div>
             <div>
                 <MenuTabs
-                    tabs={tabsData}
-                    value={selectedTab}
-                    setValue={setSelectedTab}
                     onTabChange={onTabChange}
                 />
                 <Divider/>
                 <SubCategoriesList
-                    subCategories={subCategories}
-                    isLoading={isSubCategoryLoading}
                     onItemClick={navigateToProducts}
                 />
             </div>

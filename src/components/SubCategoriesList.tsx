@@ -1,20 +1,18 @@
 import React from 'react';
 import { List, ListItem, ListItemButton, ListItemText, CircularProgress, Typography } from '@mui/material';
-
-export interface SubCategory {
-    id: number;
-    name: string;
-}
+import { useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
 
 interface SubCategoriesListProps {
-    subCategories: SubCategory[];
-    isLoading: boolean;
     onItemClick: () => void;
 }
 
-const SubCategoriesList: React.FC<SubCategoriesListProps> = ({ subCategories, isLoading, onItemClick }) => (
+const SubCategoriesList: React.FC<SubCategoriesListProps> = ({ onItemClick }) => {
+    const {isSubCategoriesLodaing, subCategories} = useSelector((state: RootState) => state.categories);
+
+    return(
     <List className="mt-2">
-        {isLoading ? (
+        {isSubCategoriesLodaing ? (
             <div className="flex justify-center items-center p-2">
                 <CircularProgress />
             </div>
@@ -32,6 +30,6 @@ const SubCategoriesList: React.FC<SubCategoriesListProps> = ({ subCategories, is
             </div>
         )}
     </List>
-);
+)};
 
 export default SubCategoriesList;

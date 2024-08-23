@@ -5,24 +5,38 @@ import MenuTabs from './MenuTabs';
 import HeaderLogo from './HeaderLogo';
 import SubCategoriesList from './SubCategoriesList';
 import MenuDrawer from './MenuDrawer';
-
-const tabsData = [
-    { key: 'tab1', label: 'Tab 1', id: 1 },
-    { key: 'tab2', label: 'Tab 2', id: 2 },
-    { key: 'tab3', label: 'Tab 3', id: 3 },
-];
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../redux/store';
+import { setActiveCategoryTab, setCategories, setIsCategoriesLodaing, setIsSubCategoriesLoading, setSubCategories } from '../redux/categoriesSlice';
+import { useFetchSubCategories } from '../hooks/useFetchCategories';
 
 const Header: React.FC = () => {
+    const dispatch = useDispatch();
+
     const modalRef = useRef<HTMLDivElement | null>(null);
-    const [selectedTab, setSelectedTab] = useState<{ categoryId: number; categoryKey: string }>({ categoryId: -1, categoryKey: '' });
-    const [isSubCategoryLoading, setIsSubCategoryLoading] = useState(false);
-    const [subCategories, setSubCategories] = useState<{ id: number, name: string }[]>([]);
-    const [menuListOpen, setMenuListOpen] = useState(false);
-    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [menuListOpen, setMenuListOpen] = useState<boolean>(false);
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+
+    const { activeCategoryTab } = useSelector((state: RootState) => state.categories);
+
+    const { fetchSubCategories } = useFetchSubCategories();
+
+    useEffect(() => {
+        dispatch(setIsCategoriesLodaing(true));        
+        setTimeout(() => {            
+            const fetchedCategories = [
+                { key: 'tab1', label: 'Tab 1', id: 1 },
+                { key: 'tab2', label: 'Tab 2', id: 2 },
+                { key: 'tab3', label: 'Tab 3', id: 3 },
+            ];
+            dispatch(setCategories(fetchedCategories));
+            dispatch(setIsCategoriesLodaing(false));
+        }, 1000);
+    },[])
 
     const handleClickOutside = (event: MouseEvent) => {
         if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-            setSelectedTab({ categoryId: -1, categoryKey: '' });
+            dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: '' }));
             setMenuListOpen(false);
         }
     };
@@ -34,21 +48,9 @@ const Header: React.FC = () => {
         };
     }, []);
 
-    const fetchSubCategories = async (categoryId: number) => {
-        setIsSubCategoryLoading(true);        
-        setTimeout(() => {            
-            const fetchedSubCategories = [
-                { id: 1, name: `Subcategory 1 of Tab ${categoryId}` },
-                { id: 2, name: `Subcategory 2 of Tab ${categoryId}` },
-                { id: 3, name: `Subcategory 3 of Tab ${categoryId}` },
-            ];
-            setSubCategories(fetchedSubCategories);
-            setIsSubCategoryLoading(false);
-        }, 1000);
-    };
 
     const handleTabChange = (event: React.SyntheticEvent | any, categoryId: number | undefined) => {
-        setSelectedTab({ categoryId: categoryId || -1, categoryKey: event.currentTarget.id });
+        dispatch(setActiveCategoryTab({ categoryId: categoryId || -1, categoryKey: event.currentTarget.id }));
         fetchSubCategories(categoryId || -1);
         setMenuListOpen(true);
     };
@@ -64,29 +66,24 @@ const Header: React.FC = () => {
 
     const handleDrawerClose = () => {
         setDrawerOpen(false);
-        setSelectedTab({ categoryId: -1, categoryKey: '' });
+        dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: '' }));
         setMenuListOpen(false);
     };
 
     return (
-        <header className="fixed flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-10">
+        <header className="fixed flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30">
             <div className='flex items-center space-x-4'>
                 <div onClick={handleDrawerOpen} className='cursor-pointer'>
                     <MenuIcon />
                 </div>
-                <div className='xxs:hidden lg:flex flex-col relative' ref={modalRef}>
+                <div className='xxs:hidden lg:flex flex-col relative min-w-[30rem]' ref={modalRef}>
                     <div className={`absolute p-2 top-[-4rem] ${menuListOpen ? 'bg-white border border-[#646463] rounded-md' : ''}`}>
                         <HeaderLogo />
                         <MenuTabs
-                            tabs={tabsData}
-                            value={selectedTab}
-                            setValue={setSelectedTab}
                             onTabChange={handleTabChange}
                         />
-                        {selectedTab?.categoryId !== -1 && (
+                        {activeCategoryTab?.categoryId !== -1 && (
                             <SubCategoriesList
-                                subCategories={subCategories}
-                                isLoading={isSubCategoryLoading}
                                 onItemClick={navigateToProducts}
                             />
                         )}
@@ -99,12 +96,7 @@ const Header: React.FC = () => {
             <MenuDrawer
                 open={drawerOpen}
                 onClose={handleDrawerClose}
-                tabsData={tabsData}
-                selectedTab={selectedTab}
                 onTabChange={handleTabChange}
-                subCategories={subCategories}
-                isSubCategoryLoading={isSubCategoryLoading}
-                setSelectedTab={setSelectedTab}
             />
         </header>
     );
