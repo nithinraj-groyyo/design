@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import BasicLayout from '../../layouts/BasicLayout';
 import ProductFilter from './ProductFilter';
 import ProductGrid from './ProductGrid';
@@ -11,12 +11,14 @@ const ProductList: React.FC = () => {
   const [opacity, setOpacity] = useState(1);
   const [lastScrollTop, setLastScrollTop] = useState(0);
 
-  const dummyProducts: any = Array.from({ length: 20 }, (_, index) => ({
-    id: index,
-    image: `https://via.placeholder.com/200?text=Product+${index + 1}`,
-    name: `Product ${index + 1}`,
-    price: `$${(Math.random() * 100 + 1).toFixed(2)}`,
-  }));
+  const dummyProducts = useMemo(() => 
+    Array.from({ length: 20 }, (_, index) => ({
+      id: index,
+      image: `https://via.placeholder.com/200?text=Product+${index + 1}`,
+      name: `Product ${index + 1}`,
+      price: `$${(Math.random() * 100 + 1).toFixed(2)}`,
+    }))
+  , []);
 
   const handleFilterChange = (size: IProductView) => {
     setCurrentView(size);
