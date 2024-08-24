@@ -71,13 +71,11 @@ const Header: React.FC = () => {
 
     const handleDrawerOpen = () => {
         setDrawerOpen(true);
-        setMenuListOpen(false);
     }
 
     const handleDrawerClose = () => {
         setDrawerOpen(false);
         dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: '' }));
-        setMenuListOpen(false);
     };
 
     return (
@@ -106,7 +104,6 @@ const Header: React.FC = () => {
             <MenuDrawer
                 open={drawerOpen}
                 onClose={handleDrawerClose}
-                onTabChange={handleTabChange}
             />
         </header>
     );

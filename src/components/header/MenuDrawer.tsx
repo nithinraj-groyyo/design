@@ -1,81 +1,94 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Divider, Drawer, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
-import { setActiveCategoryTab } from '../../redux/categoriesSlice';
-import { useFetchSubCategories } from '../../hooks/useFetchCategories';
 import MenuTabs from './MenuTabs';
 import SubCategoriesList from './SubCategoriesList';
+import { useFetchSubCategories } from '../../hooks/useFetchCategories';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 interface MenuDrawerProps {
     open: boolean;
     onClose: () => void;
-    onTabChange: (event: React.SyntheticEvent, categoryId: number | undefined, categoryKey: string | undefined) => void;
-    
 }
 
-const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, onTabChange }) => {
+const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose }) => {
     const navigate = useNavigate();
-   
-    const handleMyAccounts = () => {
-        navigate('/login');
-        onClose()
-    }
 
-    const {categories, activeCategoryTab} = useSelector((state: RootState) => state.categories);
+    const { categories } = useSelector((state: RootState) => state.categories);
 
-    const dispatch = useDispatch();
+    const [activeCategoryTab, setActiveCategoryTab] = useState<{ categoryId: number; categoryKey: string } | null>(null);
 
     const { fetchSubCategories } = useFetchSubCategories();
 
     useEffect(() => {
-        dispatch(setActiveCategoryTab({ categoryId: categories[0]?.id || -1, categoryKey: categories[0]?.key }));
-        fetchSubCategories(categories[0]?.id )
-    }, []);
+        const fetchInitialData = async () => {
+            if (categories.length > 0) {
+                const firstCategory = categories[0];
+                setActiveCategoryTab({ categoryId: firstCategory.id, categoryKey: firstCategory.key });
+                fetchSubCategories(firstCategory.id);
+            }
+        };
+
+        fetchInitialData();
+    }, [categories, fetchSubCategories]);
+
+    const handleTabChange = (event: React.SyntheticEvent, categoryId: number | undefined, categoryKey: string | undefined) => {
+        if (categoryId && categoryKey) {
+            setActiveCategoryTab({ categoryId, categoryKey });
+            fetchSubCategories(categoryId);
+        }
+    };
+
+    const handleMyAccounts = () => {
+        navigate('/login');
+        onClose();
+    };
 
     const navigateShoppingBag = () => {
         navigate('/bag');
-        onClose()
-    }
-
-    const navigateToProducts = () => {
-        navigate(`/designs/${activeCategoryTab?.categoryKey}/${activeCategoryTab?.categoryId}`)
-        dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: '' }));
-        onClose()
+        onClose();
     };
 
-    return (<Drawer
-        anchor='left'
-        open={open}
-        onClose={onClose}
-        classes={{ paper: 'w-full h-full' }}
-        className='lg:hidden'
-    >
-        <div className="flex flex-col p-4">
-            <div className='flex justify-between'>
+    const navigateToProducts = () => {
+        if (activeCategoryTab) {
+            navigate(`/designs/${activeCategoryTab.categoryKey}/${activeCategoryTab.categoryId}`);
+            setActiveCategoryTab(null);
+            onClose();
+        }
+    };
 
-                <IconButton onClick={onClose} className='self-start'>
-                    <CloseIcon />
-                </IconButton>
-                <div className="lg:hidden flex gap-4 items-center" >
-                    <div className="cursor-pointer text-sm" onClick={handleMyAccounts}>MY ACCOUNT</div>
-                    <div className="cursor-pointer text-sm" onClick={navigateShoppingBag}>SHOPPING BAG (0)</div>
+    return (
+        <Drawer
+            anchor='left'
+            open={open}
+            onClose={onClose}
+            classes={{ paper: 'w-full h-full' }}
+            className='lg:hidden'
+        >
+            <div className="flex flex-col p-4">
+                <div className='flex justify-between'>
+                    <IconButton onClick={onClose} className='self-start'>
+                        <CloseIcon />
+                    </IconButton>
+                    <div className="lg:hidden flex gap-4 items-center">
+                        <div className="cursor-pointer text-sm" onClick={handleMyAccounts}>MY ACCOUNT</div>
+                        <div className="cursor-pointer text-sm" onClick={navigateShoppingBag}>SHOPPING BAG (0)</div>
+                    </div>
+                </div>
+                <div>
+                    <MenuTabs
+                        onTabChange={handleTabChange}
+                    />
+                    <Divider />
+                    <SubCategoriesList
+                        onItemClick={navigateToProducts}
+                    />
                 </div>
             </div>
-            <div>
-                <MenuTabs
-                    onTabChange={onTabChange}
-                />
-                <Divider/>
-                <SubCategoriesList
-                    onItemClick={navigateToProducts}
-                />
-            </div>
-        </div>
-    </Drawer>
-    )
+        </Drawer>
+    );
 };
 
 export default MenuDrawer;
