@@ -1,12 +1,13 @@
 
 import { Route, Routes } from 'react-router-dom'
 import Home from './pages/home'
-import BasicLayout from './layouts/BasicLayout'
+import ProductList from './pages/product_list'
 
 const App = () => {
   return (
     <Routes>
-        <Route index element={<Home />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/designs/:categoryKey/:categoryId" element={<ProductList />} />
     </Routes>
   )
 }

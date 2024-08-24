@@ -27,7 +27,7 @@ const categoriesSlice = createSlice({
     setSubCategories(state, action: PayloadAction<ISubcategory[]>) {
       state.subCategories = action.payload;
     },
-    setIsCategoriesLodaing(state, action: PayloadAction<boolean>) {
+    setIsCategoriesLoading(state, action: PayloadAction<boolean>) {
       state.isCategoriesLodaing = action.payload;
     },
     setIsSubCategoriesLoading(state, action: PayloadAction<boolean>) {
@@ -39,6 +39,6 @@ const categoriesSlice = createSlice({
   },
 });
 
-export const { setCategories, setSubCategories, setIsCategoriesLodaing, setIsSubCategoriesLoading, setActiveCategoryTab } = categoriesSlice.actions;
+export const { setCategories, setSubCategories, setIsCategoriesLoading, setIsSubCategoriesLoading, setActiveCategoryTab } = categoriesSlice.actions;
 
 export default categoriesSlice.reducer;
