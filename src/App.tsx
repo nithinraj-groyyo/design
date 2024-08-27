@@ -5,6 +5,8 @@ import ProductList from './pages/product_list'
 import ProductDetails from './pages/productDetails'
 import ShoppingBag from './pages/shoppingBag'
 import WishList from './pages/wishlist'
+import Login from './pages/login/login'
+import Signup from './pages/signup/signup'
 import { ContactUs } from './pages/contactUs'
 import AccountPage from './pages/account'
 import Address from './pages/account/Address'
@@ -19,6 +21,8 @@ const App = () => {
         <Route path='/product-details/:categoryKey/:productId' element={<ProductDetails />} />
         <Route path='/bag' element={<ShoppingBag />} />
         <Route path='/wishlist' element={<WishList />} />
+        <Route path='/login' element={<Login/>}/>
+        <Route path='/signup' element={<Signup/>}/>
         <Route path='/contact-us' element={<ContactUs />} />
         <Route path="/account" element={<AccountPage />}>
             <Route path="address" element={<Address />} />
