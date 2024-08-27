@@ -5,20 +5,48 @@ import ProductGrid from './ProductGrid';
 import { ProductViewEnum } from '../../utilities/enum';
 import { IProductView } from '../../types/products';
 import ProductLargeView from './ProductLargeView';
+import { getProductsResponse } from '../../api/categoriesApi';
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { setProductsFailure, setProductsLoading, setProductsSuccess } from '../../redux/productsSlice';
 
 const ProductList: React.FC = () => {
   const [currentView, setCurrentView] = useState(ProductViewEnum.LARGE);
   const [opacity, setOpacity] = useState(1);
   const [lastScrollTop, setLastScrollTop] = useState(0);
+  const { categoryKey } = useParams();
+  const { productData } = useSelector((state: RootState) => state.products);
+  const dispatch = useDispatch();
 
-  const dummyProducts = useMemo(() => 
-    Array.from({ length: 20 }, (_, index) => ({
-      id: index,
-      image: `https://via.placeholder.com/200?text=Product+${index + 1}`,
-      name: `Product ${index + 1}`,
-      price: `$${(Math.random() * 100 + 1).toFixed(2)}`,
-    }))
-  , []);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      let url = "";
+      const currentPage = 1
+      const pageSize = "10"
+      const sort = "new"
+      const season = "";
+
+      dispatch(setProductsLoading());
+      try {
+        const response = await getProductsResponse({url: `${categoryKey ?? "men"}/${currentPage}/${pageSize}/${sort}/${season}`});
+        dispatch(setProductsSuccess(response?.products));
+      } catch (error: any) {
+        console.error(error)
+        dispatch(setProductsFailure(error.message));
+      }
+    }
+    fetchProducts()
+  }, [dispatch])
+
+  // const dummyProducts = useMemo(() => 
+  //   Array.from({ length: 20 }, (_, index) => ({
+  //     id: index,
+  //     image: `https://via.placeholder.com/200?text=Product+${index + 1}`,
+  //     name: `Product ${index + 1}`,
+  //     price: `$${(Math.random() * 100 + 1).toFixed(2)}`,
+  //   }))
+  // , []);
 
   const handleFilterChange = (size: IProductView) => {
     setCurrentView(size);
@@ -75,7 +103,7 @@ const ProductList: React.FC = () => {
           </>
         ) : (
           <ProductGrid
-            products={dummyProducts}
+            products={productData?.products}
             currentView={currentView}
             onAddToWishlist={handleAddToWishlist}
           />

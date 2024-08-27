@@ -29,8 +29,8 @@ const Header: React.FC = () => {
                 const categoriesResponse = response?.map((category: any) => {
                     return {
                         id: category?.id,
-                        label: category?.name?.toLowerCase(),
-                        key: category?.name?.toUpperCase(),
+                        label: category?.name?.toUpperCase(),
+                        key: category?.name?.toLowerCase(),
                     }
                 })
                 dispatch(setCategories(categoriesResponse));

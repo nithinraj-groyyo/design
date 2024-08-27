@@ -30,17 +30,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, name, price, onAddToWi
   }
 
   return (
-    <Card className={className} onClick={navigateToProductDetails}>
+    <Card className={className}>
       <CardMedia
         component="img"
         image={image}
         alt={name}
         sx={{ objectFit: 'cover', aspectRatio: "0.64" }}
+        onClick={navigateToProductDetails}
       />
       {showDetails && (
         <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6" component="div">
+          <Box display="flex" justifyContent="space-between" alignItems="start">
+            <Typography component="div" className='uppercase font-light text-xs'>
               {name}
             </Typography>
             <IconButton aria-label="add to wishlist" onClick={handleWishlistClick}>
@@ -51,8 +52,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, name, price, onAddToWi
               )}
             </IconButton>
           </Box>
-          <Typography variant="body1" color="text.primary">
-            {price}
+          <Typography component="div" className='uppercase font-light text-xs'>
+            <span>&#8377;</span>
+            <span>{price}</span>
           </Typography>
         </CardContent>
       )}
