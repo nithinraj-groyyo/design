@@ -11,9 +11,10 @@ interface ProductCardProps {
   onAddToWishlist: () => void;
   showDetails?: boolean;
   className?: string;
+  productId: number;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ image, name, price, onAddToWishlist, showDetails = true, className }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ image, name, productId, price, onAddToWishlist, showDetails = true, className }) => {
   const [isFavorited, setIsFavorited] = useState(false);
 
   const {categoryKey} = useParams();
@@ -26,7 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, name, price, onAddToWi
   };
 
   const navigateToProductDetails = () => {
-    navigate(`/product-details/${categoryKey}/${name}`)
+    navigate(`/product-details/${categoryKey}/${productId}`)
   }
 
   return (
@@ -35,6 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, name, price, onAddToWi
         component="img"
         image={image}
         alt={name}
+        className='cursor-pointer'
         sx={{ objectFit: 'cover', aspectRatio: "0.64" }}
         onClick={navigateToProductDetails}
       />

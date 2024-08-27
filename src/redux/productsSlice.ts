@@ -7,11 +7,21 @@ interface ProductsState {
         loading: boolean;
         error: string | null;
     };
+    singleProductData: {
+        product: IProductResponse | null;
+        loading: boolean;
+        error: string | null;
+    };
 }
 
 const initialState: ProductsState = {
     productData: {
         products: [],
+        loading: false,
+        error: null,
+    },
+    singleProductData: {
+        product: null,
         loading: false,
         error: null,
     },
@@ -31,10 +41,34 @@ const productsSlice = createSlice({
         setProductsFailure(state, action: PayloadAction<string>) {
             state.productData.loading = false;
             state.productData.error = action.payload;
+        },
+        setSingleProductLoading(state) {
+            state.singleProductData.loading = true;
+        },
+        setSingleProductSuccess(state, action: PayloadAction<IProductResponse>) {
+            state.singleProductData.loading = false;
+            state.singleProductData.product = action.payload;
+        },
+        setSingleProductFailure(state, action: PayloadAction<string>) {
+            state.singleProductData.loading = false;
+            state.singleProductData.error = action.payload;
+        },
+        clearSingleProduct(state) {
+            state.singleProductData.product = null;
+            state.singleProductData.error = null;
+            state.singleProductData.loading = false;
         }
     }
 });
 
-export const { setProductsLoading, setProductsSuccess, setProductsFailure } = productsSlice.actions;
+export const {
+    setProductsLoading,
+    setProductsSuccess,
+    setProductsFailure,
+    setSingleProductLoading,
+    setSingleProductSuccess,
+    setSingleProductFailure,
+    clearSingleProduct
+} = productsSlice.actions;
 
 export default productsSlice.reducer;

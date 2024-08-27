@@ -1,52 +1,23 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BasicLayout from '../../layouts/BasicLayout';
 import ProductFilter from './ProductFilter';
 import ProductGrid from './ProductGrid';
 import { ProductViewEnum } from '../../utilities/enum';
 import { IProductView } from '../../types/products';
 import ProductLargeView from './ProductLargeView';
-import { getProductsResponse } from '../../api/categoriesApi';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { setProductsFailure, setProductsLoading, setProductsSuccess } from '../../redux/productsSlice';
+import useFetchProducts from '../../hooks/useFetchProducts';
 
 const ProductList: React.FC = () => {
+  const { categoryKey } = useParams<{ categoryKey: string }>();
   const [currentView, setCurrentView] = useState(ProductViewEnum.LARGE);
   const [opacity, setOpacity] = useState(1);
   const [lastScrollTop, setLastScrollTop] = useState(0);
-  const { categoryKey } = useParams();
   const { productData } = useSelector((state: RootState) => state.products);
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      let url = "";
-      const currentPage = 1
-      const pageSize = "10"
-      const sort = "new"
-      const season = "";
-
-      dispatch(setProductsLoading());
-      try {
-        const response = await getProductsResponse({url: `${categoryKey ?? "men"}/${currentPage}/${pageSize}/${sort}/${season}`});
-        dispatch(setProductsSuccess(response?.products));
-      } catch (error: any) {
-        console.error(error)
-        dispatch(setProductsFailure(error.message));
-      }
-    }
-    fetchProducts()
-  }, [dispatch])
-
-  // const dummyProducts = useMemo(() => 
-  //   Array.from({ length: 20 }, (_, index) => ({
-  //     id: index,
-  //     image: `https://via.placeholder.com/200?text=Product+${index + 1}`,
-  //     name: `Product ${index + 1}`,
-  //     price: `$${(Math.random() * 100 + 1).toFixed(2)}`,
-  //   }))
-  // , []);
+  useFetchProducts(categoryKey);
 
   const handleFilterChange = (size: IProductView) => {
     setCurrentView(size);
@@ -92,15 +63,13 @@ const ProductList: React.FC = () => {
 
   return (
     <BasicLayout>
-      <div className='mt-[10rem] fixed w-full' style={{opacity}}>
+      <div className='mt-[10rem] fixed w-full' style={{ opacity }}>
         <ProductFilter currentView={currentView} onFilterChange={handleFilterChange} />
       </div>
 
       <div className='mt-[12rem]'>
         {currentView === ProductViewEnum.LARGE ? (
-          <>
-            <ProductLargeView />
-          </>
+          <ProductLargeView />
         ) : (
           <ProductGrid
             products={productData?.products}

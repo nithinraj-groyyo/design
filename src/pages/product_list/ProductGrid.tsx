@@ -2,6 +2,7 @@ import React from 'react';
 import ProductCard from './ProductCard';
 import { ProductViewEnum } from '../../utilities/enum';
 import { IProductResponse, IProductView } from '../../types/products';
+import { getImagesFromUrl } from '../../utilities/helper';
 
 interface ProductGridProps {
   products: IProductResponse[];
@@ -16,7 +17,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, currentView, onAddT
         return (
           <ProductCard
             key={product.id}
-            image={process.env.REACT_APP_API_URL+"/"+product?.CoverImageLink}
+            productId={product.id}
+            image={getImagesFromUrl(product?.CoverImageLink)}
             name={product.name}
             price={product.price}
             showDetails={currentView !== ProductViewEnum.SMALL}

@@ -33,12 +33,3 @@ export const submitContactForm = async (formData: any) => {
     }
 }
 
-export const getProductsResponse = async ({url}:{url: string}): Promise<any> => {
-    try {
-        const response: AxiosResponse<any> = await axiosInstance.get(`/product/fetchProducts/${url}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        throw error;
-    }
-};

@@ -12,6 +12,7 @@ import AccountPage from './pages/account'
 import Address from './pages/account/Address'
 import Orders from './pages/account/Orders'
 import Profile from './pages/account/Profile'
+import NotFoundPage from './pages/NotFoundPage'
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
             <Route path="orders" element={<Orders />} />
             <Route path="profile" element={<Profile />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }
