@@ -1,9 +1,11 @@
-import React from 'react';
-import { Link, useLocation } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { SignInIcon } from '../../assets/svg/home/SignInIcon';
 import { WishlistIcon } from '../../assets/svg/home/WishlistIcon';
 import { ShoppingBagIcon } from '../../assets/svg/home/ShoppingBagIcon';
 import useAuth from '../../hooks/useAuth';
+import { IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 
 interface IconButtonConfig {
     icon: React.ReactNode;
@@ -50,7 +52,23 @@ const IconsButton: React.FC<IconsButtonProps> = ({ icon, label, onMouseEnter, on
 const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handleMouseEnterButton }) => {
     const isAuthenticated = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
 
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+
+    const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleMenuNavigation = (path: string) => {
+        navigate(`/account/${path}`);
+        handleMenuClose();
+    };
 
     const filteredIconButtons = isAuthenticated
         ? iconButtons.filter(button => button.id !== 'login').filter(button => location.pathname !== "/bag" || button.id !== "bag")
@@ -68,6 +86,33 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
                     />
                 </Link>
             ))}
+
+            <div className='flex flex-col items-center justify-between my-auto whitespace-nowrap'>
+                <IconButton
+                    className='!w-9 !h-9'
+                    onClick={handleMenuClick}
+                >
+                    <PersonIcon fontSize="large" />
+                </IconButton>
+                <Typography>accounts</Typography>
+                <Menu
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                >
+                    <MenuItem onClick={() => handleMenuNavigation("profile")}>Account Settings</MenuItem>
+                    <MenuItem onClick={() => handleMenuNavigation("orders")}>Orders</MenuItem>
+                    <MenuItem onClick={() => handleMenuNavigation("address")}>Address</MenuItem>
+                </Menu>
+            </div>
         </div>
     );
 };
