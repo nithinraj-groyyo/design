@@ -5,6 +5,7 @@ import ProductList from './pages/product_list'
 import ProductDetails from './pages/productDetails'
 import ShoppingBag from './pages/shoppingBag'
 import WishList from './pages/wishlist'
+import { ContactUs } from './pages/contactUs'
 
 const App = () => {
   return (
@@ -14,6 +15,7 @@ const App = () => {
         <Route path='/product-details/:categoryKey/:productId' element={<ProductDetails />} />
         <Route path='/bag' element={<ShoppingBag />} />
         <Route path='/wishlist' element={<WishList />} />
+        <Route path='/contact-us' element={<ContactUs />} />
     </Routes>
   )
 }

@@ -21,3 +21,13 @@ export const getSubCategoriesResponse = async ({ categoryId }:{categoryId: numbe
         throw error;
     }
 };
+
+export const submitContactForm = async (formData: any) => {
+    try {
+        const response = await axiosInstance.post('/users/submitUserQuery', formData);
+        return response?.data;
+    } catch (error) {
+        console.error('Error submitting Contact Form:', error);
+        throw error;
+    }
+}
