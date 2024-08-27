@@ -15,7 +15,7 @@ const ShoppingBag = () => {
                         <div className="text-[1rem] font-medium text-[#000000] tracking-wider">SHOPPING BAG </div>
                         <div className="border-b-1 border-[#E6E6E6]">
                             <div className="flex items-start gap-4">
-                                <img src={"/images/products/pic1.png"} className="w-[6.25rem] h-[10rem]" alt="image" />
+                                <img src={"/images/products/pic1.png"} className="w-[6.25rem] h-[10rem]" alt="image1" />
                                 <div className="">
                                     <p className="text-[#000000] text-sm font-light uppercase">Black Cutwork Embroidery Dress</p>
                                     <p className="text-[#000000] text-sm font-light"><span>&#8377; </span>599</p>
