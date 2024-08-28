@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import BasicLayout from '../../layouts/BasicLayout';
 import ProductInfo from './ProductInfo';
 import ProductDescription from './ProductDescription';
@@ -8,57 +8,27 @@ import AddToBagButton from './AddToBagButton';
 import ImageSlider from './ImageSlider';
 import { Typography } from '@mui/material';
 import ProductCard from '../product_list/ProductCard';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getProductByIdResponse } from '../../api/productsApi';
-import { setSingleProductFailure, setSingleProductLoading, setSingleProductSuccess } from '../../redux/productsSlice';
+import { useParams } from 'react-router-dom';
 import useFetchProducts from '../../hooks/useFetchProducts';
-import { getImagesFromUrl } from '../../utilities/helper';
+import useFetchProductById from '../../hooks/useFetchProductById';
 
 const ProductDetails = () => {   
     const { productId, categoryKey } = useParams<{ productId: string, categoryKey: string }>();
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
+
     const [expanded, setExpanded] = useState(false);
 
-    const {products} = useSelector((state: RootState) => state.products.productData)
+    const { products } = useSelector((state: RootState) => state.products.productData);
+    const { product } = useSelector((state: RootState) => state.products.singleProductData);
 
-    useFetchProducts(categoryKey);
 
-    useEffect(() => {
-        if (!productId) {
-            navigate('/404', {state : {message: "Product Not Available"}});
-            return;
-        }
+    useFetchProducts({categoryKey});
 
-        const fetchProductById = async () => {
-            dispatch(setSingleProductLoading());
-            try {
-                const response = await getProductByIdResponse({ productId: +productId });
-                if (response) {
-                    dispatch(setSingleProductSuccess(response));
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                } 
-            } catch (error: any) {
-                dispatch(setSingleProductFailure(error?.message));
-                console.error(error?.message);
-                navigate('/404'); 
-            }
-        };
-
-        fetchProductById();
-    }, [productId, dispatch, navigate]);
+    useFetchProductById({ productId: Number(productId) });
 
     const handleToggle = () => {
         setExpanded(!expanded);
-    };
-
-    const handleAddToWishlist = (id: number) => {
-        console.log(`Added Product ${id} to wishlist`);
     };
 
     return (
@@ -71,7 +41,7 @@ const ProductDetails = () => {
                     <ImageSlider />
                 </div>
                 <div className="flex flex-col justify-between items-start border border-black p-4 mx-24">
-                    <ProductInfo />
+                    {product && <ProductInfo product={product} />}
                     <ProductPricing />
                     <ProductSizeSelector />
                     <AddToBagButton />
@@ -80,17 +50,15 @@ const ProductDetails = () => {
             <div className='flex flex-col gap-4 my-[10rem]'>
                 <Typography className='text-[#2D2D2A] text-sm tracking-widest px-4'>YOU MAY ALSO LIKE</Typography>
                 <div className='grid grid-cols-6'>
-                    {products?.slice(0, 6).map((product) => (
+                    {products?.slice(0, 6).map((product) => {
+                        
+                        return (
                         <ProductCard
-                            key={product.id}
-                            productId={product.id}
-                            image={getImagesFromUrl(product?.CoverImageLink)}
-                            name={product.name}
-                            price={product.price}
+                            key={product?.id}
                             className='border border-black !rounded-none'
-                            onAddToWishlist={() => handleAddToWishlist(product.id)}
+                            product={product}
                         />
-                    ))}
+                    )})}
                 </div>
             </div>
         </BasicLayout>

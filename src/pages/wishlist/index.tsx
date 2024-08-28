@@ -1,44 +1,66 @@
-import React, { useMemo } from 'react'
-import BasicLayout from '../../layouts/BasicLayout'
-import ProductCard from '../product_list/ProductCard'
+import React, { useState, useEffect, useMemo } from 'react';
+import BasicLayout from '../../layouts/BasicLayout';
+import ProductCard from '../product_list/ProductCard';
+import { fetchWishlistResponse } from '../../api/productsApi';
+import { IWishlistItem, IWishlistResponse } from '../../types/products';
+import { getImagesFromUrl } from '../../utilities/helper';
 
 const WishList = () => {
-    const products = useMemo(() =>
-        Array.from({ length: 20 }, (_, index) => ({
-            id: index,
-            image: `https://via.placeholder.com/200?text=Product+${index + 1}`,
-            name: `Product ${index + 1}`,
-            price: `$${(Math.random() * 100 + 1).toFixed(2)}`,
-        }))
-        , []);
+    const [wishlistItems, setWishlistItems] = useState<IWishlistItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        const fetchWishlist = async () => {
+            try {
+                const response: IWishlistResponse = await fetchWishlistResponse();
+                setWishlistItems(response.wishlist);
+            } catch (error: any) {
+                setError(error?.message || 'Failed to fetch wishlist');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const handleAddToWishlist = (id: number) => {
-        console.log(`Added Product ${id} to wishlist`);
+        fetchWishlist();
+    }, []);
+
+    const handleRemoveFromWishlist = (productId: number) => {
+        setWishlistItems(prevItems => prevItems.filter(item => item.Product.id !== productId));
     };
+
+    const products = useMemo(() => 
+        wishlistItems.map(item => ({
+            id: item?.Product?.id,
+            image: item?.Product?.CoverImageLink,
+            name: item?.Product?.name,
+            price: item?.Product?.price,
+        })),
+        [wishlistItems]
+    );
 
     return (
         <BasicLayout>
             <section className='xxs:mt-[5rem] lg:mt-[10rem]'>
                 <div className='m-[4rem]'>
                     <div className='text-3xl font-medium my-[1rem]'>WISHLIST</div>
+                    {loading && <p>Loading...</p>}
+                    {error && <p className="text-red-500">{error}</p>}
                     <div className='grid xss:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 justify-center xxs:gap-4 '>
-                        {products.slice(0, 6).map((product: any) => (
+                        {products?.map((product) => (
                             <ProductCard
                                 key={product.id}
-                                productId={product.id}
-                                image={product.image}
-                                name={product.name}
-                                price={product.price}
                                 className='border border-black !rounded-none'
-                                onAddToWishlist={() => handleAddToWishlist(product.id)}
+                                isAlreadyInWishlist={true}
+                                product={product}
+                                onRemoveFromWishlist={handleRemoveFromWishlist}
                             />
                         ))}
                     </div>
                 </div>
             </section>
         </BasicLayout>
-    )
-}
+    );
+};
 
-export default WishList
+export default WishList;

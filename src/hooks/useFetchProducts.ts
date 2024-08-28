@@ -3,11 +3,15 @@ import { useDispatch } from 'react-redux';
 import { setProductsLoading, setProductsSuccess, setProductsFailure } from '../redux/productsSlice';
 import { getProductsResponse } from '../api/productsApi';
 
-const useFetchProducts = (categoryKey: string | undefined) => {
+interface FetchProductsOptions {
+  categoryKey?: string;
+}
+
+const useFetchProducts = ({ categoryKey }: FetchProductsOptions) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!categoryKey) return; 
+    if (!categoryKey) return;
 
     const fetchProducts = async () => {
       const currentPage = 1;
@@ -29,7 +33,7 @@ const useFetchProducts = (categoryKey: string | undefined) => {
     };
 
     fetchProducts();
-  }, [categoryKey, dispatch]);
+  }, [categoryKey, dispatch,]);
 };
 
 export default useFetchProducts;

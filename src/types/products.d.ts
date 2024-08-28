@@ -39,7 +39,12 @@ export interface IProductCategory {
     modifiedBy: string | null;
 }
 
-
+export interface IProductColours {
+    id: number,
+    ProductId: number,
+    Color: string,
+    isAvailable: boolean
+}
 export interface IProductResponse {
     id: number;
     categoryId: number;
@@ -61,8 +66,21 @@ export interface IProductResponse {
     modifiedDate: string;
     modifiedBy: string;
     ProductImages: IProductImage[];
+    ProductColours: IProductColours[]
     productSizes: IProductSize[];
     ProductPricings: IProductPricing[];
     WishLists: any[];  
     Category: IProductCategory;
+}
+
+export interface IWishlistItem {
+    id: number;
+    userId: number;
+    productId: number;
+    createdDate: string;
+    Product: IProductResponse;
+}
+
+export interface IWishlistResponse {
+    wishlist: IWishlistItem[];
 }

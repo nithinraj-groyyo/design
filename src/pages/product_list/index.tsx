@@ -17,14 +17,10 @@ const ProductList: React.FC = () => {
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const { productData } = useSelector((state: RootState) => state.products);
 
-  useFetchProducts(categoryKey);
+  useFetchProducts({categoryKey});
 
   const handleFilterChange = (size: IProductView) => {
     setCurrentView(size);
-  };
-
-  const handleAddToWishlist = (id: number) => {
-    console.log(`Added Product ${id} to wishlist`);
   };
 
   useEffect(() => {
@@ -74,7 +70,6 @@ const ProductList: React.FC = () => {
           <ProductGrid
             products={productData?.products}
             currentView={currentView}
-            onAddToWishlist={handleAddToWishlist}
           />
         )}
       </div>

@@ -7,23 +7,18 @@ import { getImagesFromUrl } from '../../utilities/helper';
 interface ProductGridProps {
   products: IProductResponse[];
   currentView: IProductView;
-  onAddToWishlist: (id: number) => void;
 }
 
-const ProductGrid: React.FC<ProductGridProps> = ({ products, currentView, onAddToWishlist }) => {
+const ProductGrid: React.FC<ProductGridProps> = ({ products, currentView }) => {
   return (
     <div className={`grid gap-0 p-4 ${currentView === ProductViewEnum.SMALL ? 'xxs:grid-cols-4 lg:grid-cols-12' : 'xxs:grid-cols-2 md:grid-cols-3 lg:grid-cols-6'}`}>
       {products.map((product: any) => {
         return (
           <ProductCard
             key={product.id}
-            productId={product.id}
-            image={getImagesFromUrl(product?.CoverImageLink)}
-            name={product.name}
-            price={product.price}
             showDetails={currentView !== ProductViewEnum.SMALL}
             className='border border-black !rounded-none'
-            onAddToWishlist={() => onAddToWishlist(product.id)}
+            product={product}
           />
         )
       })}

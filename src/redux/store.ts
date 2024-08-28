@@ -3,11 +3,17 @@ import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import categoriesSlice from "./categoriesSlice";
 import productsSlice from "./productsSlice";
+import productSizeSlice from "./productSizeSlice";
+import cartSlice from "./cartSlice";
+import shoppingBagSlice from "./shoppingBagSlice";
 
 export const store = configureStore({
   reducer: {
     categories: categoriesSlice,
-    products: productsSlice
+    products: productsSlice,
+    productSize: productSizeSlice,
+    cart: cartSlice,
+    shoppingBag: shoppingBagSlice
   },
 });
 

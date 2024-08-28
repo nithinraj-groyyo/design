@@ -18,7 +18,6 @@ const ShoppingBagMobileView: React.FC = () => {
     const handleTabClick = (tab: Tab) => {
         setActiveTab(tab);
     };
-    console.log(activeTab)
 
     const items: Item[] = [
         { imageSrc: "/images/products/pic1.png", title: 'Black Cutwork Embroidery Dress', price: 599, quantity: '1 ( XS )' },
