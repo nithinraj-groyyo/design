@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useState } from 'react';
 import BasicLayout from '../../layouts/BasicLayout';
 import ProductInfo from './ProductInfo';
 import ProductDescription from './ProductDescription';
@@ -8,27 +8,28 @@ import AddToBagButton from './AddToBagButton';
 import ImageSlider from './ImageSlider';
 import { Typography } from '@mui/material';
 import ProductCard from '../product_list/ProductCard';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { useParams } from 'react-router-dom';
+import useFetchProducts from '../../hooks/useFetchProducts';
+import useFetchProductById from '../../hooks/useFetchProductById';
 
-
-const ProductDetails = () => {
-    const products = useMemo(() => 
-        Array.from({ length: 20 }, (_, index) => ({
-          id: index,
-          image: `https://via.placeholder.com/200?text=Product+${index + 1}`,
-          name: `Product ${index + 1}`,
-          price: `$${(Math.random() * 100 + 1).toFixed(2)}`,
-        }))
-      , []);
+const ProductDetails = () => {   
+    const { productId, categoryKey } = useParams<{ productId: string, categoryKey: string }>();
 
     const [expanded, setExpanded] = useState(false);
+
+    const { products } = useSelector((state: RootState) => state.products.productData);
+    const { product } = useSelector((state: RootState) => state.products.singleProductData);
+
+
+    useFetchProducts({categoryKey});
+
+    useFetchProductById({ productId: Number(productId) });
 
     const handleToggle = () => {
         setExpanded(!expanded);
     };
-
-    const handleAddToWishlist = (id: number) => {
-        console.log(`Added Product ${id} to wishlist`);
-      };
 
     return (
         <BasicLayout>
@@ -40,7 +41,7 @@ const ProductDetails = () => {
                     <ImageSlider />
                 </div>
                 <div className="flex flex-col justify-between items-start border border-black p-4 mx-24">
-                    <ProductInfo />
+                    {product && <ProductInfo product={product} />}
                     <ProductPricing />
                     <ProductSizeSelector />
                     <AddToBagButton />
@@ -49,16 +50,15 @@ const ProductDetails = () => {
             <div className='flex flex-col gap-4 my-[10rem]'>
                 <Typography className='text-[#2D2D2A] text-sm tracking-widest px-4'>YOU MAY ALSO LIKE</Typography>
                 <div className='grid grid-cols-6'>
-                    {products.slice(0, 6).map((product: any) => (
+                    {products?.slice(0, 6).map((product) => {
+                        
+                        return (
                         <ProductCard
-                            key={product.id}
-                            image={product.image}
-                            name={product.name}
-                            price={product.price}
+                            key={product?.id}
                             className='border border-black !rounded-none'
-                            onAddToWishlist={() => handleAddToWishlist(product.id)}
+                            product={product}
                         />
-                    ))}
+                    )})}
                 </div>
             </div>
         </BasicLayout>

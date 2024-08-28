@@ -15,6 +15,7 @@ import Profile from './pages/account/Profile'
 import ChangePassword from './pages/account/ChangePassword'
 import AddAddress from './pages/account/AddAddress'
 import EditProfile from './pages/account/EditProfile'
+import NotFoundPage from './pages/NotFoundPage'
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
             </Route>
             <Route path="changePassword" element={<ChangePassword />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }

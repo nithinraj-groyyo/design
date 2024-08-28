@@ -1,43 +1,74 @@
-import React, { useMemo } from 'react'
-import BasicLayout from '../../layouts/BasicLayout'
-import ProductCard from '../product_list/ProductCard'
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import BasicLayout from '../../layouts/BasicLayout';
+import ProductCard from '../product_list/ProductCard';
+import { fetchWishlistResponse } from '../../api/productsApi';
+import { RootState } from '../../redux/store';
+import { setWishlistItems, removeWishlistItem, setLoading, setError } from '../../redux/wishlistSlice';
+import useWindowWidth from '../../hooks/useWindowWidth';
+import { IconButton } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const WishList = () => {
-    const products = useMemo(() =>
-        Array.from({ length: 20 }, (_, index) => ({
-            id: index,
-            image: `https://via.placeholder.com/200?text=Product+${index + 1}`,
-            name: `Product ${index + 1}`,
-            price: `$${(Math.random() * 100 + 1).toFixed(2)}`,
-        }))
-        , []);
+    const dispatch = useDispatch();
+    const { items: wishlistItems, loading, error } = useSelector((state: RootState) => state.wishlist);
 
+    const navigate = useNavigate();
 
-    const handleAddToWishlist = (id: number) => {
-        console.log(`Added Product ${id} to wishlist`);
+    const { isMobileView } = useWindowWidth();
+
+    useEffect(() => {
+        const fetchWishlist = async () => {
+            dispatch(setLoading(true));
+            try {
+                const response = await fetchWishlistResponse();
+                dispatch(setWishlistItems(response.wishlist));
+            } catch (error: any) {
+                dispatch(setError(error?.message || 'Failed to fetch wishlist'));
+            } finally {
+                dispatch(setLoading(false));
+            }
+        };
+
+        fetchWishlist();
+    }, [dispatch]);
+
+    const handleRemoveFromWishlist = (productId: number) => {
+        dispatch(removeWishlistItem(productId));
     };
 
     return (
-        <BasicLayout>
-            <section className='xxs:mt-[5rem] lg:mt-[10rem]'>
-                <div className='m-[4rem]'>
-                    <div className='text-3xl font-medium my-[1rem]'>WISHLIST</div>
+        <BasicLayout showHeader={!isMobileView}>
+            <section className='xxs:mt-[0rem] lg:mt-[10rem]'>
+                <div className='m-0 lg:m-[4rem]'>
+                    <div className='flex gap-4'>
+                        <IconButton className='!text-3xl !font-bold' onClick={() => {
+                            navigate("/")
+                        }}>
+                            <ArrowBackIcon />
+                        </IconButton>
+                        <div className='text-3xl font-medium my-[1rem]'>
+                            WISHLIST
+                        </div>
+                    </div>
+                    {loading && <p>Loading...</p>}
+                    {error && <p className="text-red-500">{error}</p>}
                     <div className='grid xss:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 justify-center xxs:gap-4 '>
-                        {products.slice(0, 6).map((product: any) => (
+                        {wishlistItems?.map((item) => (
                             <ProductCard
-                                key={product.id}
-                                image={product.image}
-                                name={product.name}
-                                price={product.price}
+                                key={item.Product.id}
                                 className='border border-black !rounded-none'
-                                onAddToWishlist={() => handleAddToWishlist(product.id)}
+                                isAlreadyInWishlist={true}
+                                product={item.Product}
+                                onRemoveFromWishlist={handleRemoveFromWishlist}
                             />
                         ))}
                     </div>
                 </div>
             </section>
         </BasicLayout>
-    )
-}
+    );
+};
 
-export default WishList
+export default WishList;

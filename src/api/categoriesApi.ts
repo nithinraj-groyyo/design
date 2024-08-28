@@ -1,9 +1,10 @@
-import { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import axiosInstance from "./axiosConfig";
 
+const localUrl = "http://localhost:3002"
 export const getCategoriesResponse = async (): Promise<any> => {
     try {
-        const response: AxiosResponse<any> = await axiosInstance.get('/product/getCategories/');
+        const response: AxiosResponse<any> = await axios.get(localUrl+'/product/getCategories/');
         return response.data;
     } catch (error) {
         console.error('Error fetching categories:', error);
@@ -14,7 +15,7 @@ export const getCategoriesResponse = async (): Promise<any> => {
 
 export const getSubCategoriesResponse = async ({ categoryId }:{categoryId: number}): Promise<any> => {
     try {
-        const response: AxiosResponse<any> = await axiosInstance.get(`/product/getSubCategories/${categoryId}`);
+        const response: AxiosResponse<any> = await axios.get(localUrl+`/product/getSubCategories/${categoryId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching categories:', error);
@@ -31,3 +32,4 @@ export const submitContactForm = async (formData: any) => {
         throw error;
     }
 }
+

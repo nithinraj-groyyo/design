@@ -1,8 +1,8 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
-// const url = process.env.REACT_APP_API_URL;
-const url =  "http://localhost:3002";
+const url = process.env.REACT_APP_API_URL;
+// const url =  "http://localhost:3002";
 
 const axiosInstance = axios.create({
     baseURL: url,

@@ -1,61 +1,94 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardMedia, IconButton, Typography, Box } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardMedia, IconButton, Typography, Box, Button } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useNavigate, useParams } from 'react-router-dom';
+import { updateWishlistResponse } from '../../api/productsApi';
+import { getImagesFromUrl } from '../../utilities/helper';
+import useFetchProducts from '../../hooks/useFetchProducts';
+import { useDispatch } from 'react-redux';
+import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';
+import { toast } from 'react-toastify';
 
 interface ProductCardProps {
-  image: string;
-  name: string;
-  price: string;
-  onAddToWishlist: () => void;
   showDetails?: boolean;
   className?: string;
+  isAlreadyInWishlist?: boolean;
+  product: any;
+  onRemoveFromWishlist?: (productId: number) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ image, name, price, onAddToWishlist, showDetails = true, className }) => {
-  const [isFavorited, setIsFavorited] = useState(false);
-
-  const {categoryKey} = useParams();
-
+const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className, isAlreadyInWishlist = false, product, onRemoveFromWishlist }) => {
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const userId = JSON.parse(localStorage.getItem('userId') as string);
+  const { categoryKey } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleWishlistClick = () => {
-    setIsFavorited(!isFavorited);
-    onAddToWishlist();
-  };
+  useEffect(() => {
+    setIsInWishlist(product?.WishLists?.length > 0 ? product?.WishLists[0]?.productId === product?.id : false)
+  },[isInWishlist, product])
 
   const navigateToProductDetails = () => {
-    navigate(`/product-details/${categoryKey}/${name}`)
-  }
+    navigate(`/product-details/${categoryKey}/${product?.id}`);
+  };
 
+  const handleWishlistToggle = async () => {
+    try {
+      const add = !isInWishlist;
+      const response = await updateWishlistResponse({ add, productId: product?.id, userId });
+      if (response) {
+        setIsInWishlist(add);
+        dispatch(updateSingleProductWishlist({isInWishlist: add,  productId: product?.id}))
+        dispatch(updateProductWishlist({isInWishlist: add, productId: product?.id}));
+      }
+    } catch (error: any) {
+      console.error('Error updating wishlist:', error?.message);
+    }
+  };
+
+  const handleRemoveFromWishlist = async () => {
+    try {
+      const response = await updateWishlistResponse({ add: false, productId: product.id, userId });
+      if(response){
+        toast.success("Removed from WishList")
+        if (onRemoveFromWishlist) {
+          onRemoveFromWishlist(product.id);
+        }
+      }
+    } catch (error: any) {
+      toast.error(error?.message ?? "Unable to remove from Wishlist")
+    }
+  }
   return (
-    <Card className={className} onClick={navigateToProductDetails}>
+    <Card className={className}>
       <CardMedia
         component="img"
-        image={image}
-        alt={name}
-        sx={{ objectFit: 'cover', aspectRatio: "0.64" }}
+        image={getImagesFromUrl(product?.CoverImageLink ?? product?.image)}
+        alt={product?.name}
+        className="cursor-pointer"
+        sx={{ objectFit: 'cover', aspectRatio: '0.64' }}
+        onClick={navigateToProductDetails}
       />
       {showDetails && (
         <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6" component="div">
-              {name}
+          <Box display="flex" justifyContent="space-between" alignItems="start">
+            <Typography component="div" className="uppercase font-light text-xs">
+              {product?.name}
             </Typography>
-            <IconButton aria-label="add to wishlist" onClick={handleWishlistClick}>
-              {isFavorited ? (
-                <FavoriteIcon sx={{ color: 'red' }} />
-              ) : (
-                <FavoriteBorderIcon />
-              )}
-            </IconButton>
+            {!isAlreadyInWishlist && (
+              <IconButton aria-label="add to wishlist" onClick={handleWishlistToggle}>
+                {isInWishlist ? <FavoriteIcon sx={{ color: 'red' }} /> : <FavoriteBorderIcon />}
+              </IconButton>
+            )}
           </Box>
-          <Typography variant="body1" color="text.primary">
-            {price}
+          <Typography component="div" className="uppercase font-light text-xs">
+            <span>&#8377;</span>
+            <span>{product?.price}</span>
           </Typography>
         </CardContent>
       )}
+      {isAlreadyInWishlist &&<Button className='!bg-black !text-white uppercase !p-2 cursor-pointer !rounded-none' fullWidth onClick={handleRemoveFromWishlist}>Remove</Button>}
     </Card>
   );
 };
