@@ -12,6 +12,9 @@ import AccountPage from './pages/account'
 import Address from './pages/account/Address'
 import Orders from './pages/account/Orders'
 import Profile from './pages/account/Profile'
+import ChangePassword from './pages/account/ChangePassword'
+import AddAddress from './pages/account/AddAddress'
+import EditProfile from './pages/account/EditProfile'
 import NotFoundPage from './pages/NotFoundPage'
 
 const App = () => {
@@ -26,9 +29,14 @@ const App = () => {
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/contact-us' element={<ContactUs />} />
         <Route path="/account" element={<AccountPage />}>
-            <Route path="address" element={<Address />} />
+            <Route path="address" element={<Address />} >
+                <Route path="add" element={<AddAddress />} />
+            </Route>
             <Route path="orders" element={<Orders />} />
-            <Route path="profile" element={<Profile />} />
+            <Route path="profile" element={<Profile />}>
+              <Route path="edit" element={<EditProfile />} />
+            </Route>
+            <Route path="changePassword" element={<ChangePassword />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
     </Routes>
