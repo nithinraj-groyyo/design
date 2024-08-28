@@ -7,12 +7,15 @@ import { getImagesFromUrl } from '../../utilities/helper';
 import ShoppingBagEmptyIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { useNavigate } from 'react-router-dom';
 import useFetchUserOrders from '../../hooks/useFetchUsersOrders';
+import useWindowWidth from '../../hooks/useWindowWidth';
 
 const ShoppingBag = () => {
     const userId = JSON.parse(localStorage.getItem("userId") as string);
     const { cart } = useSelector((state: RootState) => state.shoppingBag);
 
     const navigate = useNavigate();
+
+    const {isMobileView } = useWindowWidth();
 
     const handleCheckout = () => {
         console.log("Checkout");
@@ -36,7 +39,7 @@ const ShoppingBag = () => {
     );
 
     return (
-        <BasicLayout>
+        <BasicLayout showHeader={!isMobileView}>
             <section className="xxs:hidden lg:block cart-section mt-[12rem] min-h-[50vh]">
                 <div className="flex px-6 gap-12">
                     <div className="flex flex-[3] flex-col gap-2 px-[4rem] ml-[4rem]">
@@ -114,7 +117,7 @@ const ShoppingBag = () => {
                     )}
                 </div>
             </section>
-            <ShoppingBagMobileView />
+            {isMobileView && <ShoppingBagMobileView />}
         </BasicLayout>
     );
 };

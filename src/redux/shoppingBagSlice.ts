@@ -84,9 +84,6 @@ const shoppingBagSlice = createSlice({
     reducers: {
         setCartData: (state, action: PayloadAction<ShoppingBagState>) => {
             state.cart = action.payload.cart;
-            // state.cart.data = action.payload;
-            // state.cart.badge = action.payload.reduce((acc, item) => acc + item.sizes.reduce((subAcc, size) => subAcc + size.quantity, 0), 0);
-            // state.cart.totalPrice = action.payload.reduce((acc, item) => acc + item.sizes.reduce((subAcc, size) => subAcc + parseFloat(size.subTotal), 0), 0);
             state.loading = false;
         },
         updateCartItem: (state, action: PayloadAction<{ productId: number; sizes: IShoppingCartSize[] }>) => {
@@ -124,10 +121,26 @@ const shoppingBagSlice = createSlice({
         setError: (state, action: PayloadAction<string | null>) => {
             state.error = action.payload;
             state.loading = false;
+        },
+        updateWishList: (state, action:PayloadAction<{isInCart: boolean, productId: number, isInWishlist: boolean}>) => {
+            const {isInCart, productId, isInWishlist} = action.payload;
+            
+            if(isInCart){
+                const product = state.cart.data?.find((p) => p.productId === productId);
+                if(product){
+                    product.product.WishLists = isInWishlist ? [] : [{productId}]
+                }
+            }
+            else{
+                const product = state.cart.savedItems?.find((p) => p.productId === productId);
+                if(product){
+                    product.product.WishLists = isInWishlist ? [] : [{productId}]
+                }
+            }
         }
     },
 });
 
-export const { setCartData, updateCartItem, addItemToCart, removeItemFromCart, clearCart, setLoading, setError } = shoppingBagSlice.actions;
+export const { setCartData, updateCartItem, addItemToCart, removeItemFromCart, clearCart, setLoading, setError, updateWishList } = shoppingBagSlice.actions;
 
 export default shoppingBagSlice.reducer;

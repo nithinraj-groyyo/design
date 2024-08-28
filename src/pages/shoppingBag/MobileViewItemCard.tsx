@@ -1,34 +1,121 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSaveForLater } from '../../hooks/useSaveForLater';
+import ConfirmationModal from './ConfirmationModal';
+import { useDispatch } from 'react-redux';
+import { getCartBadgeResponse, updateWishlistResponse } from '../../api/productsApi';
+import { setCartData, updateWishList } from '../../redux/shoppingBagSlice';
+import { IconButton } from '@mui/material';
+import { FavoriteBorderOutlined } from '@mui/icons-material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 interface MobileViewItemCardProps {
     imageSrc: string;
     title: string;
     price: number;
     quantity: string;
-    onRemove: () => void;
+    isSavedItem: boolean;    
+    productId: number;
+    isAlreadyInWishlist: boolean;
 }
 
-const MobileViewItemCard: React.FC<MobileViewItemCardProps> = ({ imageSrc, title, price, quantity, onRemove }) => {
+const MobileViewItemCard: React.FC<MobileViewItemCardProps> = ({
+    imageSrc,
+    title,
+    price,
+    quantity,
+    isSavedItem,
+    productId,
+    isAlreadyInWishlist
+}) => {
+    const userId = JSON.parse(localStorage.getItem("userId") as string);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isInWishlist, setIsInWishlist] = useState<boolean>(isAlreadyInWishlist);
+
+    const { saveForLaterHandler } = useSaveForLater();
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        setIsInWishlist(isAlreadyInWishlist);
+    }, [isAlreadyInWishlist]);
+
+    const handleSaveForLaterClick = () => {
+        saveForLaterHandler({ productId, isSavedItem, userId });
+    };
+
+    const confirmRemoval = () => {
+        const fetchUserOrders = async () => {
+            try {
+                const response = await getCartBadgeResponse(userId);
+                if (response) {
+                    dispatch(setCartData(response));
+                }
+            } catch (error: any) {
+                console.error(error?.message);
+            }
+        };
+        fetchUserOrders();
+    };
+
+    const handleWishlistToggle = async () => {
+        try {
+            const add = !isInWishlist;
+            const response = await updateWishlistResponse({ add, productId, userId });
+            if (response) {
+                setIsInWishlist(add);
+                dispatch(updateWishList({isInCart: !isSavedItem, productId, isInWishlist}))
+            }
+        } catch (error: any) {
+            console.error('Error updating wishlist:', error?.message);
+        }
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
     return (
-        <div className="flex items-start md:w-full gap-3">
-            <div className="xxs:w-[7rem] md:w-[12rem] xxs:h-[10rem] md:h-[16rem] overflow-hidden">
-                <img src={imageSrc} className="object-fill w-full h-full" alt="item" />
+        <div className="flex items-start w-full gap-3">
+            <div className="w-[7rem] h-[10rem] md:w-[12rem] md:h-[16rem] overflow-hidden">
+                <img src={imageSrc} className="object-cover w-full h-full" alt="item" />
             </div>
-            <div className="flex flex-col xxs:h-[10rem] md:h-[16rem] justify-between md:w-full">
-                <div>
-                    <p className="text-[#000000] text-xs md:text-lg font-semibold uppercase whitespace-wrap">{title}</p>
-                    <p className="text-[#000000] text-xs md:text-lg font-medium "><span>&#8377; </span>{price}</p>
-                    <p className="text-[#646463] text-xs md:text-lg font-normal">Quantity: {quantity}</p>
+            <div className="flex flex-col justify-between h-[10rem] md:h-[16rem] w-full">
+                <div className='flex justify-between items-start'>
+                    <div>
+                        <p className="text-black text-xs md:text-lg font-semibold uppercase">{title}</p>
+                        <p className="text-black text-xs md:text-lg font-medium">
+                            <span>&#8377; </span>{price}
+                        </p>
+                        <p className="text-gray-600 text-xs md:text-lg">Quantity: {quantity}</p>
+                    </div>
+                    <IconButton onClick={handleWishlistToggle}>
+                        {isInWishlist ? (
+                            <FavoriteIcon style={{ color: 'red' }} />
+                        ) : (
+                            <FavoriteBorderOutlined />
+                        )}
+                    </IconButton>
                 </div>
-                <div>
+                <div className='flex gap-2'>
                     <button
-                        onClick={onRemove}
-                        className="w-full bg-black text-white p-2"
+                        onClick={openModal}
+                        className="p-2 bg-black text-white uppercase flex-1"
                     >
                         Remove
                     </button>
+                    {!isSavedItem && <button className="p-2 bg-black text-white uppercase flex-1" onClick={handleSaveForLaterClick}>Buy later</button>}
+                    {isSavedItem && <button className="p-2 bg-black text-white uppercase flex-1" onClick={handleSaveForLaterClick}>Add to Bag</button>}
                 </div>
             </div>
+            <ConfirmationModal
+                isOpen={isModalOpen} 
+                onClose={closeModal} 
+                onConfirm={confirmRemoval} 
+            />
         </div>
     );
 };

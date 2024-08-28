@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import FavoriteBorderOutlined from '@mui/icons-material/FavoriteBorderOutlined';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { IShoppingCartSize, setCartData } from '../../redux/shoppingBagSlice';
-import { removeProductFromCartResponse, saveForLaterResponse, updateWishlistResponse } from '../../api/productsApi';
-import { useDispatch } from 'react-redux';
+import { IShoppingCartSize } from '../../redux/shoppingBagSlice';
+import { removeProductFromCartResponse, updateWishlistResponse } from '../../api/productsApi';
 import useFetchUserOrders from '../../hooks/useFetchUsersOrders';
 import ConfirmationModal from './ConfirmationModal';
 import { toast } from 'react-toastify';
-
+import { useSaveForLater } from '../../hooks/useSaveForLater';
 interface ShoppingBagItemProps {
     imageSrc: string;
     productName: string;
@@ -20,22 +19,15 @@ interface ShoppingBagItemProps {
 
 const ShoppingBagItem: React.FC<ShoppingBagItemProps> = ({ imageSrc, productId, productName, price, sizes, isSavedItem, isAlreadyInWishlist }) => {
     const userId = JSON.parse(localStorage.getItem("userId") as string);
-    const dispatch = useDispatch();
 
     const [isInWishlist, setIsInWishlist] = useState(isAlreadyInWishlist);
     const [refreshOrders, setRefreshOrders] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const saveForLaterHandler = async () => {
-        try {
-            const status = isSavedItem ? "Cart" : "Saved";
-            const response = await saveForLaterResponse({ productId, status, userId });
-            if (response) {
-                dispatch(setCartData(response));
-            }
-        } catch (error: any) {
-            console.error(error?.message);
-        }
+    const { saveForLaterHandler } = useSaveForLater();
+
+    const handleSaveForLaterClick = () => {
+        saveForLaterHandler({ productId, isSavedItem, userId });
     };
 
     useFetchUserOrders(userId, refreshOrders);
@@ -105,7 +97,7 @@ const ShoppingBagItem: React.FC<ShoppingBagItemProps> = ({ imageSrc, productId, 
                             <FavoriteBorderOutlined />
                         )}
                     </span>
-                    <span className="text-[#646463] text-sm font-light uppercase" onClick={saveForLaterHandler}>
+                    <span className="text-[#646463] text-sm font-light uppercase" onClick={handleSaveForLaterClick}>
                         {isSavedItem ? 'Add to Bag' : 'Buy Later'}
                     </span>
                 </div>
