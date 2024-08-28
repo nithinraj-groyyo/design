@@ -3,7 +3,7 @@ import { Card, CardContent, CardMedia, IconButton, Typography, Box, Button } fro
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useNavigate, useParams } from 'react-router-dom';
-import { updateWishlistResponse } from '../../api/productsApi';
+import { updateWishlistResponse } from '../../api/userApi';
 import { getImagesFromUrl } from '../../utilities/helper';
 import useFetchProducts from '../../hooks/useFetchProducts';
 import { useDispatch } from 'react-redux';

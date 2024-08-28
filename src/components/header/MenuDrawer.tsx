@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import MenuTabs from './MenuTabs';
 import SubCategoriesList from './SubCategoriesList';
-import { useFetchSubCategories } from '../../hooks/useFetchCategories';
+import { useFetchSubCategories } from '../../hooks/useFetchSubCategories';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 

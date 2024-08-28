@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BasicLayout from '../../layouts/BasicLayout';
 import ProductCard from '../product_list/ProductCard';
-import { fetchWishlistResponse } from '../../api/productsApi';
+import { fetchWishlistResponse } from '../../api/userApi';
 import { RootState } from '../../redux/store';
 import { setWishlistItems, removeWishlistItem, setLoading, setError } from '../../redux/wishlistSlice';
 import useWindowWidth from '../../hooks/useWindowWidth';

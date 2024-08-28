@@ -1,29 +1,31 @@
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useCallback } from 'react';
-import { setIsSubCategoriesLoading, setSubCategories } from '../redux/categoriesSlice';
-import { getSubCategoriesResponse } from '../api/categoriesApi'; 
+import { setCategories, setIsCategoriesLoading } from '../redux/categoriesSlice';
+import { getCategoriesResponse } from '../api/categoriesApi';
 
-export const useFetchSubCategories = () => {
+const useFetchCategories = () => {
     const dispatch = useDispatch();
 
-    const fetchSubCategories = useCallback(async (categoryId: number) => {
-        dispatch(setIsSubCategoriesLoading(true));
-        
-        try {
-            const response = await getSubCategoriesResponse({ categoryId });
+    useEffect(() => {
+        const fetchCategories = async () => {
+            dispatch(setIsCategoriesLoading(true));
+            try {
+                const response = await getCategoriesResponse();
+                const categoriesResponse = response?.map((category: any) => ({
+                    id: category?.id,
+                    label: category?.name?.toUpperCase(),
+                    key: category?.name?.toLowerCase(),
+                }));
+                dispatch(setCategories(categoriesResponse));
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            } finally {
+                dispatch(setIsCategoriesLoading(false));
+            }
+        };
 
-            const fetchedSubCategories = response?.length > 0 ? response?.map((category: any) => ({
-                name: category?.name,
-                id: category?.id
-              })) : [];
-
-            dispatch(setSubCategories(fetchedSubCategories));
-        } catch (error) {
-            console.error('Error fetching subcategories:', error);
-        } finally {
-            dispatch(setIsSubCategoriesLoading(false));
-        }
+        fetchCategories();
     }, [dispatch]);
-
-    return { fetchSubCategories };
 };
+
+export default useFetchCategories;

@@ -42,16 +42,6 @@ export const createCartDataResponse = async (requestBody: IAddToCartRequest) => 
     }
 }
 
-// Not Used
-export const processOrderResponse = async (post: any) => {
-    try {
-        const response = await axiosInstance.post('/product/processOrder', post, { headers });
-        return response.data;
-    } catch (error) {
-        console.error('Error processing order:', error);
-        throw error;
-    }
-};
 
 
 export const getCartBadgeResponse = async (userId: string) => {
@@ -103,30 +93,16 @@ export const removeProductFromCartResponse = async ({ productId, userId}: {
     }
 };
 
-export const updateWishlistResponse = async ({add, productId, userId}: {
-    userId: string;
-    productId: number;
-    add: boolean
-}) => {
+// Not Used
+export const processOrderResponse = async (post: any) => {
     try {
-        const response = await axiosInstance.post('/users/updateWishlist', { add, productId, userId }, { headers });
+        const response = await axiosInstance.post('/product/processOrder', post, { headers });
         return response.data;
     } catch (error) {
-        console.error('Error removing product from cart:', error);
+        console.error('Error processing order:', error);
         throw error;
     }
 };
-
-export const fetchWishlistResponse = async () => {
-    try {
-        const response = await axiosInstance.get('/users/fetchWishlist', { headers });
-        return response.data;
-    } catch (error) {
-        console.error('Error removing product from cart:', error);
-        throw error;
-    }
-};
-
 
 // Not Used
 export const getOrdersResponse = async () => {

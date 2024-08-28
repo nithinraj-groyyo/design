@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import FavoriteBorderOutlined from '@mui/icons-material/FavoriteBorderOutlined';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { updateWishlistResponse } from '../../api/productsApi';
+import { updateWishlistResponse } from '../../api/userApi';
 import { IProductResponse } from '../../types/products';
 import { useDispatch } from 'react-redux';
 import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';

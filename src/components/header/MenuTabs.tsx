@@ -48,6 +48,8 @@ const MenuTabs: React.FC<MenuTabsProps> = ({ onTabChange }) => {
           },
         }}
         aria-label="dynamic tabs example"
+        variant="scrollable"
+        scrollButtons="auto"
       >
         {categories?.map((tab) => (
           <CustomTab key={tab.key} value={tab.key} label={tab.label} />

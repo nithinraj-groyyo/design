@@ -6,42 +6,22 @@ import MenuDrawer from './MenuDrawer';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { setActiveCategoryTab, setCategories, setIsCategoriesLoading } from '../../redux/categoriesSlice';
-import { useFetchSubCategories } from '../../hooks/useFetchCategories';
+import { useFetchSubCategories } from '../../hooks/useFetchSubCategories';
 import MenuTabs from './MenuTabs';
 import SubCategoriesList from './SubCategoriesList';
 import { useNavigate } from 'react-router-dom';
-import { getCategoriesResponse } from '../../api/categoriesApi';
+import useFetchCategories from '../../hooks/useFetchCategories';
 
 const Header: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const modalRef = useRef<HTMLDivElement | null>(null);
     const [menuListOpen, setMenuListOpen] = useState<boolean>(false);
-    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+    
     const { activeCategoryTab } = useSelector((state: RootState) => state.categories);
     const { fetchSubCategories } = useFetchSubCategories();
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            dispatch(setIsCategoriesLoading(true));
-            try {
-                const response = await getCategoriesResponse();
-                const categoriesResponse = response?.map((category: any) => {
-                    return {
-                        id: category?.id,
-                        label: category?.name?.toUpperCase(),
-                        key: category?.name?.toLowerCase(),
-                    }
-                })
-                dispatch(setCategories(categoriesResponse));
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-            }finally{
-                dispatch(setIsCategoriesLoading(false));                
-            }
-        }
-        fetchCategories();
-    }, []);
+    useFetchCategories();
 
     const handleClickOutside = (event: MouseEvent) => {
         if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -71,19 +51,13 @@ const Header: React.FC = () => {
         }
     };
 
-    const handleDrawerOpen = () => {
-        setDrawerOpen(true);
-    }
 
-    const handleDrawerClose = () => {
-        setDrawerOpen(false);
-        dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: '' }));
-    };
+
 
     return (
         <header className="fixed flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30">
             <div className='flex items-center space-x-4'>
-                <div onClick={handleDrawerOpen} className='cursor-pointer'>
+                <div className='cursor-pointer'>
                     <MenuIcon />
                 </div>
                 <div className='xxs:hidden lg:flex flex-col relative min-w-[30rem]' ref={modalRef}>
@@ -99,7 +73,7 @@ const Header: React.FC = () => {
             <nav className="flex items-center">
                 <HeaderIcons />
             </nav>
-            <MenuDrawer open={drawerOpen} onClose={handleDrawerClose} />
+            
         </header>
     );
 };
