@@ -29,7 +29,7 @@ root.render(
       closeOnClick
       // rtl={false}
       // pauseOnFocusLoss
-      draggable
+      // draggable
       pauseOnHover
       // theme="light"
     />

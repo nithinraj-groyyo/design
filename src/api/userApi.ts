@@ -1,3 +1,4 @@
+import { IUserDetailsRequest } from "../types/users";
 import axiosInstance from "./axiosConfig";
 
 const token = localStorage.getItem("token")
@@ -41,6 +42,26 @@ export const updateWishlistResponse = async ({add, productId, userId}: {
 export const fetchWishlistResponse = async () => {
     try {
         const response = await axiosInstance.get('/users/fetchWishlist', { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error removing product from cart:', error);
+        throw error;
+    }
+};
+
+export const fetchUserProfileResponse = async ({userId}:{ userId: string }) => {
+    try {
+        const response = await axiosInstance.post('/users/getProfileData', {userId}, { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error removing product from cart:', error);
+        throw error;
+    }
+};
+
+export const updateUserProfileResponse = async ({data}:{data:IUserDetailsRequest}) => {
+    try {
+        const response = await axiosInstance.post('/users/updateUser', {data}, { headers });
         return response.data;
     } catch (error) {
         console.error('Error removing product from cart:', error);

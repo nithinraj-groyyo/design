@@ -1,19 +1,39 @@
 import { Button, Divider } from "@mui/material";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import EditProfile from "./EditProfile";
+import { fetchUserProfileResponse } from "../../api/userApi";
+import { IUserProfile } from "../../types/users";
 
 const Profile = () => {
-  const navigate = useNavigate();
+  const userId = JSON.parse(localStorage.getItem("userId") as string);
+
   const [editProfileModal,setEditProfileModal] = useState(false);
+
+  const [profileData, setProfileData] = useState<IUserProfile | undefined>();
+
   const editClickHandler = () =>{
-    navigate('edit');
     setEditProfileModal(true);
-  }
+  } 
+
+  useEffect(() => {
+    const getUserProfile = async() => {
+      try {
+        const response = await fetchUserProfileResponse({userId: userId?.toString()});
+        if(response){
+          setProfileData(response?.userData)
+        }
+      } catch (error: any) {
+        console.log(error?.message ?? "Unable to fetch User Data")
+      }
+    }
+    getUserProfile();
+  },[])
 
   return (
     <>
-    {editProfileModal && <EditProfile/>}
+    {(editProfileModal && profileData) && <EditProfile profileData={profileData} setProfileData={setProfileData} onClose={() => {
+      setEditProfileModal(false);
+    }} />}
       {!editProfileModal && <>
         <div className="flex flex-col bg-[#a3865b] w-full h-fit gap-8 p-8 py-16">
           <div className="font-semibold text-5xl text-white">Welcome Back,</div>
@@ -32,22 +52,22 @@ const Profile = () => {
           <div className="flex flex-col gap-4 mt-8">
             <div className="flex ml-8">
               <div className="w-1/2">Customer Name</div>
-              <div className="w-1/2">Keshav Verma</div>
+              <div className="w-1/2">{profileData?.firstName}</div>
             </div>
             <Divider sx={{ width: "96%", mx: "auto" }} />
             <div className="flex ml-8">
               <div className="w-1/2">Contact Number</div>
-              <div className="w-1/2">7973099999</div>
+              <div className="w-1/2">{profileData?.mobileNo}</div>
             </div>
             <Divider sx={{ width: "96%", mx: "auto" }} />
             <div className="flex ml-8">
               <div className="w-1/2">Email Id</div>
-              <div className="w-1/2">keshav@gmail.com</div>
+              <div className="w-1/2">{profileData?.emailId}</div>
             </div>
             <Divider sx={{ width: "96%", mx: "auto" }} />
             <div className="flex ml-8">
               <div className="w-1/2">Gender</div>
-              <div className="w-1/2">Male</div>
+              <div className="w-1/2">{profileData?.gender ?? ""}</div>
             </div>
           </div>
         </div>
