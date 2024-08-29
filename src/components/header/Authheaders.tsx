@@ -21,7 +21,7 @@ const Authheaders = () => {
         dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: '' }));
     };
   return (
-    <div className='flex justify-between items-center fixed w-full p-2 text-black z-20'>
+    <div className='flex justify-between items-center fixed w-full p-2 text-black z-30'>
         <IconButton onClick={handleDrawerOpen}>
             <MenuIcon />
         </IconButton>

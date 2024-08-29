@@ -2,10 +2,9 @@ import React, { useRef, useState, useEffect } from 'react';
 import MenuIcon from '../../assets/svg/home/MenuIcon';
 import HeaderIcons from './HeaderIcons';
 import HeaderLogo from './HeaderLogo';
-import MenuDrawer from './MenuDrawer';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { setActiveCategoryTab, setCategories, setIsCategoriesLoading } from '../../redux/categoriesSlice';
+import { setActiveCategoryTab } from '../../redux/categoriesSlice';
 import { useFetchSubCategories } from '../../hooks/useFetchSubCategories';
 import MenuTabs from './MenuTabs';
 import SubCategoriesList from './SubCategoriesList';
@@ -18,10 +17,11 @@ const Header: React.FC = () => {
     const modalRef = useRef<HTMLDivElement | null>(null);
     const [menuListOpen, setMenuListOpen] = useState<boolean>(false);
     
+    useFetchCategories();
+    
     const { activeCategoryTab } = useSelector((state: RootState) => state.categories);
     const { fetchSubCategories } = useFetchSubCategories();
-
-    useFetchCategories();
+    
 
     const handleClickOutside = (event: MouseEvent) => {
         if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -55,7 +55,7 @@ const Header: React.FC = () => {
 
 
     return (
-        <header className="fixed flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30">
+        <header className={`fixed flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30`}>
             <div className='flex items-center space-x-4'>
                 <div className='cursor-pointer'>
                     <MenuIcon />

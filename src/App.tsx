@@ -20,27 +20,26 @@ import NotFoundPage from './pages/NotFoundPage'
 const App = () => {
   return (
     <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/designs/:categoryKey/:categoryId" element={<ProductList />} />
-        <Route path='/product-details/:categoryKey/:productId' element={<ProductDetails />} />
-        <Route path='/bag' element={<ShoppingBag />} />
-        <Route path='/wishlist' element={<WishList />} />
-        <Route path='/login' element={<Login/>}/>
-        <Route path='/signup' element={<Signup/>}/>
-        <Route path='/contact-us' element={<ContactUs />} />
-        <Route path="/account" element={<AccountPage />}>
-            <Route path="address" element={<Address />} >
-                <Route path="add" element={<AddAddress />} />
-            </Route>
-            <Route path="orders" element={<Orders />} />
-            <Route path="profile" element={<Profile />}>
-              <Route path="edit" element={<EditProfile />} />
-            </Route>
-            <Route path="changePassword" element={<ChangePassword />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/designs/:categoryKey/:categoryId" element={<ProductList />} />
+      <Route path="/product-details/:categoryKey/:productId" element={<ProductDetails />} />
+      <Route path="/bag" element={<ShoppingBag />} />
+      <Route path="/wishlist" element={<WishList />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/contact-us" element={<ContactUs />} />
+      <Route path="account" element={<AccountPage />}>
+        <Route path="address" element={<Address />} />
+        <Route path="orders" element={<Orders />} />
+        <Route path="profile" element={<Profile />}>
+          <Route path="edit" element={<EditProfile />} />
         </Route>
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="changePassword" element={<ChangePassword />} />
+      </Route>
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }
+
 
 export default App
