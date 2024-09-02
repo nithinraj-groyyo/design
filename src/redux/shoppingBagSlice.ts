@@ -86,28 +86,6 @@ const shoppingBagSlice = createSlice({
             state.cart = action.payload.cart;
             state.loading = false;
         },
-        updateCartItem: (state, action: PayloadAction<{ productId: number; sizes: IShoppingCartSize[] }>) => {
-            const { productId, sizes } = action.payload;
-            const cartItem = state.cart.data.find(item => item.productId === productId);
-            if (cartItem) {
-                cartItem.sizes = sizes;
-                state.cart.badge = state.cart.data.reduce((acc, item) => acc + item.sizes.reduce((subAcc, size) => subAcc + size.quantity, 0), 0);
-                state.cart.totalPrice = state.cart.data.reduce((acc, item) => acc + item.sizes.reduce((subAcc, size) => subAcc + parseFloat(size.subTotal), 0), 0);
-            }
-            state.loading = false;
-        },
-        addItemToCart: (state, action: PayloadAction<CartItem>) => {
-            state.cart.data.push(action.payload);
-            state.cart.badge = state.cart.data.reduce((acc, item) => acc + item.sizes.reduce((subAcc, size) => subAcc + size.quantity, 0), 0);
-            state.cart.totalPrice = state.cart.data.reduce((acc, item) => acc + item.sizes.reduce((subAcc, size) => subAcc + parseFloat(size.subTotal), 0), 0);
-            state.loading = false;
-        },
-        removeItemFromCart: (state, action: PayloadAction<number>) => {
-            state.cart.data = state.cart.data.filter(item => item.productId !== action.payload);
-            state.cart.badge = state.cart.data.reduce((acc, item) => acc + item.sizes.reduce((subAcc, size) => subAcc + size.quantity, 0), 0);
-            state.cart.totalPrice = state.cart.data.reduce((acc, item) => acc + item.sizes.reduce((subAcc, size) => subAcc + parseFloat(size.subTotal), 0), 0);
-            state.loading = false;
-        },
         clearCart: (state) => {
             state.cart.data = [];
             state.cart.badge = 0;
@@ -141,6 +119,6 @@ const shoppingBagSlice = createSlice({
     },
 });
 
-export const { setCartData, updateCartItem, addItemToCart, removeItemFromCart, clearCart, setLoading, setError, updateWishList } = shoppingBagSlice.actions;
+export const { setCartData, clearCart, setLoading, setError, updateWishList } = shoppingBagSlice.actions;
 
 export default shoppingBagSlice.reducer;

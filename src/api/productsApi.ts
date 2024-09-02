@@ -2,7 +2,7 @@ import { AxiosResponse } from "axios";
 import axiosInstance from "./axiosConfig";
 import { IAddToCartRequest } from "../types/cart";
 
-const token = localStorage.getItem("token")
+const token = localStorage.getItem("authToken")
 const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${token}`,

@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { SignInIcon } from '../../assets/svg/home/SignInIcon';
 import { WishlistIcon } from '../../assets/svg/home/WishlistIcon';
-import { ShoppingBagIcon } from '../../assets/svg/home/ShoppingBagIcon';
+// import { ShoppingBagIcon } from '../../assets/svg/home/ShoppingBagIcon';
 import useAuth from '../../hooks/useAuth';
 import { IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
+import CustomizedShoppingBadges from '../Badge';
+import useSignOut from '../../hooks/useSignOut';
+import SignOutModal from './SignOutModal';
 
 interface IconButtonConfig {
     icon: React.ReactNode;
@@ -29,7 +32,7 @@ interface HeaderIconsProps {
 const iconButtons: IconButtonConfig[] = [
     { icon: <SignInIcon />, label: "sign in", redirect: "/login", id: "login" },
     { icon: <WishlistIcon />, label: "wishlist", redirect: "/wishlist", id: "wishlist" },
-    { icon: <ShoppingBagIcon />, label: "shopping bag", redirect: "/bag", id: "bag" },
+    { icon: <CustomizedShoppingBadges />, label: "shopping bag", redirect: "/bag", id: "bag" },
 ];
 
 const IconsButton: React.FC<IconsButtonProps> = ({ icon, label, onMouseEnter, onMouseLeave }) => {
@@ -74,6 +77,22 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
         ? iconButtons.filter(button => button.id !== 'login').filter(button => location.pathname !== "/bag" || button.id !== "bag")
         : location?.pathname === "/bag" ? iconButtons.filter(button => button.id !== "bag") : iconButtons;
 
+    const { signOut } = useSignOut();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSignOutClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirmSignOut = () => {
+    signOut()
+    window.location.href = '/login';
+  };
     return (
         <div className="xxs:hidden lg:flex gap-[3rem] items-center">
             {filteredIconButtons.map((button, index) => (
@@ -111,6 +130,13 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
                     <MenuItem onClick={() => handleMenuNavigation("profile")}>Account Settings</MenuItem>
                     <MenuItem onClick={() => handleMenuNavigation("orders")}>Orders</MenuItem>
                     <MenuItem onClick={() => handleMenuNavigation("address")}>Address</MenuItem>
+                    {isAuthenticated && <MenuItem onClick={handleSignOutClick}>Sign Out</MenuItem>}
+
+                    <SignOutModal
+                        open={isModalOpen}
+                        onClose={handleCloseModal}
+                        onConfirm={handleConfirmSignOut}
+                    />
                 </Menu>
             </div>
         </div>

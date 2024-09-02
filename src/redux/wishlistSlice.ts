@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IWishlistItem } from '../types/products';
 
 interface WishlistState {
+    localWishList: number[];
     items: IWishlistItem[];
     loading: boolean;
     error: string | null;
@@ -11,6 +12,7 @@ const initialState: WishlistState = {
     items: [],
     loading: false,
     error: null,
+    localWishList: []
 };
 
 const wishlistSlice = createSlice({
@@ -29,9 +31,14 @@ const wishlistSlice = createSlice({
         setError(state, action: PayloadAction<string | null>) {
             state.error = action.payload;
         },
+        setLocalWishlistItems(state, action: PayloadAction<{productId: number}>) {
+            const { productId } = action.payload;
+
+            state.localWishList.push(productId);
+        },
     },
 });
 
-export const { setWishlistItems, removeWishlistItem, setLoading, setError } = wishlistSlice.actions;
+export const { setWishlistItems, removeWishlistItem, setLoading, setError, setLocalWishlistItems } = wishlistSlice.actions;
 
 export default wishlistSlice.reducer;

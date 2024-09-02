@@ -11,7 +11,10 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const WishList = () => {
+    const userId = JSON.parse(localStorage.getItem("userId") as string);
+
     const dispatch = useDispatch();
+    
     const { items: wishlistItems, loading, error } = useSelector((state: RootState) => state.wishlist);
 
     const navigate = useNavigate();
@@ -23,7 +26,7 @@ const WishList = () => {
             dispatch(setLoading(true));
             try {
                 const response = await fetchWishlistResponse();
-                dispatch(setWishlistItems(response.wishlist));
+                dispatch(setWishlistItems(response?.wishlist));
             } catch (error: any) {
                 dispatch(setError(error?.message || 'Failed to fetch wishlist'));
             } finally {
@@ -31,8 +34,10 @@ const WishList = () => {
             }
         };
 
-        fetchWishlist();
-    }, [dispatch]);
+        if(userId){
+            fetchWishlist();
+        }
+    }, [dispatch, userId]);
 
     const handleRemoveFromWishlist = (productId: number) => {
         dispatch(removeWishlistItem(productId));

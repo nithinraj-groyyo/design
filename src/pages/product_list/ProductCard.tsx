@@ -71,22 +71,40 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
         onClick={navigateToProductDetails}
       />
       {showDetails && (
-        <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="start">
+        <>
+          {/* Desktop view  */}
+          <CardContent className='hidden lg:block'>
+            <Box display="flex" justifyContent="space-between" alignItems="start">
+              <Typography component="div" className="uppercase font-light text-xs">
+                {product?.name}
+              </Typography>
+              {!isAlreadyInWishlist && (
+                <IconButton aria-label="add to wishlist" onClick={handleWishlistToggle}>
+                  {isInWishlist ? <FavoriteIcon sx={{ color: 'red' }} /> : <FavoriteBorderIcon />}
+                </IconButton>
+              )}
+            </Box>
             <Typography component="div" className="uppercase font-light text-xs">
-              {product?.name}
+              <span>&#8377;</span>
+              <span>{product?.price}</span>
             </Typography>
-            {!isAlreadyInWishlist && (
-              <IconButton aria-label="add to wishlist" onClick={handleWishlistToggle}>
-                {isInWishlist ? <FavoriteIcon sx={{ color: 'red' }} /> : <FavoriteBorderIcon />}
-              </IconButton>
-            )}
-          </Box>
-          <Typography component="div" className="uppercase font-light text-xs">
-            <span>&#8377;</span>
-            <span>{product?.price}</span>
-          </Typography>
-        </CardContent>
+          </CardContent>
+
+              {/* Mobile view  */}
+          <div className='lg:hidden px-2 py-1'>
+            <div className='flex justify-between items-center'>
+              <div className="uppercase font-light text-xs">
+                <span>&#8377;</span>
+                <span>{product?.price}</span>
+              </div>
+              {!isAlreadyInWishlist && (
+                <IconButton aria-label="add to wishlist" onClick={handleWishlistToggle}>
+                  {isInWishlist ? <FavoriteIcon sx={{ color: 'red' }} /> : <FavoriteBorderIcon />}
+                </IconButton>
+              )}
+            </div>
+          </div>
+        </>
       )}
       {isAlreadyInWishlist &&<Button className='!bg-black !text-white uppercase !p-2 cursor-pointer !rounded-none' fullWidth onClick={handleRemoveFromWishlist}>Remove</Button>}
     </Card>

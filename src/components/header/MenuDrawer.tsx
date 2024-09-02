@@ -17,6 +17,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose }) => {
     const navigate = useNavigate();
 
     const { categories } = useSelector((state: RootState) => state.categories);
+    const { cart } = useSelector((state: RootState) => state.shoppingBag);
 
     const [activeCategoryTab, setActiveCategoryTab] = useState<{ categoryId: number; categoryKey: string } | null>(null);
 
@@ -74,7 +75,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose }) => {
                     </IconButton>
                     <div className="lg:hidden flex gap-4 items-center">
                         <div className="cursor-pointer text-sm" onClick={handleMyAccounts}>MY ACCOUNT</div>
-                        <div className="cursor-pointer text-sm" onClick={navigateShoppingBag}>SHOPPING BAG (0)</div>
+                        <div className="cursor-pointer text-sm" onClick={navigateShoppingBag}>SHOPPING BAG ({cart?.savedItems?.length})</div>
                     </div>
                 </div>
                 <div>
