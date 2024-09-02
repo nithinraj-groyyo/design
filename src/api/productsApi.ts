@@ -93,6 +93,40 @@ export const removeProductFromCartResponse = async ({ productId, userId}: {
     }
 };
 
+export const updateProductStatusResponse = async ({ id, status}: { 
+    id: number;
+    status: boolean;
+}) => {
+    try {
+        const response = await axiosInstance.post('/product/updateProductStatus', { id, status}, { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating product status:', error);
+        throw error;
+    }
+};
+
+export const bulkProductUploadResponse = async (data: any) => {
+    try {
+        const response = await axiosInstance.post('/product/bulkProductUpload', data, { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error in Bulk upload of products:', error);
+        throw error;
+    }
+};
+
+export const addUpdateProductResponse = async (data: any, type: "create" | "edit") => {
+    try {
+        const response = await axiosInstance.post('/product/addUpdateProduct', data, { headers });
+        return response.data;
+    } catch (error) {
+        console.error(`Error in ${type === "create" ? "Creating" : "Updating" } of products: `, error);
+        throw error;
+    }
+};
+
+
 // Not Used
 export const processOrderResponse = async (post: any) => {
     try {

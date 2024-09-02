@@ -52,7 +52,10 @@ const Profile = () => {
           <div className="flex flex-col gap-4 mt-8">
             <div className="flex ml-8">
               <div className="w-1/2">Customer Name</div>
-              <div className="w-1/2">{profileData?.firstName}</div>
+              <div className="w-1/2 flex gap-3">
+                <span>{profileData?.firstName}</span>
+                <span>{profileData?.lastName}</span>
+              </div>
             </div>
             <Divider sx={{ width: "96%", mx: "auto" }} />
             <div className="flex ml-8">

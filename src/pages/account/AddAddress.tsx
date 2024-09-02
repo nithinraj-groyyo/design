@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Button, TextField } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { addUpdateAddressResponse } from "../../api/userApi";
+import { IAddressRequest, IAddressResponse } from "../../types/users";
+import { Country, State } from "country-state-city";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
@@ -12,21 +14,26 @@ const validationSchema = Yup.object({
   country: Yup.string().required("Country is required"),
   state: Yup.string().required("State is required"),
   city: Yup.string().required("City is required"),
-  zip: Yup.string().required("Zip code is required"),
-  phone: Yup.string()
-    .matches(/^[0-9]+$/, "Phone number must be only digits")
-    .min(10, "Phone number must be at least 10 digits")
-    .required("Phone number is required"),
+  zip: Yup.string()
+    .matches(/^\d+$/, "Zip code must be only digits")
+    .required("Zip code is required"),
+  phone: Yup.string(),
+    // .matches(/^[0-9]+$/, "Phone number must be only digits")
+    // .min(10, "Phone number must be at least 10 digits")
+    // .required("Phone number is required"),
   landmark: Yup.string(),
   addressType: Yup.string().required("Address type is required"),
 });
 
 interface IAddAddressProps {
-  setAddAddressModal: (val: boolean) => void
+  setAddAddressModal: (val: boolean) => void;
+  address: IAddressResponse | null
 }
 
-const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
-  const navigate = useNavigate();
+const AddAddress = ({setAddAddressModal, address}: IAddAddressProps) => {
+  const userId = JSON.parse(localStorage.getItem("userId") as string);
+  const countries = Country.getAllCountries();
+  const [states, setStates] = useState<any[]>([]);
 
   const formik = useFormik({
     initialValues: {
@@ -44,28 +51,72 @@ const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-      
-        const response = await fetch('/api/add-address', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
+        const addressPayload: IAddressRequest = {
+          addressId: address ? address?.id : "",
+          userId,
+          addressName: values.name,
+          addressType: values.addressType,
+          streetAddress1: values.address1,
+          streetAddress2: values.address2 ?? "",
+          phone: values.phone,
+          landmark: values.landmark ?? "",
+          city: values.city,
+          state: values.state,
+          zip: values.zip,
+        };
+        
+        const response = await addUpdateAddressResponse({ data: addressPayload });
 
-        if (response) {
+        if (response?.message === "success") {
           toast.success('Address added successfully');
-        } 
+          setAddAddressModal(false);
+          window.location.reload();
+        }
       } catch (error) {
         console.error('Error adding address:', error);
-        toast.error('Failed to add address')
+        toast.error('Failed to add address');
       }
     },
   });
 
+  useEffect(() => {
+    if (address) {
+      formik.setValues({
+        name: address.addressName,
+        address1: address.streetAddress1,
+        address2: address.streetAddress2,
+        country: "India",
+        state: address.state,
+        city: address.city,
+        zip: address.zip?.toString(),
+        phone: address.phone,
+        landmark: address.landmark,
+        addressType: address.addressType,
+      });
+
+      const countryData = Country.getAllCountries().find(c => c.name === "India");
+      if (countryData) {
+        const statesData = State.getStatesOfCountry(countryData.isoCode);
+        setStates(statesData);
+      }
+    }
+  }, [address]);
+
+  const handleCountryChange = (event: any) => {
+    const country = event.target.value as string;
+
+    const countryData = Country.getAllCountries().find(c => c.name === country);
+    if (countryData) {
+      const statesData = State.getStatesOfCountry(countryData.isoCode);
+      setStates(statesData);
+    }
+    formik.setFieldValue('country', country);
+    formik.setFieldValue('state', '');
+  };
+
   const handleCancel = () => {
     formik.resetForm();
-    setAddAddressModal(false)
+    setAddAddressModal(false);
   };
 
   return (
@@ -75,10 +126,10 @@ const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
         <div className="flex gap-8">
           <div className="flex flex-col w-1/2 gap-4">
             <div className="flex flex-col w-full gap-2">
-              <div>Name</div>
               <TextField
                 id="name"
                 name="name"
+                label="Name"
                 variant="outlined"
                 className="!w-full"
                 value={formik.values.name}
@@ -89,10 +140,10 @@ const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
               />
             </div>
             <div className="flex flex-col w-full gap-2">
-              <div>Address1</div>
               <TextField
                 id="address1"
                 name="address1"
+                label="Address1"
                 variant="outlined"
                 className="!w-full"
                 value={formik.values.address1}
@@ -103,24 +154,33 @@ const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
               />
             </div>
             <div className="flex flex-col w-full gap-2">
-              <div>Country</div>
-              <TextField
-                id="country"
-                name="country"
-                variant="outlined"
-                className="!w-full"
-                value={formik.values.country}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.country && Boolean(formik.errors.country)}
-                helperText={formik.touched.country && formik.errors.country}
-              />
+              <FormControl variant="outlined" className="!w-full">
+                <InputLabel>Country</InputLabel>
+                <Select
+                  id="country"
+                  name="country"
+                  label="Country"
+                  value={formik.values.country}
+                  onChange={handleCountryChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.country && Boolean(formik.errors.country)}
+                >
+                  {countries?.map((country) => (
+                    <MenuItem key={country.isoCode} value={country.name}>
+                      {country.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {formik.touched.country && formik.errors.country && (
+                <div className="text-red-600 text-xs">{formik.errors.country}</div>
+              )}
             </div>
             <div className="flex flex-col w-full gap-2">
-              <div>City</div>
               <TextField
                 id="city"
                 name="city"
+                label="City"
                 variant="outlined"
                 className="!w-full"
                 value={formik.values.city}
@@ -131,10 +191,10 @@ const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
               />
             </div>
             <div className="flex flex-col w-full gap-2">
-              <div>Landmark</div>
               <TextField
                 id="landmark"
                 name="landmark"
+                label="Landmark"
                 variant="outlined"
                 className="!w-full"
                 value={formik.values.landmark}
@@ -147,10 +207,10 @@ const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
           </div>
           <div className="flex flex-col w-1/2 gap-4">
             <div className="flex flex-col w-full gap-2">
-              <div>Phone</div>
               <TextField
                 id="phone"
                 name="phone"
+                label="Phone"
                 variant="outlined"
                 className="!w-full"
                 value={formik.values.phone}
@@ -161,10 +221,10 @@ const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
               />
             </div>
             <div className="flex flex-col w-full gap-2">
-              <div>Address2</div>
               <TextField
                 id="address2"
                 name="address2"
+                label="Address2"
                 variant="outlined"
                 className="!w-full"
                 value={formik.values.address2}
@@ -175,24 +235,34 @@ const AddAddress = ({setAddAddressModal}: IAddAddressProps) => {
               />
             </div>
             <div className="flex flex-col w-full gap-2">
-              <div>State</div>
-              <TextField
-                id="state"
-                name="state"
-                variant="outlined"
-                className="!w-full"
-                value={formik.values.state}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched.state && Boolean(formik.errors.state)}
-                helperText={formik.touched.state && formik.errors.state}
-              />
+              <FormControl variant="outlined" className="!w-full">
+                <InputLabel>State</InputLabel>
+                <Select
+                  id="state"
+                  name="state"
+                  label="State"
+                  value={formik.values.state}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.state && Boolean(formik.errors.state)}
+                >
+                  {states.map((state) => (
+                    <MenuItem key={state.isoCode} value={state.name}>
+                      {state.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              {formik.touched.state && formik.errors.state && (
+                <div className="text-red-600 text-xs">{formik.errors.state}</div>
+              )}
             </div>
+            
             <div className="flex flex-col w-full gap-2">
-              <div>Zip</div>
               <TextField
                 id="zip"
                 name="zip"
+                label="Zip"
                 variant="outlined"
                 className="!w-full"
                 value={formik.values.zip}

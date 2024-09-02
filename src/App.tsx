@@ -14,6 +14,9 @@ import Orders from './pages/account/Orders'
 import Profile from './pages/account/Profile'
 import ChangePassword from './pages/account/ChangePassword'
 import NotFoundPage from './pages/NotFoundPage'
+import AdminProductList from './pages/account/product/AdminProductList'
+import BulkUploadProduct from './pages/account/product/BulkUploadProduct'
+import AddProducts from './pages/account/product/AddProducts'
 
 const App = () => {
   return (
@@ -31,6 +34,9 @@ const App = () => {
         <Route path="orders" element={<Orders />} />
         <Route path="profile" element={<Profile />} />
         <Route path="changePassword" element={<ChangePassword />} />
+        <Route path="product-list" element={<AdminProductList />} />
+        <Route path="bulk-upload" element={<BulkUploadProduct />} />
+        <Route path="add-product" element={<AddProducts />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

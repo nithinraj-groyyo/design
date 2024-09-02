@@ -68,7 +68,7 @@ const menuItems = [
 const AccountPage = () => {
   const navigate = useNavigate();
 
-  const onClickHandler = (route:string) => {
+  const onClickHandler = (route: string) => {
     navigate(route);
   };
 
@@ -76,14 +76,13 @@ const AccountPage = () => {
     <BasicLayout showFooter={false}>
       <div
         className="flex mt-[10rem]"
-        style={{ minHeight: "calc(100vh - 10rem)" }}
+        style={{ height: "calc(100vh - 10rem)" }}
       >
-        <div className="flex-[1]">
+        <div className="flex-[1] overflow-y-auto" style={{ height: "100%" }}>
           <List>
             {menuItems.map((menuItem, index) => (
               <React.Fragment key={index}>
-                <ListItem
-                >
+                <ListItem>
                   <ListItemText
                     primary={menuItem.title}
                     primaryTypographyProps={{
@@ -121,7 +120,7 @@ const AccountPage = () => {
             ))}
           </List>
         </div>
-        <div className="flex-[5] bg-[#f1f1f1]">
+        <div className="flex-[5] bg-[#f1f1f1] overflow-y-auto" style={{ height: "100%" }}>
           <Outlet />
         </div>
       </div>
