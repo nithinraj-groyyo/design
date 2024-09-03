@@ -17,6 +17,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import AdminProductList from './pages/account/product/AdminProductList'
 import BulkUploadProduct from './pages/account/product/BulkUploadProduct'
 import AddProducts from './pages/account/product/AddProducts'
+import OrderReturns from './pages/account/product/OrderReturns'
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
         <Route path="product-list" element={<AdminProductList />} />
         <Route path="bulk-upload" element={<BulkUploadProduct />} />
         <Route path="add-product" element={<AddProducts />} />
+        <Route path="orders-returns" element={<OrderReturns />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

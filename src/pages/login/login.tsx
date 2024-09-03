@@ -43,7 +43,7 @@ const Login = () => {
           localStorage.setItem("authToken", JSON.stringify(response?.token))
           localStorage.setItem("user",JSON.stringify(response?.user))
           localStorage.setItem("roles",JSON.stringify(response?.roles))
-          localStorage.setItem("userId",JSON.stringify(response?.id))
+          localStorage.setItem("userId",JSON.stringify(response?.user?.id))
           resetForm(); 
           navigate("/")
         }
