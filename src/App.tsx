@@ -18,6 +18,7 @@ import BulkUploadProduct from './pages/account/product/BulkUploadProduct';
 import AddProducts from './pages/account/product/AddProducts';
 import useFetchUserOrders from './hooks/useFetchUsersOrders';
 import ProtectedRoute from './layouts/ProtectedRoutes';
+import OrderReturns from './pages/account/product/OrderReturns';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
@@ -55,6 +56,7 @@ const App = () => {
         <Route path="product-list" element={<AdminProductList />} />
         <Route path="bulk-upload" element={<BulkUploadProduct />} />
         <Route path="add-product" element={<AddProducts />} />
+        <Route path="orders-returns" element={<OrderReturns />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
