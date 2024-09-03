@@ -4,6 +4,7 @@ import Footer from '../components/footer/Footer';
 import useWindowWidth from '../hooks/useWindowWidth';
 import { useLocation } from 'react-router-dom';
 import Authheaders from '../components/header/Authheaders';
+import MobileHeader from '../components/header/MobileHeader';
 
 interface BasicLayoutProps {
   showHeader?: boolean;
@@ -16,7 +17,7 @@ const BasicLayout: React.FC<PropsWithChildren<BasicLayoutProps>> = ({ showHeader
   
   return (
     <div className='flex flex-col min-h-[100vh]'>
-      {showHeader && ((location?.pathname === "/login" || location?.pathname === "/signup") && isMobileView ? <Authheaders /> : <Header />) }
+      {showHeader && isMobileView ? ((location?.pathname === "/login" || location?.pathname === "/signup") ? <Authheaders /> : <MobileHeader />): <Header /> }
       <main className='flex-1'>
         {children}
       </main>

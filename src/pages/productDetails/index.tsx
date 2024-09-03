@@ -13,6 +13,8 @@ import { RootState } from '../../redux/store';
 import { useParams } from 'react-router-dom';
 import useFetchProducts from '../../hooks/useFetchProducts';
 import useFetchProductById from '../../hooks/useFetchProductById';
+import MobileViewProductDetails from './MobileViewProductDetails';
+import useWindowWidth from '../../hooks/useWindowWidth';
 
 const ProductDetails = () => {   
     const { productId, categoryKey } = useParams<{ productId: string, categoryKey: string }>();
@@ -22,6 +24,7 @@ const ProductDetails = () => {
     const { products } = useSelector((state: RootState) => state.products.productData);
     const { product } = useSelector((state: RootState) => state.products.singleProductData);
 
+    const { isMobileView } = useWindowWidth();
 
     useFetchProducts({categoryKey});
 
@@ -32,8 +35,8 @@ const ProductDetails = () => {
     };
 
     return (
-        <BasicLayout>
-            <div className="grid grid-cols-3 min-h-[40rem] mt-[12rem] mb-[4rem]">
+        <BasicLayout showFooter={isMobileView ? false : true}>
+            <div className="hidden lg:grid grid-cols-3 min-h-[40rem] mt-[12rem] mb-[4rem]">
                 <div className='flex flex-col gap-4 justify-end items-start border border-black p-[1rem] mx-[6rem]'>
                     <ProductDescription expanded={expanded} onToggle={handleToggle} />
                 </div>
@@ -47,7 +50,7 @@ const ProductDetails = () => {
                     <AddToBagButton />
                 </div>
             </div>
-            <div className='flex flex-col gap-4 my-[10rem]'>
+            <div className='hidden lg:flex flex-col gap-4 my-[10rem]'>
                 <Typography className='text-[#2D2D2A] text-sm tracking-widest px-4'>YOU MAY ALSO LIKE</Typography>
                 <div className='grid grid-cols-6'>
                     {products?.slice(0, 6).map((product) => {
@@ -61,6 +64,7 @@ const ProductDetails = () => {
                     )})}
                 </div>
             </div>
+            <MobileViewProductDetails />
         </BasicLayout>
     );
 };

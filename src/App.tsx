@@ -1,34 +1,54 @@
-
-import { Route, Routes } from 'react-router-dom'
-import Home from './pages/home'
-import ProductList from './pages/product_list'
-import ProductDetails from './pages/productDetails'
-import ShoppingBag from './pages/shoppingBag'
-import WishList from './pages/wishlist'
-import Login from './pages/login/login'
-import Signup from './pages/signup/signup'
-import { ContactUs } from './pages/contactUs'
-import AccountPage from './pages/account'
-import Address from './pages/account/Address'
-import Orders from './pages/account/Orders'
-import Profile from './pages/account/Profile'
-import ChangePassword from './pages/account/ChangePassword'
-import NotFoundPage from './pages/NotFoundPage'
-import AdminProductList from './pages/account/product/AdminProductList'
-import BulkUploadProduct from './pages/account/product/BulkUploadProduct'
-import AddProducts from './pages/account/product/AddProducts'
-import OrderReturns from './pages/account/product/OrderReturns'
+import { Route, Routes } from 'react-router-dom';
+import Home from './pages/home';
+import ProductList from './pages/product_list';
+import ProductDetails from './pages/productDetails';
+import ShoppingBag from './pages/shoppingBag';
+import WishList from './pages/wishlist';
+import Login from './pages/login/login';
+import Signup from './pages/signup/signup';
+import { ContactUs } from './pages/contactUs';
+import AccountPage from './pages/account';
+import Address from './pages/account/Address';
+import Orders from './pages/account/Orders';
+import Profile from './pages/account/Profile';
+import ChangePassword from './pages/account/ChangePassword';
+import NotFoundPage from './pages/NotFoundPage';
+import AdminProductList from './pages/account/product/AdminProductList';
+import BulkUploadProduct from './pages/account/product/BulkUploadProduct';
+import AddProducts from './pages/account/product/AddProducts';
+import useFetchUserOrders from './hooks/useFetchUsersOrders';
+import ProtectedRoute from './layouts/ProtectedRoutes';
+import OrderReturns from './pages/account/product/OrderReturns';
 
 const App = () => {
+  const userId = JSON.parse(localStorage.getItem('userId') as string);
+  const isAuthenticated = Boolean(userId); 
+
+  useFetchUserOrders(userId, false);
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route
+        path="/login"
+        element={
+          <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
+            <Login />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
+            <Signup />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/designs/:categoryKey/:categoryId" element={<ProductList />} />
       <Route path="/product-details/:categoryKey/:productId" element={<ProductDetails />} />
       <Route path="/bag" element={<ShoppingBag />} />
       <Route path="/wishlist" element={<WishList />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
       <Route path="/contact-us" element={<ContactUs />} />
       <Route path="account" element={<AccountPage />}>
         <Route path="address" element={<Address />} />
@@ -42,8 +62,7 @@ const App = () => {
       </Route>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
-  )
-}
+  );
+};
 
-
-export default App
+export default App;

@@ -55,7 +55,7 @@ const Header: React.FC = () => {
 
 
     return (
-        <header className={`fixed flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30`}>
+        <header className={`fixed hidden lg:flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30`}>
             <div className='flex items-center space-x-4'>
                 <div className='cursor-pointer'>
                     <MenuIcon />
