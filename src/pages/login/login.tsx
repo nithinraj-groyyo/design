@@ -40,7 +40,7 @@ const Login = () => {
 
         if(response?.token){
           toast.success('Logged In successfully!');
-          localStorage.setItem("authToken", JSON.stringify(response?.token))
+          localStorage.setItem("authToken", response?.token)
           localStorage.setItem("user",JSON.stringify(response?.user))
           localStorage.setItem("roles",JSON.stringify(response?.roles))
           localStorage.setItem("userId",JSON.stringify(response?.user?.id))

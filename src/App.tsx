@@ -23,8 +23,6 @@ const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
   const isAuthenticated = Boolean(userId); 
 
-  useFetchUserOrders(userId, false);
-
   return (
     <Routes>
       <Route path="/" element={<Home />} />

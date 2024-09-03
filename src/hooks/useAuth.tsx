@@ -9,10 +9,9 @@ const useAuth = (): boolean => {
     
     if (token && userData) {
       try {
-        const parsedToken = JSON.parse(token);
         const parsedUserData = JSON.parse(userData);
 
-        if (parsedToken && parsedUserData) {
+        if (token && parsedUserData) {
           setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
