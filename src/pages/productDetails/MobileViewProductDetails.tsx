@@ -15,6 +15,7 @@ import AddToBagButton from './AddToBagButton';
 import ProductCard from '../product_list/ProductCard';
 import useFetchProducts from '../../hooks/useFetchProducts';
 import Footer from '../../components/footer/Footer';
+import { setLocalWishlistItems } from '../../redux/wishlistSlice';
 
 const MobileViewProductDetails = () => {
     const { productId, categoryKey } = useParams<{ productId: string, categoryKey: string }>();
@@ -47,6 +48,10 @@ const MobileViewProductDetails = () => {
     useFetchProducts({categoryKey});
 
     const handleWishlistToggle = async () => {
+        if(!userId && product){
+            dispatch(setLocalWishlistItems({product} as any))
+            return 
+        }
         try {
             const add = !isInWishlist;
             if(product){
@@ -63,7 +68,7 @@ const MobileViewProductDetails = () => {
     };
 
     return (
-        <div>
+        <div className='lg:hidden'>
             <div className='mt-[3rem]'>
                 {product?.ProductImages?.map((img, index) => (
                     <div key={index}>

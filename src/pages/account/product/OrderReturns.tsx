@@ -1,13 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingBagEmptyIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { FormControl, MenuItem, Modal, Select, TextField } from "@mui/material";
 import Divider from "@mui/material/Divider";
+import { fetchUserOrdersResponse } from "../../../api/userApi";
 
 const OrderReturns = () => {
+  const userId = JSON.parse(localStorage.getItem("userId") as string);
+
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetchUserOrdersResponse({userId});
+        console.log(response, "response");
+      } catch (error) {
+        console.error(error, "error");
+      }
+    }
+    fetchOrders();
+  }, [])
 
   return (
     <div className="bg-white p-4 m-4 rounded-lg flex flex-col gap-4">

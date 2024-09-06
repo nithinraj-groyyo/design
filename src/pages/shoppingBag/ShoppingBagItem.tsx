@@ -8,6 +8,8 @@ import useFetchUserOrders from '../../hooks/useFetchUsersOrders';
 import ConfirmationModal from './ConfirmationModal';
 import { toast } from 'react-toastify';
 import { useSaveForLater } from '../../hooks/useSaveForLater';
+import { useDispatch } from 'react-redux';
+import { setLocalWishlistItems } from '../../redux/wishlistSlice';
 interface ShoppingBagItemProps {
     imageSrc: string;
     productName: string;
@@ -16,11 +18,13 @@ interface ShoppingBagItemProps {
     sizes: IShoppingCartSize[];
     isSavedItem: boolean;
     isAlreadyInWishlist: boolean;
+    product: any
 }
 
-const ShoppingBagItem: React.FC<ShoppingBagItemProps> = ({ imageSrc, productId, productName, price, sizes, isSavedItem, isAlreadyInWishlist }) => {
+const ShoppingBagItem: React.FC<ShoppingBagItemProps> = ({ imageSrc, productId, productName, price, sizes, isSavedItem, isAlreadyInWishlist, product }) => {
     const userId = JSON.parse(localStorage.getItem("userId") as string);
-
+    const dispatch = useDispatch();
+    
     const [isInWishlist, setIsInWishlist] = useState(isAlreadyInWishlist);
     const [refreshOrders, setRefreshOrders] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,8 +38,13 @@ const ShoppingBagItem: React.FC<ShoppingBagItemProps> = ({ imageSrc, productId, 
     useFetchUserOrders(userId, refreshOrders);
 
     const handleWishlistToggle = async () => {
+        const add = !isInWishlist;
+
+        if(!userId){
+            dispatch(setLocalWishlistItems({product}))
+            return 
+        }
         try {
-            const add = !isInWishlist;
             const response = await updateWishlistResponse({ add, productId, userId });
             if (response) {
                 setIsInWishlist(add);

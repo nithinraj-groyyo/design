@@ -50,6 +50,8 @@ export interface IAddressResponse {
     landmark: string;
     city: string;
     state: string;
+    emailId: string;
+    country: string;
     zip: number;
     isActive: boolean;
     flag: boolean;

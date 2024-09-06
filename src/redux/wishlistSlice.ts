@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IWishlistItem } from '../types/products';
 
 interface WishlistState {
-    localWishList: number[];
+    localWishList: any[];
     items: IWishlistItem[];
     loading: boolean;
     error: string | null;
@@ -31,14 +31,29 @@ const wishlistSlice = createSlice({
         setError(state, action: PayloadAction<string | null>) {
             state.error = action.payload;
         },
-        setLocalWishlistItems(state, action: PayloadAction<{productId: number}>) {
-            const { productId } = action.payload;
+        setLocalWishlistItems(state, action: PayloadAction<{ product: IWishlistItem }>) {
+            const { product } = action.payload;
 
-            state.localWishList.push(productId);
+            const index = state.localWishList.findIndex(item => item?.id === product?.id);
+
+            if (index === -1) {                
+                state.localWishList.push(product);
+            } else {                
+                state.localWishList.splice(index, 1);
+            }
+
+            localStorage.setItem('localWishList', JSON.stringify(state.localWishList));
+        },
+        removeFromLocalWishlist(state, action: PayloadAction<{ productId: number }>) {
+            const { productId } = action.payload;
+            
+            state.localWishList = state.localWishList.filter(item => item?.id !== productId);
+            
+            localStorage.setItem('localWishList', JSON.stringify(state.localWishList));
         },
     },
 });
 
-export const { setWishlistItems, removeWishlistItem, setLoading, setError, setLocalWishlistItems } = wishlistSlice.actions;
+export const { setWishlistItems, removeWishlistItem, setLoading, setError, setLocalWishlistItems, removeFromLocalWishlist } = wishlistSlice.actions;
 
 export default wishlistSlice.reducer;

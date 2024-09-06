@@ -25,6 +25,10 @@ const menuItems = [
       { title: "Orders & Returns", route: "/account/orders-returns" },
     ],
   },
+  
+];
+
+const adminMenuItems = [
   {
     title: "Admin Section",
     subItems: [],
@@ -67,6 +71,7 @@ const menuItems = [
 
 const AccountPage = () => {
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("roles") as string);
 
   const onClickHandler = (route: string) => {
     navigate(route);
@@ -74,10 +79,7 @@ const AccountPage = () => {
 
   return (
     <BasicLayout showFooter={false}>
-      <div
-        className="flex mt-[10rem]"
-        style={{ height: "calc(100vh - 10rem)" }}
-      >
+      <div className="flex mt-[10rem]" style={{ height: "calc(100vh - 10rem)" }}>
         <div className="flex-[1] overflow-y-auto" style={{ height: "100%" }}>
           <List>
             {menuItems.map((menuItem, index) => (
@@ -118,6 +120,46 @@ const AccountPage = () => {
                 )}
               </React.Fragment>
             ))}
+
+            {user && user.role === "Admin" &&
+              adminMenuItems.map((menuItem, index) => (
+                <React.Fragment key={index}>
+                  <ListItem>
+                    <ListItemText
+                      primary={menuItem.title}
+                      primaryTypographyProps={{
+                        style: { fontWeight: "normal", fontSize: "1.35rem" },
+                      }}
+                    />
+                  </ListItem>
+                  {menuItem.subItems.length > 0 && (
+                    <List>
+                      {menuItem.subItems.map((subItem, subIndex) => (
+                        <ListItem
+                          key={subIndex}
+                          onClick={() => onClickHandler(subItem.route)}
+                          className="cursor-pointer"
+                        >
+                          <ListItemText
+                            primary={subItem.title}
+                            primaryTypographyProps={{
+                              style: {
+                                fontWeight: "lighter",
+                                fontSize: "1rem",
+                                lineHeight: "0.65",
+                                color: "#7f7f7f",
+                              },
+                            }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  )}
+                  {index !== adminMenuItems.length - 1 && (
+                    <Divider sx={{ width: "90%", mx: "auto" }} />
+                  )}
+                </React.Fragment>
+              ))}
           </List>
         </div>
         <div className="flex-[5] bg-[#f1f1f1] overflow-y-auto" style={{ height: "100%" }}>

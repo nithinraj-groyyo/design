@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import axiosInstance from "./axiosConfig";
 
-const localUrl = "http://192.168.1.13:3002"
+const localUrl = "http://localhost:3002"
 export const getCategoriesResponse = async (): Promise<any> => {
     try {
         const response: AxiosResponse<any> = await axios.get(localUrl+'/product/getCategories/');

@@ -8,6 +8,7 @@ import { setCartData, updateWishList } from '../../redux/shoppingBagSlice';
 import { IconButton } from '@mui/material';
 import { FavoriteBorderOutlined } from '@mui/icons-material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { setLocalWishlistItems } from '../../redux/wishlistSlice';
 
 interface MobileViewItemCardProps {
     imageSrc: string;
@@ -17,6 +18,7 @@ interface MobileViewItemCardProps {
     isSavedItem: boolean;    
     productId: number;
     isAlreadyInWishlist: boolean;
+    product: any
 }
 
 const MobileViewItemCard: React.FC<MobileViewItemCardProps> = ({
@@ -26,7 +28,8 @@ const MobileViewItemCard: React.FC<MobileViewItemCardProps> = ({
     quantity,
     isSavedItem,
     productId,
-    isAlreadyInWishlist
+    isAlreadyInWishlist,
+    product
 }) => {
     const userId = JSON.parse(localStorage.getItem("userId") as string);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -59,6 +62,10 @@ const MobileViewItemCard: React.FC<MobileViewItemCardProps> = ({
     };
 
     const handleWishlistToggle = async () => {
+        if(!userId){
+            dispatch(setLocalWishlistItems({product}))
+            return 
+        }
         try {
             const add = !isInWishlist;
             const response = await updateWishlistResponse({ add, productId, userId });

@@ -84,6 +84,7 @@ const ShoppingBagMobileView: React.FC = () => {
                             isSavedItem={item?.isSavedItem}
                             productId={item?.productId}
                             isAlreadyInWishlist={item?.isAlreadyInWishlist}
+                            product={item}
                         />
                     ))
                 ) : (

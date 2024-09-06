@@ -110,3 +110,13 @@ export const removeAddressResponse = async ({ addressId }: { addressId: number }
         throw error;
     }
 };
+
+export const fetchUserOrdersResponse = async ({ userId }: { userId: number }) => {
+    try {
+        const response = await axiosInstance.get(`/users/fetchUserOrders/${userId}/Admin/all`, { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error removing address:', error);
+        throw error;
+    }
+};

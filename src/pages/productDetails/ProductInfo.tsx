@@ -5,6 +5,7 @@ import { updateWishlistResponse } from '../../api/userApi';
 import { IProductResponse } from '../../types/products';
 import { useDispatch } from 'react-redux';
 import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';
+import { setLocalWishlistItems } from '../../redux/wishlistSlice';
 
 interface IProductInfoProps {
     product: IProductResponse;
@@ -22,6 +23,10 @@ const ProductInfo = ({ product }: IProductInfoProps) => {
     const dispatch = useDispatch();
 
     const handleWishlistToggle = async () => {
+        if(!userId && product){
+            dispatch(setLocalWishlistItems({product} as any))
+            return 
+        }
         try {
             const add = !isInWishlist;
             const response = await updateWishlistResponse({ add, productId: product.id, userId });

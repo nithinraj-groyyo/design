@@ -9,6 +9,7 @@ import useFetchProducts from '../../hooks/useFetchProducts';
 import { useDispatch } from 'react-redux';
 import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';
 import { toast } from 'react-toastify';
+import { setLocalWishlistItems } from '../../redux/wishlistSlice';
 
 interface ProductCardProps {
   showDetails?: boolean;
@@ -27,20 +28,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
 
   useEffect(() => {
     setIsInWishlist(product?.WishLists?.length > 0 ? product?.WishLists[0]?.productId === product?.id : false)
-  },[isInWishlist, product])
+  }, [isInWishlist, product])
 
   const navigateToProductDetails = () => {
     navigate(`/product-details/${categoryKey}/${product?.id}`);
   };
 
   const handleWishlistToggle = async () => {
+    if (!userId && product) {
+      dispatch(setLocalWishlistItems({ product }))
+      return
+    }
     try {
       const add = !isInWishlist;
       const response = await updateWishlistResponse({ add, productId: product?.id, userId });
       if (response) {
         setIsInWishlist(add);
-        dispatch(updateSingleProductWishlist({isInWishlist: add,  productId: product?.id}))
-        dispatch(updateProductWishlist({isInWishlist: add, productId: product?.id}));
+        dispatch(updateSingleProductWishlist({ isInWishlist: add, productId: product?.id }))
+        dispatch(updateProductWishlist({ isInWishlist: add, productId: product?.id }));
       }
     } catch (error: any) {
       console.error('Error updating wishlist:', error?.message);
@@ -48,9 +53,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
   };
 
   const handleRemoveFromWishlist = async () => {
+    if(!userId){
+      dispatch(setLocalWishlistItems({product}))
+      return 
+    }
     try {
       const response = await updateWishlistResponse({ add: false, productId: product.id, userId });
-      if(response){
+      if (response) {
         toast.success("Removed from WishList")
         if (onRemoveFromWishlist) {
           onRemoveFromWishlist(product.id);
@@ -90,7 +99,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
             </Typography>
           </CardContent>
 
-              {/* Mobile view  */}
+          {/* Mobile view  */}
           <div className='lg:hidden px-2 py-1'>
             <div className='flex justify-between items-center'>
               <div className="uppercase font-light text-xs">
@@ -106,7 +115,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
           </div>
         </>
       )}
-      {isAlreadyInWishlist &&<Button className='!bg-black !text-white uppercase !p-2 cursor-pointer !rounded-none' fullWidth onClick={handleRemoveFromWishlist}>Remove</Button>}
+      {isAlreadyInWishlist && <Button className='!bg-black !text-white uppercase !p-2 cursor-pointer !rounded-none' fullWidth onClick={handleRemoveFromWishlist}>Remove</Button>}
     </Card>
   );
 };

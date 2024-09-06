@@ -19,6 +19,8 @@ import AddProducts from './pages/account/product/AddProducts';
 import useFetchUserOrders from './hooks/useFetchUsersOrders';
 import ProtectedRoute from './layouts/ProtectedRoutes';
 import OrderReturns from './pages/account/product/OrderReturns';
+import AdminRoutes from './layouts/AdminRoutes';
+import Unauthorized from './components/Unauthorized';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
@@ -53,9 +55,20 @@ const App = () => {
         <Route path="orders" element={<Orders />} />
         <Route path="profile" element={<Profile />} />
         <Route path="changePassword" element={<ChangePassword />} />
-        <Route path="product-list" element={<AdminProductList />} />
-        <Route path="bulk-upload" element={<BulkUploadProduct />} />
-        <Route path="add-product" element={<AddProducts />} />
+        
+        <Route path="product-list" element={<AdminRoutes />}>
+          <Route path="" element={<AdminProductList />} />
+        </Route>
+        <Route path="bulk-upload" element={<AdminRoutes />}>
+            <Route path="" element={<BulkUploadProduct />} />
+        </Route>
+
+        <Route path="add-product" element={<AdminRoutes />}>
+            <Route path="" element={<AddProducts />} />
+        </Route>
+
+        <Route path="unauthorized" element={<Unauthorized />} />
+        
         <Route path="orders-returns" element={<OrderReturns />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
