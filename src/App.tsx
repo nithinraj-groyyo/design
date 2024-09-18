@@ -21,6 +21,7 @@ import ProtectedRoute from './layouts/ProtectedRoutes';
 import OrderReturns from './pages/account/product/OrderReturns';
 import AdminRoutes from './layouts/AdminRoutes';
 import Unauthorized from './components/Unauthorized';
+import EditProduct from './pages/account/product/EditProduct';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
@@ -65,6 +66,10 @@ const App = () => {
 
         <Route path="add-product" element={<AdminRoutes />}>
             <Route path="" element={<AddProducts />} />
+        </Route>
+
+        <Route path="edit-product" element={<AdminRoutes />}>
+            <Route path="" element={<EditProduct />} />
         </Route>
 
         <Route path="unauthorized" element={<Unauthorized />} />

@@ -12,7 +12,7 @@ function SocialMedia() {
   ];
 
   return (
-    <div className="flex justify-start items-center mt-2 lg:mt-8 w-full">
+    <div className="flex justify-start items-center lg:mt-8 w-full">
       <div className="flex gap-3 max-w-full">
         {socialIcons.map((icon, index) => {
           const IconComponent = icon.Component;

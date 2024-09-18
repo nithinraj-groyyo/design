@@ -13,7 +13,7 @@ export const ContactUs = () => {
               "Order and Delivery",
               "Returns and Refunds",
               "Payments and Pricing",
-              "Groyyo Studio Customer Promise",
+              // "Groyyo Studio Customer Promise",
             ].map((item, index) => (
               <div key={index} className="font-light tracking-widest">
                 {item}

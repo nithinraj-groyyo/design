@@ -32,15 +32,25 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useFormik } from "formik";
 import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
+import { useLocation } from 'react-router-dom'
 import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
 import { useFetchSubCategories } from "../../../hooks/useFetchSubCategories";
 import { ICategory } from "../../../types/categories";
+import { RootState } from "../../../redux/store";
 import { toast } from "react-toastify";
 import { addUpdateProductResponse } from "../../../api/productsApi";
 
+const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    alignItems: 'flex-start',
+    '& .MuiTypography-root': {
+        marginBottom: theme.spacing(1),
+    },
+}));
+
 interface ImageData {
-    id: string;
+    id: string | number;
     side: string;
     file: File | null;
     isCover: boolean;
@@ -50,7 +60,7 @@ interface ImageData {
 
 
 interface PriceListData {
-    id: number;
+    id: string | number;
     qtyFrom: string;
     qtyTo: string;
     price: string;
@@ -72,45 +82,109 @@ interface FormData {
     leftHeading2Content: string;
 }
 
-const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    alignItems: 'flex-start',
-    '& .MuiTypography-root': {
-        marginBottom: theme.spacing(1),
-    },
-}));
-
-
-const AddProducts = () => {
+const EditProduct = () => {
+    const location = useLocation();
     const userId = JSON.stringify(localStorage.getItem("userId") as string);
 
+    const { product } = location?.state;
+
     const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
+    const { categories, subCategories } = useSelector((state: RootState) => state.categories);
+    const { fetchSubCategories } = useFetchSubCategories();
 
-  const handleCategoryChange = (e: any) => {
-    const selectedCategoryId = e.target.value as number;
-    const selectedCat = categories.find((cat) => cat.id === selectedCategoryId) || null;
+    useEffect(() => {
+        if (product) {
+            if (product?.OtherCategoryId && !subCategories.length) {
+                fetchSubCategories(product?.OtherCategoryId);
+            }
 
-    formik.setFieldValue('category', selectedCat?.key); 
-    setSelectedCategory(selectedCat); 
-  };
 
+            if (formik.values.productId !== product.id) {
+                formik.setFieldValue('productId', product?.id);
+                formik.setFieldValue('productName', product?.name);
+                formik.setFieldValue('styleName', product?.StyleName);
+                formik.setFieldValue('description', product?.description);
+                formik.setFieldValue('status', product?.status);
+                formik.setFieldValue('leftHeading1', product?.leftHeading1);
+                formik.setFieldValue('leftHeading1Content', product?.leftHeading1Content);
+                formik.setFieldValue('leftHeading2', product?.leftHeading2);
+                formik.setFieldValue('leftHeading2Content', product?.leftHeading2Content);
+            }
+
+            const initialCategory = categories?.find(cat => cat.id === product?.categoryId) || null;
+            const initialOtherCategory = subCategories?.find((cat) => {
+                return cat.id === product?.OtherCategoryId
+            });
+
+            setSelectedCategory(initialCategory);
+
+            formik.setFieldValue('category', initialCategory?.key);
+            formik.setFieldValue('otherCategory', initialOtherCategory?.id);
+
+            const previousSizes = product?.productSizes?.map((size: any) => size?.sizeName)?.join(", ");
+            formik.setFieldValue('sizes', previousSizes);
+
+            const previousColors = product?.ProductColours?.length > 0 ? product?.ProductColours?.map((size: any) => size?.Color)?.join(", ") : "";
+            formik.setFieldValue('colors', previousColors);
+
+            const imageList = product?.ProductImages?.map((image: any, index: number) => {
+                const { fileName, filePath, id, side } = image;
+                return {
+                    id,
+                    fileName,
+                    file: filePath,
+                    side,
+                    isDeleted: false,
+                    isCover: index === 0 ? true : false
+                }
+                // { id: uuidv1(), side: "", file: null, isCover: true, fileName: "", isDeleted: false }
+
+            })
+            setImgList(imageList);
+
+            const pricingList = product?.ProductPricings?.map((pricing: any) => {
+                const { MinQuantity, MaxQuantity, id, Price } = pricing;
+                return {
+                    id,
+                    qtyFrom: MinQuantity?.toString() ?? "",
+                    qtyTo: MaxQuantity?.toString() ?? "",
+                    price: Price?.toString() ?? ""
+                }
+            })
+            setPriceList(pricingList)
+        }
+    }, [product, categories, subCategories]);
+
+    useEffect(() => {
+        if (selectedCategory?.id) {
+            fetchSubCategories(selectedCategory?.id as number)
+        }
+    }, [selectedCategory])
+
+    const handleCategoryChange = (e: any) => {
+        const selectedCategoryId = e.target.value as number;
+        const selectedCat = categories.find((cat) => cat.id === selectedCategoryId) || null;
+
+        formik.setFieldValue('category', selectedCat?.key);
+        setSelectedCategory(selectedCat);
+    };
 
     const [imgList, setImgList] = useState<ImageData[]>([
         { id: uuidv1(), side: "", file: null, isCover: true, fileName: "", isDeleted: false },
     ]);
 
-    const {categories, subCategories} = useSelector((state: RootState) => state.categories);
-    const {fetchSubCategories} = useFetchSubCategories();
+    const [priceList, setPriceList] = useState<PriceListData[]>([
+        { id: 1, qtyFrom: "", qtyTo: "", price: "" },
+    ]);
 
-    useEffect(() => {
-        if(selectedCategory?.id){
-            fetchSubCategories(selectedCategory?.id as number)
-        }
-    }, [selectedCategory])
-    
-    
-    const handleFileUpload = (id: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+
+    const [selectedStatus, setSelectedStatus] = useState('enabled');
+
+    const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedStatus(event.target.value);
+    };
+
+    const handleFileUpload = (id: string | number) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event?.target?.files;
         if (files && files?.length > 0) {
             const file: any = files[0];
@@ -129,15 +203,22 @@ const AddProducts = () => {
             );
         }
     };
-    const handleCheckboxIsCover = (selectedId: string) => {
-        setImgList((prevItems) =>
-          prevItems.map((item) => ({
-            ...item,
-            isCover: item.id === selectedId,
-          }))
-        );
-      };
 
+    const handleCheckboxIsCover = (selectedId: string | number) => {
+        setImgList((prevItems) =>
+            prevItems.map((item) => ({
+                ...item,
+                isCover: item.id === selectedId,
+            }))
+        );
+    };
+
+    const handleAddRow = () => {
+        setPriceList(prevRows => [
+            ...prevRows,
+            { id: uuidv1(), qtyFrom: "", qtyTo: "", price: "" },
+        ]);
+    };
 
     const handleAddImage = () => {
         setImgList(prev => [
@@ -146,26 +227,11 @@ const AddProducts = () => {
         ]);
     };
 
-    const handleRemoveImage = (id: string) => () => {
-        setImgList(prev => prev.filter(img => img?.id !== id));
-    };
-
-    const [priceList, setPriceList] = useState<PriceListData[]>([
-        { id: 1, qtyFrom: "", qtyTo: "", price: "" },
-    ]);
-
-    const handleAddRow = () => {
-        setPriceList(prevRows => [
-            ...prevRows,
-            { id: prevRows.length + 1, qtyFrom: "", qtyTo: "", price: "" },
-        ]);
-    };
-
-    const handleDeleteRow = (id: number) => {
+    const handleDeleteRow = (id: number | string) => {
         setPriceList(prevRows => prevRows.filter(row => row.id !== id));
     };
 
-    const handleInputChange = (id: number, field: keyof PriceListData, value: string) => {
+    const handleInputChange = (id: number | string, field: keyof PriceListData, value: string) => {
         setPriceList(prevRows =>
             prevRows.map(row =>
                 row.id === id ? { ...row, [field]: value } : row
@@ -173,10 +239,17 @@ const AddProducts = () => {
         );
     };
 
-    const [selectedStatus, setSelectedStatus] = useState('enabled');
+    const handleRemoveImage = (id: string |  number) => () => {
+        setImgList(prev => {
+            const updatedImageList  = prev.filter(img => img?.id !== id);
+            if(updatedImageList?.length === 0){
+                return [
+                    { id: uuidv1(), side: "", file: null, isCover: true, fileName: "", isDeleted: false },
+                ];
+            }
+            return updatedImageList;
+        });
 
-    const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedStatus(event.target.value);
     };
 
     const formik = useFormik<FormData>({
@@ -224,7 +297,7 @@ const AddProducts = () => {
                         leftHeading2: values?.leftHeading2,
                         leftHeading2Content: values?.leftHeading2Content                
                     };
-        
+
                     const convertPriceList = priceList?.map((price) => {
                         return{
                             qtyFrom: +price?.qtyFrom,
@@ -232,37 +305,39 @@ const AddProducts = () => {
                             price: +price?.price,
                         }
                     })
-        
+
                     const formData = new FormData();
-        
+
                     imgList.forEach(item => {
                         formData.append("upload_file", item?.file ?? "");
                     })
-                    
+
                     formData.append("content", JSON.stringify(payload));
                     formData.append("imgList", JSON.stringify(imgList));
                     formData.append("priceList", JSON.stringify(convertPriceList));
                     formData.append("userId", userId);
-console.log({convertPriceList, imgList, payload})
-console.log(formData)
-                    // try {
-                    //     const response = await addUpdateProductResponse(formData, "create");
-                    //     if(response?.message === "success"){
-                    //         toast.success(`Successfuly Created a Product`);
-                    //     }
-                    // }catch(error: any){
-                    //     console.error(error?.message)
-                    //     toast.error("Error while Creating product")
-                    // }
+                    console.log({convertPriceList, imgList, payload})
+                    console.log(formData)
+                    try {
+                        const response = await addUpdateProductResponse(formData, "create");
+                        if(response?.message === "success"){
+                            toast.success(`Successfuly Updated the Product`);
+                        }
+                    }catch(error: any){
+                        console.error(error?.message)
+                        toast.error("Error while Updatin g product")
+                    }
                 }
 
             }
         },
     });
 
-
     return (
-        <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg">
+        <form
+            onSubmit={formik.handleSubmit}
+            className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg"
+        >
             <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
                 <div className="flex justify-between">
                     <div className="font-bold">Add Product</div>
@@ -292,7 +367,7 @@ console.log(formData)
                                     error={formik.touched.styleName && Boolean(formik.errors.styleName)}
                                     helperText={formik.touched.styleName && formik.errors.styleName}
                                 />
-                                 <FormControl fullWidth>
+                                <FormControl fullWidth>
                                     <InputLabel>Category</InputLabel>
                                     <Select
                                         name="category"
@@ -304,15 +379,15 @@ console.log(formData)
                                     >
                                         <MenuItem value="">--Select--</MenuItem>
                                         {categories.map((cat) => (
-                                        <MenuItem key={cat.id} value={cat.id}>
-                                            {cat.label}
-                                        </MenuItem>
+                                            <MenuItem key={cat.id} value={cat.id}>
+                                                {cat.label}
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                     {formik.touched.category && formik.errors.category && (
                                         <div className="text-red-600 text-xs">{formik.errors.category}</div>
                                     )}
-                                    </FormControl>
+                                </FormControl>
 
                                 <FormControl fullWidth>
                                     <InputLabel>Other Category</InputLabel>
@@ -373,7 +448,7 @@ console.log(formData)
                                             value={img?.fileName || ""}
                                             className="cursor-pointer"
                                             InputProps={{
-                                                readOnly: true, 
+                                                readOnly: true,
                                                 endAdornment: (
                                                     <InputAdornment position="end">
                                                         <input
@@ -385,13 +460,13 @@ console.log(formData)
                                                         />
                                                         <label htmlFor={`upload-file-${img?.id}`}>
                                                             <IconButton color="primary" component="span">
-                                                                <UploadIcon />
+                                                                {!img?.fileName && <UploadIcon />}
                                                             </IconButton>
                                                         </label>
                                                     </InputAdornment>
                                                 ),
                                                 sx: {
-                                                    pointerEvents: 'none', 
+                                                    pointerEvents: 'none',
                                                 },
                                             }}
                                             sx={{ flex: '1 1 300px' }}
@@ -410,15 +485,21 @@ console.log(formData)
                                             label=""
                                         />
                                     </FormGroup>
-                                    {imgList?.length > 1 && <div className="flex gap-2">
-                                        <IconButton color="error" onClick={handleRemoveImage(img?.id)}>
+                                    {imgList?.length > 0 && <div className="flex gap-2">
+                                        <IconButton
+                                            color="error"
+                                        onClick={handleRemoveImage(img?.id)}
+                                        >
                                             <DeleteIcon />
                                         </IconButton>
                                     </div>}
                                 </div>
                             ))}
                             <div className="flex justify-end mt-2">
-                                <IconButton color="primary" onClick={handleAddImage}>
+                                <IconButton
+                                    color="primary"
+                                onClick={handleAddImage}
+                                >
                                     <AddBoxIcon />
                                 </IconButton>
                             </div>
@@ -460,7 +541,7 @@ console.log(formData)
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {priceList.map((row, index) => (
+                                                {priceList?.map((row, index) => (
                                                     <TableRow key={row?.id} sx={{ borderBottom: "none" }}>
                                                         <TableCell>
                                                             <TextField
@@ -478,7 +559,7 @@ console.log(formData)
                                                                 type="number"
                                                                 fullWidth
                                                                 variant="outlined"
-                                                                 placeholder="0"
+                                                                placeholder="0"
                                                                 value={row?.qtyTo}
                                                                 onChange={(e) => handleInputChange(row?.id, 'qtyTo', e.target.value)}
                                                                 inputProps={{ min: 0 }}
@@ -489,7 +570,7 @@ console.log(formData)
                                                                 type="number"
                                                                 fullWidth
                                                                 variant="outlined"
-                                                                 placeholder="0"
+                                                                placeholder="0"
                                                                 value={row?.price}
                                                                 onChange={(e) => handleInputChange(row?.id, 'price', e.target.value)}
                                                                 inputProps={{ min: 0 }}
@@ -498,12 +579,18 @@ console.log(formData)
                                                         <TableCell>
                                                             <div className="flex gap-4">
                                                                 {priceList?.length > 1 && (
-                                                                    <IconButton color="error" onClick={() => handleDeleteRow(row?.id)}>
+                                                                    <IconButton
+                                                                        color="error"
+                                                                        onClick={() => handleDeleteRow(row?.id)}
+                                                                    >
                                                                         <DeleteIcon />
                                                                     </IconButton>
                                                                 )}
                                                                 {index === priceList?.length - 1 && (
-                                                                    <IconButton color="primary"  onClick={handleAddRow}>
+                                                                    <IconButton
+                                                                        color="primary"
+                                                                        onClick={handleAddRow}
+                                                                    >
                                                                         <AddBoxIcon />
                                                                     </IconButton>
                                                                 )}
@@ -535,7 +622,7 @@ console.log(formData)
                     <div className="flex-[1]">
                         <Card className="p-4 flex flex-col gap-4">
                             <div className="font-bold">Product Status</div>
-                            
+
                             <FormControl component="fieldset">
                                 <FormLabel component="legend">
                                     <p className="font-bold text-sm">Status</p>
@@ -591,7 +678,7 @@ console.log(formData)
                 </div>
             </div>
         </form>
-    );
-};
+    )
+}
 
-export default AddProducts;
+export default EditProduct

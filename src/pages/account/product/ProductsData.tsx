@@ -63,7 +63,7 @@ const ProductTable: React.FC = () => {
   };
 
   const goToEditPage = (product: IProductResponse) => {
-    navigate('/account/product/add', {
+    navigate('/account/edit-product', {
       state: { product },
     });
   };

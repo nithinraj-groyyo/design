@@ -18,7 +18,7 @@ const CustomerService = () => {
             <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>Orders and Delivery</Typography>
             <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>Returns and refunds</Typography>
             <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>Payments and Pricing</Typography>
-            <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>Groyyo Studio Customer Promise</Typography>
+            {/* <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>Groyyo Studio Customer Promise</Typography> */}
         </div>
     </div>
   )
