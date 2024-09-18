@@ -14,6 +14,20 @@ module.exports = {
         'xl': '1280px', // Extra large devices (large desktops, 1280px and up)
         '2xl': '1536px',// Double extra large devices (larger desktops, 1536px and up)
       },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        fadeOut: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+      },
+      animation: {
+        fadeIn: 'fadeIn 300ms ease-in',
+        fadeOut: 'fadeOut 300ms ease-out',
+      },
     },
   },
   plugins: [],

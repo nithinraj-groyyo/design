@@ -16,12 +16,12 @@ import NotFoundPage from './pages/NotFoundPage';
 import AdminProductList from './pages/account/product/AdminProductList';
 import BulkUploadProduct from './pages/account/product/BulkUploadProduct';
 import AddProducts from './pages/account/product/AddProducts';
-import useFetchUserOrders from './hooks/useFetchUsersOrders';
 import ProtectedRoute from './layouts/ProtectedRoutes';
 import OrderReturns from './pages/account/product/OrderReturns';
 import AdminRoutes from './layouts/AdminRoutes';
 import Unauthorized from './components/Unauthorized';
 import EditProduct from './pages/account/product/EditProduct';
+import ServicePage from './pages/service_page/ServicePage';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
@@ -51,6 +51,7 @@ const App = () => {
       <Route path="/bag" element={<ShoppingBag />} />
       <Route path="/wishlist" element={<WishList />} />
       <Route path="/contact-us" element={<ContactUs />} />
+      <Route path="/services" element={<ServicePage/>}/>
       <Route path="account" element={<AccountPage />}>
         <Route path="address" element={<Address />} />
         <Route path="orders" element={<Orders />} />
