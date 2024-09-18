@@ -10,17 +10,51 @@ import MenuTabs from './MenuTabs';
 import SubCategoriesList from './SubCategoriesList';
 import { useNavigate } from 'react-router-dom';
 import useFetchCategories from '../../hooks/useFetchCategories';
+import NavigationBar from './NavigationBar';
 
 const Header: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const modalRef = useRef<HTMLDivElement | null>(null);
     const [menuListOpen, setMenuListOpen] = useState<boolean>(false);
+
+    const [opacity, setOpacity] = useState(1);
+    const [lastScrollTop, setLastScrollTop] = useState(0);
     
     useFetchCategories();
     
     const { activeCategoryTab } = useSelector((state: RootState) => state.categories);
     const { fetchSubCategories } = useFetchSubCategories();
+
+    useEffect(() => {
+        const handleScroll = () => {
+          const scrollTop = window.scrollY;
+          const scrollHeight = document.documentElement.scrollHeight;
+          const clientHeight = document.documentElement.clientHeight;
+    
+          const isScrollingDown = scrollTop > lastScrollTop;
+    
+          if (isScrollingDown) {
+            const newOpacity = 1 - Math.min(scrollTop / 300, 1);
+            setOpacity(newOpacity);
+          } else if (!isScrollingDown && opacity < 1) {
+            const newOpacity = opacity + 0.05;
+            setOpacity(Math.min(newOpacity, 1));
+          }
+    
+          if (scrollTop + clientHeight >= scrollHeight && !isScrollingDown) {
+            setOpacity(1);
+          }
+    
+          setLastScrollTop(scrollTop <= 0 ? 0 : scrollTop);
+        };
+    
+        window.addEventListener('scroll', handleScroll);
+    
+        return () => {
+          window.removeEventListener('scroll', handleScroll);
+        };
+      }, [lastScrollTop, opacity]);
     
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,16 +85,30 @@ const Header: React.FC = () => {
         }
     };
 
+    const handleHeaderOpacity = () => {
+        setOpacity(1)
+    }
 
-
+    const navigateToHomePage = () => {
+        navigate("/")
+    };
 
     return (
-        <header className={`fixed hidden lg:flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30`}>
+        <header 
+            className={`fixed hidden lg:flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30 hover:bg-white hover:shadow-lg transition-all duration-500 ease-in-out p-6 rounded-lg`} 
+            style={{ opacity }}
+            onMouseOver={handleHeaderOpacity}
+        >
             <div className='flex items-center space-x-4'>
                 <div className='cursor-pointer'>
-                    <MenuIcon />
+                    <img  
+                        src="/images/Groyyo_Studio_Logo.png" 
+                        width={100} height={100} 
+                        // style={{mixBlendMode: "color-burn"}}
+                        onClick={navigateToHomePage}    
+                    />
                 </div>
-                <div className='xxs:hidden lg:flex flex-col relative min-w-[30rem]' ref={modalRef}>
+                {/* <div className='xxs:hidden lg:flex flex-col relative min-w-[30rem]' ref={modalRef}>
                     <div className={`absolute p-2 top-[-4rem] ${menuListOpen ? 'bg-white border border-[#646463] rounded-md' : ''}`}>
                         <HeaderLogo />
                         <MenuTabs onTabChange={handleTabChange} />
@@ -68,7 +116,8 @@ const Header: React.FC = () => {
                             <SubCategoriesList onItemClick={navigateToProducts} />
                         )}
                     </div>
-                </div>
+                </div> */}
+                <NavigationBar />
             </div>
             <nav className="flex items-center">
                 <HeaderIcons />
