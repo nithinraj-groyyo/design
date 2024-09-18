@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BasicLayout from "../../layouts/BasicLayout";
 import { Button } from "@mui/material";
-import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
-import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
 const ServicePage = () => {
   const carouselDetails = [
@@ -29,6 +29,16 @@ const ServicePage = () => {
     setCurrentService((currentService + val + 3) % 3);
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleIndex(1)
+    }, 3000);
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [currentService])
+
   return (
     <BasicLayout>
       <div
@@ -53,43 +63,55 @@ const ServicePage = () => {
           }}
         >
           <div
-            className="flex p-4 items-center cursor-pointer"
+            className="flex items-center cursor-pointer absolute left-20"
             onClick={() => handleIndex(-1)}
           >
-            <ArrowCircleLeftIcon />
+            <KeyboardArrowLeftIcon />
           </div>
-          <div className="flex flex-col gap-8 bg-white p-8 rounded w-full min-w-[30vw] min-h-[32.5vh] text-center">
+          <div
+            className="flex flex-col gap-8 bg-white p-8 rounded w-full min-w-[30vw]  text-center">
             <div className="text-4xl font-bold whitespace-nowrap">
               {carouselDetails[currentService]?.title}
             </div>
             <div>{carouselDetails[currentService]?.description}</div>
-            
-              <div>
-                <Button
-                  variant="outlined"
-                  sx={{
-                    color: "black",
+
+            <div>
+              <Button
+                variant="outlined"
+                sx={{
+                  color: "black",
+                  borderColor: "black",
+                  padding: "1rem",
+                  minWidth: "15rem",
+                  "&:hover": {
+                    backgroundColor: "black",
+                    color: "white",
                     borderColor: "black",
-                    padding: "1rem",
-                    minWidth: "15rem",
-                    "&:hover": {
-                      backgroundColor: "black",
-                      color: "white",
-                      borderColor: "black",
-                    },
-                  }}
-                >
-                  {carouselDetails[currentService]?.buttonName}
-                </Button>
-              </div>
+                  },
+                }}
+              >
+                {carouselDetails[currentService]?.buttonName}
+              </Button>
+            </div>
             
           </div>
           <div
-            className="flex p-4 items-center cursor-pointer"
+            className="flex items-center cursor-pointer absolute right-20 "
             onClick={() => handleIndex(1)}
           >
-            <ArrowCircleRightIcon />
+            <KeyboardArrowRightIcon />
           </div>
+          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-2">
+                {carouselDetails.map((_, index) => (
+                    <div
+                        key={index}
+                        className={`w-3 h-3 rounded-full cursor-pointer ${
+                            index === currentService ? 'bg-black' : 'bg-gray-400'
+                        }`}
+                        onClick={() => setCurrentService(index)}
+                    />
+                ))}
+            </div>
         </div>
       </div>
 
@@ -237,23 +259,23 @@ const ServicePage = () => {
                 </li>
               </div>
               <div className="text-center">
-              <Button
-                variant="outlined"
-                sx={{
-                  color: "black",
-                  borderColor: "black",
-                  padding: "1rem",
-                  minWidth: "15rem",
-                  "&:hover": {
-                    backgroundColor: "black",
-                    color: "white",
+                <Button
+                  variant="outlined"
+                  sx={{
+                    color: "black",
                     borderColor: "black",
-                  },
-                }}
-              >
-                Contact us
-              </Button>
-            </div>
+                    padding: "1rem",
+                    minWidth: "15rem",
+                    "&:hover": {
+                      backgroundColor: "black",
+                      color: "white",
+                      borderColor: "black",
+                    },
+                  }}
+                >
+                  Contact us
+                </Button>
+              </div>
             </div>
           </div>
         </div>
