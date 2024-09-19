@@ -9,6 +9,7 @@ import useWindowWidth from '../../hooks/useWindowWidth';
 import { IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { motion } from 'framer-motion';
 
 const WishList = () => {
     const userId = JSON.parse(localStorage.getItem("userId") as string);
@@ -22,6 +23,9 @@ const WishList = () => {
     const { isMobileView } = useWindowWidth();
 
     const [localWishlistState, setLocalWishlistState] = useState<any[]>([]);
+
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
 
     useEffect(() => {
         const fetchWishlist = async () => {
@@ -43,7 +47,25 @@ const WishList = () => {
             setLocalWishlistState(localWishlist || []);
         }
     }, [dispatch, userId]);
-    
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        }
+    }, [lastScrollY]);
+
+    const handleScroll = () => {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {            
+            setIsVisible(false);
+          } else {            
+            setIsVisible(true);
+          }
+      
+          setLastScrollY(currentScrollY);
+    }
+
     const handleRemoveFromWishlist = (productId: number) => {
         if (!userId) {
             dispatch(removeFromLocalWishlist({ productId }));
@@ -55,20 +77,34 @@ const WishList = () => {
 
     const isWishlistEmpty = userId ? wishlistItems.length === 0 : localWishlistState.length === 0;
 
+    const cardVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+        hover: { scale: 1.05 },
+        exit: { opacity: 0, y: 50, transition: { duration: 0.3 } }
+    };
+
     return (
         <BasicLayout showHeader={!isMobileView}>
             <section className='xxs:mt-[0rem] lg:mt-[10rem]'>
                 <div className='m-0 lg:m-[4rem]'>
-                    <div className='flex gap-4'>
+                    <motion.div 
+                        className='flex gap-4'
+                        initial={{ opacity: 1, y: 0 }}
+                        animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: -100 }}
+                        transition={{ duration: 0.5 }}
+                    >
                         <IconButton className='!text-3xl !font-bold' onClick={() => {
                             navigate("/");
                         }}>
                             <ArrowBackIcon />
                         </IconButton>
-                        <div className='text-3xl font-medium my-[1rem]'>
+                        <div
+                            className='text-3xl font-medium my-[1rem]'
+                        >
                             WISHLIST
                         </div>
-                    </div>
+                    </motion.div>
                     {loading && <p>Loading...</p>}
                     {error && <p className="text-red-500">{error}</p>}
                     {isWishlistEmpty ? (
@@ -83,25 +119,24 @@ const WishList = () => {
                         </div>
                     ) : (
                         <div className='grid xss:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 justify-center xxs:gap-4'>
-                            {userId ? wishlistItems?.map((item) => (
-                                <ProductCard
-                                    key={item.Product.id}
-                                    className='border border-black !rounded-none'
-                                    isAlreadyInWishlist={true}
-                                    product={item.Product}
-                                    onRemoveFromWishlist={handleRemoveFromWishlist}
-                                />
-                            )) : (
-                                localWishlistState?.map((item) => (
+                            {(userId ? wishlistItems : localWishlistState)?.map((item) => (
+                                <motion.div
+                                    key={userId ? item.Product.id : item.id}
+                                    variants={cardVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    whileHover="hover"
+                                    exit="exit"
+                                    className='bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden'
+                                >
                                     <ProductCard
-                                        key={item.id}
-                                        className='border border-black !rounded-none'
+                                        className='!rounded-none'
                                         isAlreadyInWishlist={true}
-                                        product={item}
+                                        product={userId ? item.Product : item}
                                         onRemoveFromWishlist={handleRemoveFromWishlist}
                                     />
-                                ))
-                            )}
+                                </motion.div>
+                            ))}
                         </div>
                     )}
                 </div>
