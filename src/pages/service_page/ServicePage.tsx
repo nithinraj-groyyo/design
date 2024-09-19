@@ -1,6 +1,8 @@
+
 import React, { useEffect, useState } from "react";
 import BasicLayout from "../../layouts/BasicLayout";
 import { Button } from "@mui/material";
+import { motion } from "framer-motion";
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
@@ -17,9 +19,8 @@ const ServicePage = () => {
       buttonName: "Book an appointment",
     },
     {
-      title: " Design Consultation",
-      description:
-        "Expert guidance to perfect your design ideas.",
+      title: "Design Consultation",
+      description: "Expert guidance to perfect your design ideas.",
       buttonName: "Contact us",
     },
   ];
@@ -30,18 +31,23 @@ const ServicePage = () => {
   };
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+
+  useEffect(() => {
     const interval = setInterval(() => {
-      handleIndex(1)
+      handleIndex(1);
     }, 3000);
 
     return () => {
-      clearInterval(interval)
-    }
-  }, [currentService])
+      clearInterval(interval);
+    };
+  }, [currentService]);
 
   return (
     <BasicLayout>
-      <div
+      <motion.div
         className="w-screen min-h-[70vh] mt-[10rem]"
         style={{
           backgroundImage: "url(/images/landingPages/floralPattern1.jpg)",
@@ -51,25 +57,37 @@ const ServicePage = () => {
           position: "relative",
           fontFamily: "Poppins",
         }}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
       >
-        <div
-          className="p-8 flex items-center justify-between rounded-xl min-w-[50vw] "
+        <motion.div
+          className="p-8 flex items-center justify-between rounded-xl w-full max-w-[50vw]"
           style={{
             height: "auto",
             position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
+            top: "25%",
+            left: "25%",
+            transform: "translate(-25%, -25%)",
           }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
         >
+
           <div
             className="flex items-center cursor-pointer absolute left-20"
             onClick={() => handleIndex(-1)}
           >
             <KeyboardArrowLeftIcon />
           </div>
-          <div
-            className="flex flex-col gap-8 bg-white p-8 rounded w-full min-w-[30vw]  text-center">
+
+          <motion.div
+            className="flex flex-col gap-8 bg-white p-8 rounded w-full min-w-[30vw] text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
             <div className="text-4xl font-bold whitespace-nowrap">
               {carouselDetails[currentService]?.title}
             </div>
@@ -93,35 +111,46 @@ const ServicePage = () => {
                 {carouselDetails[currentService]?.buttonName}
               </Button>
             </div>
-            
-          </div>
+          </motion.div>
+
           <div
-            className="flex items-center cursor-pointer absolute right-20 "
+            className="flex items-center cursor-pointer absolute right-20"
             onClick={() => handleIndex(1)}
           >
             <KeyboardArrowRightIcon />
           </div>
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-2">
-                {carouselDetails.map((_, index) => (
-                    <div
-                        key={index}
-                        className={`w-3 h-3 rounded-full cursor-pointer ${
-                            index === currentService ? 'bg-black' : 'bg-gray-400'
-                        }`}
-                        onClick={() => setCurrentService(index)}
-                    />
-                ))}
-            </div>
-        </div>
-      </div>
+            {carouselDetails.map((_, index) => (
+              <motion.div
+                key={index}
+                className={`w-3 h-3 rounded-full cursor-pointer ${index === currentService ? "bg-black" : "bg-gray-400"
+                  }`}
+                onClick={() => setCurrentService(index)}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
 
-      <div
-        className="px-32 py-8   flex flex-col gap-8"
+      <motion.div
+        className="px-32 py-8 flex flex-col gap-8"
         style={{ fontFamily: "Poppins" }}
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.2 }}
       >
         <div className="text-center font-semibold text-lg">Services</div>
 
-        <div className=" px-32 py-8 flex flex-col gap-16 shadow-md rounded-lg border border-none bg-[#ffc2ab] bg-opacity-40">
+        <motion.div
+          className="px-32 py-8 flex flex-col gap-16 shadow-md rounded-lg border border-none bg-[#ffc2ab] bg-opacity-40"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 1 }}
+          // viewport={{ once: true }}
+        >
           <div
             className="text-center font-bold tracking-[0.25em] text-5xl"
             style={{ fontFamily: "Pompiere" }}
@@ -174,10 +203,16 @@ const ServicePage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <div className="flex gap-8 ">
-          <div className=" w-full p-16 flex flex-col gap-8 shadow-md rounded-lg border border-none bg-[#ffc2ab] bg-opacity-40">
+          <motion.div
+            className="w-full p-16 flex flex-col gap-8 shadow-md rounded-lg border border-none bg-[#ffc2ab] bg-opacity-40"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 1 }}
+            // viewport={{ once: true }}
+          >
             <div className="flex justify-center">
               <img
                 src={"/images/auth/login_img_1.jpeg"}
@@ -226,9 +261,15 @@ const ServicePage = () => {
                 Book an appointment
               </Button>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="shadow-md w-full  p-16 flex flex-col gap-8 rounded-lg border border-none bg-[#ffc2ab] bg-opacity-40">
+          <motion.div
+            className="shadow-md w-full p-16 flex flex-col gap-8 rounded-lg border border-none bg-[#ffc2ab] bg-opacity-40"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 1 }}
+            // viewport={{ once: true }}
+          >
             <div className="flex justify-center">
               <img
                 src={"/images/auth/login_img_1.jpeg"}
@@ -258,28 +299,29 @@ const ServicePage = () => {
                   ahead with our trend analysis and insights.
                 </li>
               </div>
-              <div className="text-center">
-                <Button
-                  variant="outlined"
-                  sx={{
-                    color: "black",
-                    borderColor: "black",
-                    padding: "1rem",
-                    minWidth: "15rem",
-                    "&:hover": {
-                      backgroundColor: "black",
-                      color: "white",
-                      borderColor: "black",
-                    },
-                  }}
-                >
-                  Contact us
-                </Button>
-              </div>
             </div>
-          </div>
+            <div className="text-center">
+              <Button
+                variant="outlined"
+                sx={{
+                  color: "black",
+                  borderColor: "black",
+                  padding: "1rem",
+                  minWidth: "15rem",
+                  "&:hover": {
+                    backgroundColor: "black",
+                    color: "white",
+                    borderColor: "black",
+                  },
+                }}
+              >
+                Contact us
+              </Button>
+            </div>
+          </motion.div>
         </div>
-      </div>
+
+      </motion.div>
     </BasicLayout>
   );
 };
