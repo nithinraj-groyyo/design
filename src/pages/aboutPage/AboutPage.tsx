@@ -1,0 +1,139 @@
+import React from "react";
+import BasicLayout from "../../layouts/BasicLayout";
+import { Button } from "@mui/material";
+import { Link } from "react-router-dom";
+import ClientsLogosSlider from "./ClientsLogoSlider";
+
+const AboutPage = () => {
+  const aboutDetails = [
+    {
+      title: "LAUNCHED IN",
+      value: "2021",
+    },
+    {
+      title: "TEAM",
+      value: "100+",
+    },
+    {
+      title: "FACTORIES",
+      value: "360+",
+    },
+    {
+      title: "BRANDS",
+      value: "110+",
+    },
+  ];
+  return (
+    <BasicLayout>
+      <div className="mt-[9rem]" style={{ fontFamily: "Poppins" }}>
+        {/* About Section */}
+        <div
+          className="flex flex-col gap-8 py-4"
+          style={{ background: "linear-gradient(0deg, #ede3e3, transparent)" }}
+        >
+          <div
+            className="text-center font-bold tracking-wide text-4xl"
+            style={{ fontFamily: "'Space Mono', monospace" }}
+          >
+            About Groyyo Design Studio
+          </div>
+          <div className="text-center w-full flex justify-center">
+            <div
+              className="w-[70%] text-center"
+              style={{ fontFamily: "'Space Mono', monospace" }}
+            >
+              {" "}
+              Founded in 2021 and based in Gurgaon, Groyyo Design Studio is a
+              one-stop solution for fashion and lifestyle design needs. Blending
+              creativity with innovation, the studio crafts unique,
+              trend-forward designs that help brands stand out in the fast-paced
+              fashion industry. By merging timeless elegance with modern flair,
+              classic aesthetics are revived with a fresh, contemporary twist.
+              In addition to offering ready-made collections, clients can book
+              appointments for personalized customization services to bring
+              their vision to life. Whether it's original designs or bespoke
+              solutions, Groyyo Design Studio delivers exceptional quality,
+              style, and craftsmanship to elevate any brand.
+            </div>
+          </div>
+          <div className="text-center">
+            <Link to={"/services"}>
+              <Button
+                variant="outlined"
+                sx={{
+                  color: "white",
+                  borderColor: "black",
+                  backgroundColor: "black",
+                  padding: "1rem",
+                  minWidth: "15rem",
+                  "&:hover": {
+                    backgroundColor: "white",
+                    borderColor: "black",
+                    color: "black",
+                  },
+                }}
+              >
+                Go to our Services
+              </Button>
+            </Link>
+          </div>
+          <div className="flex text-center w-full gap-6 justify-center my-4">
+            {aboutDetails.map((aboutDetail, aboutDetailKey) => {
+              return (
+                <>
+                  <div className="flex flex-col gap-4 border border-none px-[3.5rem] py-[2.5rem] rounded-xl shadow-lg bg-white">
+                    <div className="font-semibold">{aboutDetail?.title}</div>
+                    <div
+                      className="text-7xl"
+                      style={{ fontFamily: "'Space Mono', monospace" }}
+                    >
+                      {aboutDetail?.value}
+                    </div>
+                  </div>
+                </>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Clients Section */}
+        <div className="bg-black  p-8 flex flex-col gap-4 items-center min-h-64">
+          <div className="text-center font-semibold text-4xl tracking-wider text-white">
+            SOME OF OUR CLIENTS
+          </div>
+          <ClientsLogosSlider/>
+
+        </div>
+
+        {/* News Section */}
+        <div className="flex flex-col gap-4 mx-8 my-12 items-center">
+          <div className="text-center font-semibold text-4xl tracking-wider ">
+            IN THE NEWS
+          </div>
+          <div className="flex mt-8 gap-4 justify-center w-[90%]">
+            <div className="w-full flex items-center justify-center">
+              <img src="images/news/1.jpg" alt="news" />
+            </div>
+            <div className="w-full flex items-center justify-center">
+              <img src="images/news/2.jpg" alt="news" />
+            </div>
+            <div className="w-full flex items-center justify-center">
+              <img src="images/news/3.jpg" alt="news" />
+            </div>
+            <div className="w-full flex items-center justify-center">
+              <img src="images/news/4.jpg" alt="news" />
+            </div>
+            <div className="w-full flex items-center justify-center">
+              <img src="images/news/5.jpg" alt="news" />
+            </div>
+            <div className="w-full flex items-center justify-center">
+              <img src="images/news/6.jpg" alt="news" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </BasicLayout>
+  );
+};
+
+export default AboutPage;
