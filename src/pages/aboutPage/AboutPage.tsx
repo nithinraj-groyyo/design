@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import BasicLayout from "../../layouts/BasicLayout";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import ClientsLogosSlider from "./ClientsLogoSlider";
+import NewsSection from "./NewsSection";
 
 const AboutPage = () => {
   const aboutDetails = [
@@ -23,10 +24,14 @@ const AboutPage = () => {
       value: "110+",
     },
   ];
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [])
+
   return (
     <BasicLayout>
       <div className="mt-[9rem]" style={{ fontFamily: "Poppins" }}>
-        {/* About Section */}
         <div
           className="flex flex-col gap-8 py-4"
           style={{ background: "linear-gradient(0deg, #ede3e3, transparent)" }}
@@ -42,7 +47,6 @@ const AboutPage = () => {
               className="w-[70%] text-center"
               style={{ fontFamily: "'Space Mono', monospace" }}
             >
-              {" "}
               Founded in 2021 and based in Gurgaon, Groyyo Design Studio is a
               one-stop solution for fashion and lifestyle design needs. Blending
               creativity with innovation, the studio crafts unique,
@@ -96,41 +100,9 @@ const AboutPage = () => {
           </div>
         </div>
 
-        {/* Clients Section */}
-        <div className="bg-black  p-8 flex flex-col gap-4 items-center min-h-64">
-          <div className="text-center font-semibold text-4xl tracking-wider text-white">
-            SOME OF OUR CLIENTS
-          </div>
-          <ClientsLogosSlider/>
+        <ClientsLogosSlider/>
 
-        </div>
-
-        {/* News Section */}
-        <div className="flex flex-col gap-4 mx-8 my-12 items-center">
-          <div className="text-center font-semibold text-4xl tracking-wider ">
-            IN THE NEWS
-          </div>
-          <div className="flex mt-8 gap-4 justify-center w-[90%]">
-            <div className="w-full flex items-center justify-center">
-              <img src="images/news/1.jpg" alt="news" />
-            </div>
-            <div className="w-full flex items-center justify-center">
-              <img src="images/news/2.jpg" alt="news" />
-            </div>
-            <div className="w-full flex items-center justify-center">
-              <img src="images/news/3.jpg" alt="news" />
-            </div>
-            <div className="w-full flex items-center justify-center">
-              <img src="images/news/4.jpg" alt="news" />
-            </div>
-            <div className="w-full flex items-center justify-center">
-              <img src="images/news/5.jpg" alt="news" />
-            </div>
-            <div className="w-full flex items-center justify-center">
-              <img src="images/news/6.jpg" alt="news" />
-            </div>
-          </div>
-        </div>
+        <NewsSection />
       </div>
     </BasicLayout>
   );

@@ -19,9 +19,11 @@
   padding: 60px 0;
   white-space: nowrap;
   position: relative;
+  width: 100%;
+  overflow: hidden;
 }
 
-.logos::before,
+/* .logos::before,
 .logos::after {
   position: absolute;
   top: 0;
@@ -29,9 +31,9 @@
   height: 100%;
   content: "";
   z-index: 2;
-}
+} */
 
-.logos:before {
+/* .logos:before {
   left: 0;
   background: linear-gradient(to left, rgba(255, 255, 255, 0), black);
 }
@@ -39,7 +41,7 @@
 .logos:after {
   right: 0;
   background: linear-gradient(to right, rgba(255, 255, 255, 0), black);
-}
+} */
 
 .logos:hover .logos-slide {
   animation-play-state: paused;
@@ -51,8 +53,9 @@
 }
 
 .logos-slide img {
-  height: auto; 
-  width: auto; 
+  width: 10rem; 
+  height: auto;
+  padding: 0 1rem;
   min-height: 50px; 
   min-width: 100px; 
   margin: 0 40px;
