@@ -88,10 +88,11 @@ const ServicePage = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
           >
-            <div className="text-4xl font-bold whitespace-nowrap">
+            <div className="text-4xl font-bold whitespace-nowrap" style={{ fontFamily: "'Space Mono', monospace" }}>
+
               {carouselDetails[currentService]?.title}
             </div>
-            <div>{carouselDetails[currentService]?.description}</div>
+            <div style={{fontFamily:"Poppins"}}>{carouselDetails[currentService]?.description}</div>
 
             <div>
               <Button
