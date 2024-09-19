@@ -23,10 +23,15 @@ module.exports = {
           '0%': { opacity: '1' },
           '100%': { opacity: '0' },
         },
+        slide: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
       },
       animation: {
         fadeIn: 'fadeIn 300ms ease-in',
         fadeOut: 'fadeOut 300ms ease-out',
+        slide: 'slide 35s linear infinite',
       },
     },
   },
