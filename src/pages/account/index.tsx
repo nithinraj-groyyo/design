@@ -34,39 +34,47 @@ const adminMenuItems = [
     subItems: [],
   },
   {
-    title: "Product",
+    title: "Website Info",
     subItems: [
-      { title: "Add Product", route: "/account/add-product" },
-      { title: "Bulk Upload", route: "/account/bulk-upload" },
-      { title: "Product List", route: "/account/product-list" },
+      { title: "About us", route: "/account/web-info/about-us" },
+      { title: "Teams", route: "/account/web-info/teams" },
+      { title: "Services", route: "/account/web-info/services" },
     ],
-  },
-  {
-    title: "Blog",
-    subItems: [
-      { title: "Blogs", route: "/account/blogs" },
-      { title: "Add Blog", route: "/account/add-blog" },
-    ],
-  },
-  {
-    title: "Event",
-    subItems: [
-      { title: "Events", route: "/account/events" },
-      { title: "Add Events", route: "/account/add-events" },
-    ],
-  },
-  {
-    title: "Customer",
-    subItems: [{ title: "Queries", route: "/account/queries" }],
-  },
-  {
-    title: "Site Settings",
-    subItems: [
-      { title: "Brands", route: "/account/brands" },
-      { title: "Add Brands", route: "/account/add-brands" },
-      { title: "Manage Categories", route: "/account/manage-categories" },
-    ],
-  },
+  }
+  // {
+  //   title: "Product",
+  //   subItems: [
+  //     { title: "Add Product", route: "/account/add-product" },
+  //     { title: "Bulk Upload", route: "/account/bulk-upload" },
+  //     { title: "Product List", route: "/account/product-list" },
+  //   ],
+  // },
+  // {
+  //   title: "Blog",
+  //   subItems: [
+  //     { title: "Blogs", route: "/account/blogs" },
+  //     { title: "Add Blog", route: "/account/add-blog" },
+  //   ],
+  // },
+  // {
+  //   title: "Event",
+  //   subItems: [
+  //     { title: "Events", route: "/account/events" },
+  //     { title: "Add Events", route: "/account/add-events" },
+  //   ],
+  // },
+  // {
+  //   title: "Customer",
+  //   subItems: [{ title: "Queries", route: "/account/queries" }],
+  // },
+  // {
+  //   title: "Site Settings",
+  //   subItems: [
+  //     { title: "Brands", route: "/account/brands" },
+  //     { title: "Add Brands", route: "/account/add-brands" },
+  //     { title: "Manage Categories", route: "/account/manage-categories" },
+  //   ],
+  // },
 ];
 
 const AccountPage = () => {
