@@ -97,12 +97,19 @@ const AdminServicePage: React.FC = () => {
 
                 <motion.div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4'>
                     {services.map((service, index) => (
-                        <AdminServiceCard
-                            key={index}
-                            service={service}
-                            onEdit={handleOpenDialog}
-                            onDelete={handleDeleteService}
-                        />
+                        <motion.div
+                            key={service.title}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            <AdminServiceCard
+                                service={service}
+                                onEdit={handleOpenDialog}
+                                onDelete={handleDeleteService}
+                            />
+                        </motion.div>
                     ))}
                 </motion.div>
             </AccountSettingsLayout>
