@@ -33,7 +33,7 @@ const ServicePage = () => {
           "Industry Expertise":
             " Leverage our experience in the apparel sector to get design recommendations tailored to your target market.",
         },
-        
+
         {
           "Trend Forecasting":
             " Stay ahead with our trend analysis and market insights.",
@@ -79,9 +79,9 @@ const ServicePage = () => {
     setCurrentService((currentService + val + 3) % 3);
   };
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -176,9 +176,8 @@ const ServicePage = () => {
             {carouselDetails.map((_, index) => (
               <motion.div
                 key={index}
-                className={`w-3 h-3 rounded-full cursor-pointer ${
-                  index === currentService ? "bg-black" : "bg-gray-400"
-                }`}
+                className={`w-3 h-3 rounded-full cursor-pointer ${index === currentService ? "bg-black" : "bg-gray-400"
+                  }`}
                 onClick={() => setCurrentService(index)}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -202,52 +201,43 @@ const ServicePage = () => {
           return (
             <>
               <motion.div
-                className="px-20 mx-12 py-8 flex flex-col gap-16 shadow-lg rounded-lg border border-none bg-[#f5f5f5] bg-opacity-40"
+                className="px-20 2xl:mx-12 py-8 flex flex-col gap-16 shadow-lg rounded-lg border border-none bg-[#f5f5f5] bg-opacity-40"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 1 }}
-                // viewport={{ once: true }}
+              // viewport={{ once: true }}
               >
-                <div className="flex gap-16 ">
-
-                  <div>
+                <div className="flex gap-16">
+                  <div className="flex-[1] flex justify-center items-center">
                     <img
                       src={"/images/landingPages/landingPage_2_2.png"}
                       alt="Thumbnail"
-                      className="w-[30rem] min-w-[20rem] max-h-[20rem] h-full object-cover rounded-xl"
+                      className="xl:w-64 xl:h-5w-64 2xl:w-64 2xl:h-64 object-cover rounded-xl"
                     />
                   </div>
 
-                  <div className="flex flex-col gap-6">
-                    <div
-                      className="font-bold  text-3xl"
-                      style={{ fontFamily: "'Space Mono', monospace" }}
-                    >
-                      {serviceDetail?.title}
+                  <div className="flex flex-[2] flex-col gap-6 justify-between">
+                    <div className="flex-2">
+                      <div
+                        className="font-bold text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl "
+                        style={{ fontFamily: "'Space Mono', monospace" }}
+                      >
+                        {serviceDetail?.title}
+                      </div>
+                      <div className="whitespace-normal text-justify my-4 text-xs xl:text-sm 2xl:text-[1rem] 3xl:text-xl">{serviceDetail?.description} </div>
+                      
+                      {serviceDetail?.descriptionListKeys?.map((descriptionListKey, index) => (
+                        <div key={index} className="flex flex-col gap-2">
+                          {Object.entries(descriptionListKey).map(([key, value]) => (
+                            <li key={key} className="flex text-xs xl:text-sm 2xl:text-[1rem] 3xl:text-xl">
+                              <span className="font-semibold whitespace-nowrap">{key}:</span>
+                              <span className="ml-2">{value}</span>
+                            </li>
+                          ))}
+                        </div>
+                      ))}
+
                     </div>
-                    <div>{serviceDetail?.description}</div>
-                    {serviceDetail?.descriptionListKeys.map(
-                      (descriptionListKey) => {
-                        return (
-                          <>
-                            <div className="flex flex-col gap-2">
-                              {Object.entries(descriptionListKey)?.map(
-                                ([key, value]) => {
-                                  return (
-                                    <li key={key} className="">
-                                      <span className="font-semibold whitespace-nowrap">
-                                        {key} :
-                                      </span>
-                                      {value}
-                                    </li>
-                                  );
-                                }
-                              )}
-                            </div>
-                          </>
-                        );
-                      }
-                    )}
 
                     <div className="text-center">
                       <Button
@@ -256,13 +246,13 @@ const ServicePage = () => {
                           color: "black",
                           borderColor: "black",
                           backgroundColor: "transparent",
-                          padding: "1rem",
                           minWidth: "12rem",
                           "&:hover": {
                             backgroundColor: "black",
                             color: "white",
                           },
                         }}
+                        className="!text-xs xl:!text-sm 2xl:!text-[1rem] !p-[0.5rem] 2xl:!p-[1rem]"
                       >
                         {serviceDetail?.buttonName}
                       </Button>
@@ -273,124 +263,6 @@ const ServicePage = () => {
             </>
           );
         })}
-
-        {/* <div className="flex gap-8 ">
-          <motion.div
-            className="w-full p-16 flex flex-col gap-8 shadow-lg rounded-lg border border-none bg-[#f9f9f9] bg-opacity-40 justify-between"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 1 }}
-            // viewport={{ once: true }}
-          >
-            <div className="flex justify-center">
-              <img
-                src={"/images/auth/login_img_1.jpeg"}
-                alt="Thumbnail"
-                className="w-[10rem] h-[10rem] object-cover rounded-xl"
-              />
-            </div>
-            <div
-              className="text-center font-bold  text-3xl"
-              style={{ fontFamily: "'Space Mono', monospace" }}
-            >
-              Customization Services
-            </div>
-            <div className="flex flex-col gap-4 ">
-              <div>
-                We offer customization services to tailor designs to your
-                specific needs.
-              </div>
-              <div className="flex flex-col gap-2">
-                <li>
-                  <span className="font-semibold">Tailored for You:</span>{" "}
-                  Modify colors, patterns, or fabrics to match your brand.
-                </li>
-                <li>
-                  <span className="font-semibold">Bespoke Creations:</span> Work
-                  with us to develop a design from scratch that aligns with your
-                  vision.
-                </li>
-              </div>
-            </div>
-            <div className="text-center">
-              <Button
-                variant="outlined"
-                sx={{
-                  color: "white",
-                  borderColor: "black",
-                  backgroundColor: "black",
-                  padding: "1rem",
-                  minWidth: "15rem",
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                    borderColor: "black",
-                    color: "black",
-                  },
-                }}
-              >
-                Book an appointment
-              </Button>
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="shadow-lg w-full p-16 flex flex-col gap-8 rounded-lg border border-none bg-[#f9f9f9] bg-opacity-40 justify-between"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 1 }}
-            // viewport={{ once: true }}
-          >
-            <div className="flex justify-center">
-              <img
-                src={"/images/auth/login_img_1.jpeg"}
-                alt="Thumbnail"
-                className="w-[10rem] h-[10rem] object-cover rounded-xl"
-              />
-            </div>
-            <div
-              className="text-center font-bold text-3xl"
-              style={{ fontFamily: "'Space Mono', monospace" }}
-            >
-              Design Consultation
-            </div>
-            <div className="flex flex-col gap-4 ">
-              <div>
-                Our expert team offers personalized consultation services to
-                guide you through the process.
-              </div>
-              <div className="flex flex-col gap-2">
-                <li>
-                  <span className="font-semibold">Industry Expertise:</span>{" "}
-                  Leverage our experience in the apparel sector to get design
-                  recommendations tailored to your market.
-                </li>
-                <li>
-                  <span className="font-semibold">Trend Forecasting:</span> Stay
-                  ahead with our trend analysis and insights.
-                </li>
-              </div>
-            </div>
-            <div className="text-center">
-              <Button
-                variant="outlined"
-                sx={{
-                  color: "white",
-                  borderColor: "black",
-                  backgroundColor: "black",
-                  padding: "1rem",
-                  minWidth: "15rem",
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                    borderColor: "black",
-                    color: "black",
-                  },
-                }}
-              >
-                Contact us
-              </Button>
-            </div>
-          </motion.div>
-        </div> */}
       </motion.div>
     </BasicLayout>
   );
