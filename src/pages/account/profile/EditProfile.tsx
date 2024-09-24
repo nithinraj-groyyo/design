@@ -3,8 +3,8 @@ import { Button, FormControl, FormHelperText, InputLabel, MenuItem, Select, Text
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
-import { IUserDetailsRequest, IUserProfile } from '../../types/users';
-import { updateUserProfileResponse } from '../../api/userApi';
+import { IUserDetailsRequest, IUserProfile } from '../../../types/users';
+import { updateUserProfileResponse } from '../../../api/userApi';
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required('First Name is required'),

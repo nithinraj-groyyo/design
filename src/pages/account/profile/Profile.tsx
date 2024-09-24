@@ -1,8 +1,8 @@
 import { Button, Divider } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import EditProfile from "./EditProfile";
-import { fetchUserProfileResponse } from "../../api/userApi";
-import { IUserProfile } from "../../types/users";
+import { fetchUserProfileResponse } from "../../../api/userApi";
+import { IUserProfile } from "../../../types/users";
 
 const Profile = () => {
   const userId = JSON.parse(localStorage.getItem("userId") as string);

@@ -3,8 +3,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { toast } from "react-toastify";
-import { addUpdateAddressResponse } from "../../api/userApi";
-import { IAddressRequest, IAddressResponse } from "../../types/users";
+import { addUpdateAddressResponse } from "../../../api/userApi";
+import { IAddressRequest, IAddressResponse } from "../../../types/users";
 import { Country, State } from "country-state-city";
 
 const validationSchema = Yup.object({

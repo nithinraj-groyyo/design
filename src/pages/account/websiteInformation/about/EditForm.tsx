@@ -1,66 +1,56 @@
-import { Button, TextField } from '@mui/material';
+import { Button, TextField, IconButton } from '@mui/material';
 import React from 'react';
-
-interface Client {
-    name: string;
-    logo: string | null;
-    file: File | null;
-}
-
+import DeleteIcon from '@mui/icons-material/Delete';
+import ClearIcon from '@mui/icons-material/Clear';
+import { Client } from '../../../../reducer/adminAboutControlReducer';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 interface EditFormProps {
     aboutContent: string;
-    setAboutContent: (content: string) => void;
     clients: Client[];
-    setClients: (clients: Client[]) => void;
+    dispatch: React.Dispatch<any>;
 }
 
-const EditForm: React.FC<EditFormProps> = ({
-    aboutContent,
-    setAboutContent,
-    clients,
-    setClients,
-}) => {
-
+const EditForm: React.FC<EditFormProps> = ({ aboutContent, clients, dispatch }) => {
     const handleNameChange = (index: number, newName: string) => {
-        const updatedClients = [...clients];
-        updatedClients[index].name = newName;
-        setClients(updatedClients);
+        dispatch({ type: 'UPDATE_CLIENT_NAME', index, name: newName });
     };
 
     const handleImageUpload = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            const img = new Image();
             const reader = new FileReader();
-
             reader.onload = (e: any) => {
-                img.src = e.target.result;
-
-                img.onload = () => {
-                    const updatedClients = [...clients];
-                    updatedClients[index].logo = img.src;
-                    updatedClients[index].file = file;
-                    setClients(updatedClients);
-                };
+                dispatch({
+                    type: 'UPDATE_CLIENT_LOGO',
+                    index,
+                    logo: e.target.result,
+                    file,
+                });
             };
-
             reader.readAsDataURL(file);
         }
     };
 
-    const handleAddClient = () => {
-        setClients([...clients, { name: '', logo: null, file: null }]);
+    const handleDeleteClient = (index: number) => {
+        dispatch({ type: 'DELETE_CLIENT', index });
     };
 
-    const handleDeleteClient = (index: number) => {
-        const updatedClients = clients.filter((_, i) => i !== index);
-        setClients(updatedClients);
+    const handleRemoveImage = (index: number) => {
+        dispatch({
+            type: 'UPDATE_CLIENT_LOGO',
+            index,
+            logo: null,
+            file: null,
+        });
+    };
+
+    const handleAddClient = () => {
+        dispatch({ type: 'ADD_CLIENT' });
     };
 
     return (
         <div className="py-2 px-4 flex flex-col gap-4">
-
             <TextField
                 multiline
                 rows={10}
@@ -70,7 +60,7 @@ const EditForm: React.FC<EditFormProps> = ({
                 fullWidth
                 label="About Content"
                 value={aboutContent}
-                onChange={(e) => setAboutContent(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_ABOUT_CONTENT', payload: e.target.value })}
             />
 
             <div className="flex flex-col gap-4">
@@ -86,29 +76,54 @@ const EditForm: React.FC<EditFormProps> = ({
                             onChange={(e) => handleNameChange(index, e.target.value)}
                         />
 
-                        <div className="flex items-center">
+                        <div className="">
                             {client.logo ? (
-                                <div>
-                                    <div>Image Preview:</div>
+                                <div className="relative">
+                                    <button
+                                        onClick={() => handleRemoveImage(index)}
+                                        className="absolute top-[0px] right-[-10px] bg-white rounded-full shadow-lg border-2 border-white"
+                                    >
+                                        <ClearIcon fontSize="small" />
+                                    </button>
                                     <img
                                         src={client.logo}
                                         alt="Client Logo Preview"
-                                        className="w-[100px] h-auto border"
+                                        className="w-[100px] shadow-md p-2"
                                     />
                                 </div>
                             ) : (
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => handleImageUpload(index, e)}
-                                    className="mb-2"
-                                />
+                                <label htmlFor={`file-upload-${index}`} className="cursor-pointer">
+                                    <Button 
+                                        variant="outlined" 
+                                        startIcon={<AttachFileIcon />} 
+                                        component="span"
+                                    >
+                                        Upload Image
+                                    </Button>
+                                    <input
+                                        id={`file-upload-${index}`}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => handleImageUpload(index, e)}
+                                        className="hidden"
+                                    />
+                                </label>
                             )}
                         </div>
 
                         <Button
                             variant="contained"
-                            color="secondary"
+                            sx={{
+                                backgroundColor: 'red',
+                                color: 'white',
+                                '&:hover': {
+                                    backgroundColor: '#cc0000',
+                                },
+                                '&:active': {
+                                    backgroundColor: '#990000',
+                                },
+                            }}
+                            startIcon={<DeleteIcon />}
                             onClick={() => handleDeleteClient(index)}
                         >
                             Delete
@@ -124,5 +139,4 @@ const EditForm: React.FC<EditFormProps> = ({
     );
 };
 
-
-export default EditForm
+export default EditForm;

@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import AddAddress from './AddAddress';
 import HomeIcon from '@mui/icons-material/Home';
 import WorkIcon from '@mui/icons-material/Work';
-import { getProfileAddressResponse, removeAddressResponse, setDefaultAddressResponse } from '../../api/userApi';
-import { IAddressResponse } from '../../types/users';
+import { getProfileAddressResponse, removeAddressResponse, setDefaultAddressResponse } from '../../../api/userApi';
+import { IAddressResponse } from '../../../types/users';
 import { toast } from 'react-toastify';
 
 const Address = () => {
