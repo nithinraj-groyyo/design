@@ -24,10 +24,12 @@ import EditProduct from './pages/account/product/EditProduct';
 import ServicePage from './pages/service_page/ServicePage';
 import AboutPage from './pages/aboutPage/AboutPage';
 import TeamsPage from './pages/teamPage/TeamsPage';
+import AboutUsInfo from './pages/account/websiteInformation/about/AboutUsInfo';
+import AdminTeamPage from './pages/account/websiteInformation/teams/AdminTeamPage';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
-  const isAuthenticated = Boolean(userId); 
+  const isAuthenticated = Boolean(userId);
 
   return (
     <Routes>
@@ -53,32 +55,39 @@ const App = () => {
       <Route path="/bag" element={<ShoppingBag />} />
       <Route path="/wishlist" element={<WishList />} />
       <Route path="/contact-us" element={<ContactUs />} />
+
       <Route path="/services" element={<ServicePage/>}/>
       <Route path="/about" element={<AboutPage/>}/>
       <Route path="/team" element={<TeamsPage/>}/>
+
       <Route path="account" element={<AccountPage />}>
         <Route path="address" element={<Address />} />
         <Route path="orders" element={<Orders />} />
         <Route path="profile" element={<Profile />} />
         <Route path="changePassword" element={<ChangePassword />} />
-        
+
+        <Route path="web-info" element={<AdminRoutes />}>
+          <Route path="about-us" element={<AboutUsInfo />} />
+          <Route path="teams" element={<AdminTeamPage />} />
+        </Route>
+
         <Route path="product-list" element={<AdminRoutes />}>
           <Route path="" element={<AdminProductList />} />
         </Route>
         <Route path="bulk-upload" element={<AdminRoutes />}>
-            <Route path="" element={<BulkUploadProduct />} />
+          <Route path="" element={<BulkUploadProduct />} />
         </Route>
 
         <Route path="add-product" element={<AdminRoutes />}>
-            <Route path="" element={<AddProducts />} />
+          <Route path="" element={<AddProducts />} />
         </Route>
 
         <Route path="edit-product" element={<AdminRoutes />}>
-            <Route path="" element={<EditProduct />} />
+          <Route path="" element={<EditProduct />} />
         </Route>
 
         <Route path="unauthorized" element={<Unauthorized />} />
-        
+
         <Route path="orders-returns" element={<OrderReturns />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
