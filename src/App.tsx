@@ -38,17 +38,17 @@ const App = () => {
       <Route
         path="/login"
         element={
-          // <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
+          <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
             <Login />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/signup"
         element={
-          // <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
+          <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
             <Signup />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         }
       />
       <Route path="/designs/:categoryKey/:categoryId" element={<ProductList />} />
