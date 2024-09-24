@@ -1,8 +1,9 @@
 import React from 'react'
+import AccountSettingsLayout from '../../../../layouts/AccountSettingsLayout'
 
 const AdminTeamPage = () => {
   return (
-    <div>AdminTeamPage</div>
+    <AccountSettingsLayout>AdminTeamPage</AccountSettingsLayout>
   )
 }
 
