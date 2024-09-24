@@ -62,9 +62,9 @@ const AboutUsInfo = () => {
   ];
 
   return (
-    <div className='w-full h-full p-[2rem]'>
-      <div className='bg-white w-full min-h-full rounded-lg'>
-        <div className='py-4 px-4 flex items-center justify-between flex-row'>
+    <div className='w-full p-[1.5rem]'>
+      <div className='bg-white w-full  rounded-lg'>
+        <div className='py-4 px-8 flex items-center justify-between flex-row'>
           <p className='text-xl font-bold'>About Us</p>
           {editAboutPage ? (
             <div className='flex items-center gap-4'>
@@ -120,7 +120,7 @@ const AboutUsInfo = () => {
                 </p>
               </div>
 
-              <div className=" mt-6">
+              <div className=" my-6">
                 <h3 className="text-xl font-bold  mb-4">Client Names</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                   {logos.map((logo, index) => (

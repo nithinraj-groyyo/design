@@ -24,6 +24,7 @@ import EditProduct from './pages/account/product/EditProduct';
 import ServicePage from './pages/service_page/ServicePage';
 import AboutPage from './pages/aboutPage/AboutPage';
 import AboutUsInfo from './pages/account/websiteInformation/about/AboutUsInfo';
+import AdminTeamPage from './pages/account/websiteInformation/teams/AdminTeamPage';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
@@ -63,6 +64,7 @@ const App = () => {
 
         <Route path="web-info" element={<AdminRoutes />}>
           <Route path="about-us" element={<AboutUsInfo />} />
+          <Route path="teams" element={<AdminTeamPage />} />
         </Route>
 
         <Route path="product-list" element={<AdminRoutes />}>
