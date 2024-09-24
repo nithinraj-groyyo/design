@@ -13,8 +13,8 @@ interface TeamPageModalProps {
 
 const TeamPageModal: React.FC<TeamPageModalProps> = ({ memberDetails, onClose }) => {
   return (
-    <div className='flex justify-end h-screen  bg-opacity-80 text-white !opacity-100'> 
-      <div className='w-full bg-opacity-80 p-12 flex flex-col gap-20'>
+    <div className='flex justify-end h-screen  text-white'> 
+      <div className='w-full p-12 flex flex-col gap-20'>
         <div className='flex justify-between mt-4'>
           <div className='flex flex-col gap-2'>
             <div className='text-6xl'>{memberDetails.name}</div>
