@@ -99,6 +99,7 @@ const AboutPage = () => {
             })}
           </div> */}
         </div>
+        
 
         <ClientsLogosSlider/>
 
