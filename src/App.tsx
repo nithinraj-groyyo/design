@@ -8,10 +8,10 @@ import Login from './pages/login/login';
 import Signup from './pages/signup/signup';
 import { ContactUs } from './pages/contactUs';
 import AccountPage from './pages/account';
-import Address from './pages/account/Address';
+import Address from './pages/account/profile/Address';
 import Orders from './pages/account/Orders';
-import Profile from './pages/account/Profile';
-import ChangePassword from './pages/account/ChangePassword';
+import Profile from './pages/account/profile/Profile';
+import ChangePassword from './pages/account/profile/ChangePassword';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminProductList from './pages/account/product/AdminProductList';
 import BulkUploadProduct from './pages/account/product/BulkUploadProduct';
@@ -23,7 +23,10 @@ import Unauthorized from './components/Unauthorized';
 import EditProduct from './pages/account/product/EditProduct';
 import ServicePage from './pages/service_page/ServicePage';
 import AboutPage from './pages/aboutPage/AboutPage';
+import TeamsPage from './pages/teamPage/TeamsPage';
 import AboutUsInfo from './pages/account/websiteInformation/about/AboutUsInfo';
+import AdminTeamPage from './pages/account/websiteInformation/teams/AdminTeamPage';
+import AdminServicePage from './pages/account/websiteInformation/services/AdminServicePage';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
@@ -53,8 +56,11 @@ const App = () => {
       <Route path="/bag" element={<ShoppingBag />} />
       <Route path="/wishlist" element={<WishList />} />
       <Route path="/contact-us" element={<ContactUs />} />
-      <Route path="/services" element={<ServicePage />} />
-      <Route path="/about" element={<AboutPage />} />
+
+      <Route path="/services" element={<ServicePage/>}/>
+      <Route path="/about" element={<AboutPage/>}/>
+      <Route path="/team" element={<TeamsPage/>}/>
+
       <Route path="account" element={<AccountPage />}>
         <Route path="address" element={<Address />} />
         <Route path="orders" element={<Orders />} />
@@ -63,6 +69,8 @@ const App = () => {
 
         <Route path="web-info" element={<AdminRoutes />}>
           <Route path="about-us" element={<AboutUsInfo />} />
+          <Route path="teams" element={<AdminTeamPage />} />
+          <Route path="services" element={<AdminServicePage />} />
         </Route>
 
         <Route path="product-list" element={<AdminRoutes />}>

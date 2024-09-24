@@ -28,11 +28,11 @@ const ClientsLogosSlider: React.FC = () => {
   ];
 
   return (
-    <div className="p-8 flex flex-col gap-4 items-center min-h-64">
-      <div className="text-center font-semibold text-4xl tracking-wider text-white">
+    <div className="p-8 flex flex-col gap-2 items-center min-h-64">
+      <div className="text-center font-semibold text-4xl tracking-wider" style={{ fontFamily: "'Space Mono', monospace" }}>
         SOME OF OUR CLIENTS
       </div>
-      <div className="w-full overflow-hidden py-14 whitespace-nowrap relative">
+      <div className="w-full overflow-hidden py-6 whitespace-nowrap relative">
         <motion.div
           className="flex animate-slide"
           animate={slidingAnimation}

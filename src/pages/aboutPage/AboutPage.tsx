@@ -3,27 +3,27 @@ import BasicLayout from "../../layouts/BasicLayout";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import ClientsLogosSlider from "./ClientsLogoSlider";
-import NewsSection from "./NewsSection";
+// import NewsSection from "./NewsSection";
 
 const AboutPage = () => {
-  const aboutDetails = [
-    {
-      title: "LAUNCHED IN",
-      value: "2021",
-    },
-    {
-      title: "TEAM",
-      value: "100+",
-    },
-    {
-      title: "FACTORIES",
-      value: "360+",
-    },
-    {
-      title: "BRANDS",
-      value: "110+",
-    },
-  ];
+  // const aboutDetails = [
+  //   {
+  //     title: "LAUNCHED IN",
+  //     value: "2021",
+  //   },
+  //   {
+  //     title: "TEAM",
+  //     value: "100+",
+  //   },
+  //   {
+  //     title: "FACTORIES",
+  //     value: "360+",
+  //   },
+  //   {
+  //     title: "BRANDS",
+  //     value: "110+",
+  //   },
+  // ];
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -31,21 +31,21 @@ const AboutPage = () => {
 
   return (
     <BasicLayout>
-      <div className="mt-[9rem]" style={{ fontFamily: "Poppins" }}>
+      <div className="mt-[10rem]" style={{ fontFamily: "Poppins" }}>
         <div
           className="flex flex-col gap-8 py-4"
-          style={{ background: "linear-gradient(0deg, #ede3e3, transparent)" }}
+          style={{ background: "linear-gradient(0deg, #f9f9f9, transparent)" }}
         >
           <div
             className="text-center font-bold tracking-wide text-4xl"
             style={{ fontFamily: "'Space Mono', monospace" }}
           >
-            About Groyyo Design Studio
+            ABOUT GROYYO DESIGN STUDIO
           </div>
           <div className="text-center w-full flex justify-center">
             <div
-              className="w-[70%] text-center"
-              style={{ fontFamily: "'Space Mono', monospace" }}
+              className="w-[75%]  tracking-wider text-justify"
+              // style={{ fontFamily: "'Space Mono', monospace" }}
             >
               Founded in 2021 and based in Gurgaon, Groyyo Design Studio is a
               one-stop solution for fashion and lifestyle design needs. Blending
@@ -60,7 +60,7 @@ const AboutPage = () => {
               style, and craftsmanship to elevate any brand.
             </div>
           </div>
-          <div className="text-center">
+          <div className="text-center mb-8 mt-4">
             <Link to={"/services"}>
               <Button
                 variant="outlined"
@@ -71,7 +71,7 @@ const AboutPage = () => {
                   padding: "1rem",
                   minWidth: "15rem",
                   "&:hover": {
-                    backgroundColor: "white",
+                    backgroundColor: "transparent",
                     borderColor: "black",
                     color: "black",
                   },
@@ -81,7 +81,7 @@ const AboutPage = () => {
               </Button>
             </Link>
           </div>
-          <div className="flex text-center w-full gap-6 justify-center my-4">
+          {/* <div className="flex text-center w-full gap-6 justify-center my-4">
             {aboutDetails.map((aboutDetail, aboutDetailKey) => {
               return (
                 <>
@@ -97,12 +97,13 @@ const AboutPage = () => {
                 </>
               );
             })}
-          </div>
+          </div> */}
         </div>
+        
 
         <ClientsLogosSlider/>
 
-        <NewsSection />
+        {/* <NewsSection /> */}
       </div>
     </BasicLayout>
   );
