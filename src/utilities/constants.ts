@@ -1,3 +1,4 @@
+import { FAQ } from "../types/faq";
 import { Service } from "../types/service";
 
 export const CONSTANT = {
@@ -56,3 +57,20 @@ export const initialServices: Service[] = [
     },
   ];
   
+  export const initialFAQs: FAQ[] = [
+    { id: '1', question: 'What is the return policy?', answer: 'You can return any item within 30 days.' },
+    { id: '2', question: 'How do I track my order?', answer: 'You will receive a tracking link via email.' },
+    { id: '3', question: 'What payment methods do you accept?', answer: 'We accept credit cards, PayPal, and bank transfers.' },
+    { id: '4', question: 'Do you ship internationally?', answer: 'Yes, we ship to most countries worldwide.' },
+    { id: '5', question: 'What should I do if I receive a defective item?', answer: 'Please contact our customer service for a replacement.' },
+    { id: '6', question: 'Can I change my order after it has been placed?', answer: 'Orders can be modified within 1 hour of placement.' },
+    { id: '7', question: 'How do I cancel my order?', answer: 'You can cancel your order by contacting customer support.' },
+    { id: '8', question: 'Do you offer gift wrapping services?', answer: 'Yes, we offer gift wrapping for an additional fee.' },
+    { id: '9', question: 'What if I forgot my password?', answer: 'Use the “Forgot Password” link on the login page to reset it.' },
+    { id: '10', question: 'How can I contact customer service?', answer: 'You can reach customer service via email or phone.' },
+    { id: '11', question: 'Do you have a loyalty program?', answer: 'Yes, we offer a loyalty program for frequent customers.' },
+    { id: '12', question: 'What if I receive the wrong item?', answer: 'Please contact our support team to resolve this issue.' },
+    { id: '13', question: 'Can I return an item if I opened it?', answer: 'Opened items can be returned if they are defective.' },
+    { id: '14', question: 'Is there a warranty on the products?', answer: 'Most products come with a one-year warranty.' },
+    { id: '15', question: 'How do I subscribe to the newsletter?', answer: 'You can subscribe through our website footer.' },
+];

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, DialogContentText } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AccountSettingsLayout from '../../../../layouts/AccountSettingsLayout';
@@ -12,8 +12,9 @@ const AdminServicePage: React.FC = () => {
     const [services, setServices] = useState<Service[]>(initialServices);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [editService, setEditService] = useState<Service | null>(null);
-    
-    
+    const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
+        
     const descriptionKeyRefs = useRef<(HTMLInputElement | null)[]>([]);
 
     const handleOpenDialog = (service: Service | null = null) => {
@@ -47,6 +48,7 @@ const AdminServicePage: React.FC = () => {
 
     const handleDeleteService = (serviceToDelete: Service) => {
         setServices((prev) => prev.filter((service) => service.title !== serviceToDelete.title));
+        handleCloseConfirmDialog(); 
     };
 
     const handleCloseDialog = () => {
@@ -75,6 +77,11 @@ const AdminServicePage: React.FC = () => {
                 i === index ? { ...desc, [field]: value } : desc
             ) || [],
         }));
+    };
+
+    const handleCloseConfirmDialog = () => {
+        setOpenConfirmDialog(false);
+        setServiceToDelete(null);
     };
 
     useEffect(() => {
@@ -107,7 +114,10 @@ const AdminServicePage: React.FC = () => {
                             <AdminServiceCard
                                 service={service}
                                 onEdit={handleOpenDialog}
-                                onDelete={handleDeleteService}
+                                onDelete={(service) => {
+                                    setServiceToDelete(service);
+                                    setOpenConfirmDialog(true);
+                                }}
                             />
                         </motion.div>
                     ))}
@@ -199,6 +209,23 @@ const AdminServicePage: React.FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Dialog open={openConfirmDialog} onClose={handleCloseConfirmDialog}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete the service "{serviceToDelete?.title}"?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseConfirmDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={() => handleDeleteService(serviceToDelete!)} color="secondary">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
         </>
     );
 };

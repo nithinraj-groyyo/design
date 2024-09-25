@@ -9,8 +9,8 @@ const AccountSettingsLayout: React.FC<PropsWithChildren<AccountSettingsLayoutPro
     Body: React.FC<PropsWithChildren>;
 } = ({ children }) => {
     return (
-        <div className='w-full p-[1.5rem] h-full'>
-            <div className='bg-white w-full h-full rounded-lg'>
+        <div className='w-full p-[1.5rem] h-auto '>
+            <div className='bg-white w-full h-auto rounded-lg'>
                 {children}
             </div>
         </div>
@@ -28,7 +28,7 @@ AccountSettingsLayout.Header = ({ title, children }) => {
 
 AccountSettingsLayout.Body = ({ children }) => {
     return (
-        <div className="p-4">
+        <div className="p-4 h-auto">
             {children}
         </div>
     );

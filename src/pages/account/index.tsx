@@ -39,6 +39,7 @@ const adminMenuItems = [
       { title: "About us", route: "/account/web-info/about-us" },
       { title: "Teams", route: "/account/web-info/teams" },
       { title: "Services", route: "/account/web-info/services" },
+      { title: "FAQ", route: "/account/web-info/faq" },
     ],
   },
   // {
@@ -129,7 +130,7 @@ const AccountPage = () => {
               </React.Fragment>
             ))}
 
-{user && user.role === "Admin" &&
+            {user && user.role === "Admin" &&
               adminMenuItems.map((menuItem, index) => (
                 <React.Fragment key={index}>
                   <ListItem>
