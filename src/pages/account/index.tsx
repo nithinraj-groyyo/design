@@ -15,16 +15,16 @@ const menuItems = [
     title: "Accounts",
     subItems: [
       { title: "Profile", route: "/account/profile" },
-      { title: "Addresses", route: "/account/address" },
+      // { title: "Addresses", route: "/account/address" },
       { title: "Change Password", route: "/account/changePassword" },
     ],
   },
-  {
-    title: "Orders",
-    subItems: [
-      { title: "Orders & Returns", route: "/account/orders-returns" },
-    ],
-  },
+  // {
+  //   title: "Orders",
+  //   subItems: [
+  //     { title: "Orders & Returns", route: "/account/orders-returns" },
+  //   ],
+  // },
   
 ];
 
@@ -39,42 +39,43 @@ const adminMenuItems = [
       { title: "About us", route: "/account/web-info/about-us" },
       { title: "Teams", route: "/account/web-info/teams" },
       { title: "Services", route: "/account/web-info/services" },
+      { title: "FAQ", route: "/account/web-info/faq" },
     ],
   },
-  {
-    title: "Product",
-    subItems: [
-      { title: "Add Product", route: "/account/add-product" },
-      { title: "Bulk Upload", route: "/account/bulk-upload" },
-      { title: "Product List", route: "/account/product-list" },
-    ],
-  },
-  {
-    title: "Blog",
-    subItems: [
-      { title: "Blogs", route: "/account/blogs" },
-      { title: "Add Blog", route: "/account/add-blog" },
-    ],
-  },
-  {
-    title: "Event",
-    subItems: [
-      { title: "Events", route: "/account/events" },
-      { title: "Add Events", route: "/account/add-events" },
-    ],
-  },
-  {
-    title: "Customer",
-    subItems: [{ title: "Queries", route: "/account/queries" }],
-  },
-  {
-    title: "Site Settings",
-    subItems: [
-      { title: "Brands", route: "/account/brands" },
-      { title: "Add Brands", route: "/account/add-brands" },
-      { title: "Manage Categories", route: "/account/manage-categories" },
-    ],
-  },
+  // {
+  //   title: "Product",
+  //   subItems: [
+  //     { title: "Add Product", route: "/account/add-product" },
+  //     { title: "Bulk Upload", route: "/account/bulk-upload" },
+  //     { title: "Product List", route: "/account/product-list" },
+  //   ],
+  // },
+  // {
+  //   title: "Blog",
+  //   subItems: [
+  //     { title: "Blogs", route: "/account/blogs" },
+  //     { title: "Add Blog", route: "/account/add-blog" },
+  //   ],
+  // },
+  // {
+  //   title: "Event",
+  //   subItems: [
+  //     { title: "Events", route: "/account/events" },
+  //     { title: "Add Events", route: "/account/add-events" },
+  //   ],
+  // },
+  // {
+  //   title: "Customer",
+  //   subItems: [{ title: "Queries", route: "/account/queries" }],
+  // },
+  // {
+  //   title: "Site Settings",
+  //   subItems: [
+  //     { title: "Brands", route: "/account/brands" },
+  //     { title: "Add Brands", route: "/account/add-brands" },
+  //     { title: "Manage Categories", route: "/account/manage-categories" },
+  //   ],
+  // },
 ];
 
 const AccountPage = () => {
@@ -129,7 +130,7 @@ const AccountPage = () => {
               </React.Fragment>
             ))}
 
-            {user || user?.role === "Admin" ||
+            {user && user.role === "Admin" &&
               adminMenuItems.map((menuItem, index) => (
                 <React.Fragment key={index}>
                   <ListItem>
