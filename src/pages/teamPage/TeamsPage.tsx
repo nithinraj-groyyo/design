@@ -156,9 +156,11 @@ const TeamsPage = () => {
 
   return (
     <BasicLayout>
-      <div className="bg-[#e6e6e6] w-screen mt-[10rem] px-6 py-8 flex flex-col gap-8">
+      <div className="bg-[#e6e6e6] w-screen mt-[10rem] px-6 py-8 flex flex-col gap-8" 
+      style={{ fontFamily: "Poppins" }}
+      >
         <div className="flex mx-4 items-center">
-          <div className="text-6xl font-semibold flex-1">Our Team</div>
+          <div className="text-6xl font-semibold flex-1" >Our Team</div>
           <div className="flex justify-evenly items-center">
             <IconButton
               className="text-3xl cursor-pointer"
@@ -166,7 +168,7 @@ const TeamsPage = () => {
             >
               <ArrowCircleLeftIcon fontSize="large" />
             </IconButton>
-            <div className="text-3xl min-w-36 text-center">
+            <div className="text-3xl min-w-36 text-center" >
               {currentDepartment}
             </div>
             <IconButton
@@ -182,14 +184,14 @@ const TeamsPage = () => {
           className={`flex whitespace-nowrap overflow-x-hidden gap-4 relative ${
             selectedDepartmentMembers.length < totalCards
               ? "justify-center"
-              : "justify-between"
+              : "justify-evenly"
           }`}
         >
           <button
             className={`absolute left-0 top-[50%] transform translate-y-[-50%] rounded-full p-1 ${
               startCardMember > 0
                 ? "active:shadow-md bg-opacity-70 bg-white"
-                : "bg-opacity-100 bg-[#EBEBE4]"
+                : "bg-opacity-100 bg-[EBEBE4]"
             }`}
             onClick={handlePrevCard}
             disabled={startCardMember === 0}
@@ -215,7 +217,7 @@ const TeamsPage = () => {
             selectedDepartmentMembers
               .slice(
                 startCardMember,
-                startCardMember + selectedDepartmentMembers.length
+                startCardMember + 4
               )
               .map((member) => (
                 <div key={member.id} className="p-4 flex flex-col gap-4">
