@@ -33,7 +33,6 @@ const ServicePage = () => {
           "Industry Expertise":
             " Leverage our experience in the apparel sector to get design recommendations tailored to your target market.",
         },
-
         {
           "Trend Forecasting":
             " Stay ahead with our trend analysis and market insights.",
@@ -79,10 +78,6 @@ const ServicePage = () => {
     setCurrentService((currentService + val + 3) % 3);
   };
 
-  // useEffect(() => {
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, []);
-
   useEffect(() => {
     const interval = setInterval(() => {
       handleIndex(1);
@@ -95,14 +90,11 @@ const ServicePage = () => {
 
   return (
     <BasicLayout>
+      {/* Carousel Section */}
       <motion.div
-        className="w-screen min-h-[70vh] mt-[10rem]"
+        className="w-full min-h-[70vh] mt-[10rem] bg-cover bg-center bg-fixed relative"
         style={{
           backgroundImage: "url(/images/landingPages/floralPattern4.png)",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-          backgroundSize: "cover",
-          position: "relative",
           fontFamily: "Poppins",
         }}
         initial={{ opacity: 0, y: 5 }}
@@ -110,42 +102,35 @@ const ServicePage = () => {
         transition={{ duration: 1 }}
       >
         <motion.div
-          className="p-8 flex items-center justify-between rounded-xl w-full max-w-[50vw]"
-          style={{
-            height: "auto",
-            position: "absolute",
-            top: "25%",
-            left: "25%",
-            transform: "translate(-25%, -25%)",
-          }}
+          className={`p-8 flex items-center justify-between rounded-xl max-w-[90vw] lg:max-w-[50vw] mx-auto absolute top-[25%] left-[0%] lg:left-[25%] h-auto  transform -translate-x-1/2 -translate-y-1/4`}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
         >
           <div
-            className="flex items-center cursor-pointer absolute left-20"
+            className="flex items-center cursor-pointer absolute left-4 lg:left-20"
             onClick={() => handleIndex(-1)}
           >
             <KeyboardArrowLeftIcon />
           </div>
 
           <motion.div
-            className="flex flex-col gap-8 bg-white p-8 rounded w-full min-w-[30vw] text-center"
+            className="flex flex-col gap-8 bg-white p-8 rounded w-full text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
           >
             <div
-              className="text-4xl font-bold whitespace-nowrap"
+              className="lg:text-3xl font-bold whitespace-nowrap "
               style={{ fontFamily: "'Space Mono', monospace" }}
             >
               {carouselDetails[currentService]?.title}
             </div>
-            <div style={{ fontFamily: "Poppins" }}>
+            <div style={{ fontFamily: "Poppins" }} className="text-xs lg:text-sm">
               {carouselDetails[currentService]?.description}
             </div>
 
-            <div>
+            <div className="!min-w-[10rem]">
               <Button
                 variant="outlined"
                 sx={{
@@ -153,7 +138,7 @@ const ServicePage = () => {
                   borderColor: "black",
                   backgroundColor: "black",
                   padding: "1rem",
-                  minWidth: "15rem",
+                  // minWidth: "10rem",
                   "&:hover": {
                     backgroundColor: "transparent",
                     borderColor: "black",
@@ -167,16 +152,16 @@ const ServicePage = () => {
           </motion.div>
 
           <div
-            className="flex items-center cursor-pointer absolute right-20"
+            className="flex items-center cursor-pointer absolute right-4 lg:right-20"
             onClick={() => handleIndex(1)}
           >
             <KeyboardArrowRightIcon />
           </div>
-          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
             {carouselDetails.map((_, index) => (
               <motion.div
                 key={index}
-                className={`w-3 h-3 rounded-full cursor-pointer ${index === currentService ? "bg-black" : "bg-gray-400"
+                className={`w-2 h-2 md:w-3 md:h-3 rounded-full cursor-pointer ${index === currentService ? "bg-black" : "bg-gray-400"
                   }`}
                 onClick={() => setCurrentService(index)}
                 initial={{ scale: 0 }}
@@ -188,79 +173,79 @@ const ServicePage = () => {
         </motion.div>
       </motion.div>
 
+      {/* Service Details Section */}
       <motion.div
-        className="px-32 py-8 flex flex-col gap-8"
+        className="px-6 md:px-16 lg:px-32 py-8 flex flex-col gap-8"
         style={{ fontFamily: "Poppins" }}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2 }}
       >
-        <div className="text-center font-semibold text-lg">Services</div>
+        <div className="text-center font-semibold text-lg md:text-2xl">
+          Services
+        </div>
 
         {serviceDetails.map((serviceDetail, serviceDetailIndex) => {
           return (
-            <>
-              <motion.div
-                className="px-20 2xl:mx-12 py-8 flex flex-col gap-16 shadow-lg rounded-lg border border-none bg-[#f5f5f5] bg-opacity-40"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 1 }}
-              // viewport={{ once: true }}
-              >
-                <div className="flex gap-16">
-                  <div className="flex-[1] flex justify-center items-center">
-                    <img
-                      src={"/images/landingPages/landingPage_2_2.png"}
-                      alt="Thumbnail"
-                      className="xl:w-64 xl:h-5w-64 2xl:w-64 2xl:h-64 object-cover rounded-xl"
-                    />
-                  </div>
+            <motion.div
+              key={serviceDetailIndex}
+              className="flex flex-col md:flex-row gap-8 md:gap-16 p-6 md:p-8 lg:p-12 shadow-lg rounded-lg border border-none bg-[#f5f5f5] bg-opacity-40"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 1 }}
+            >
+              <div className="flex-[1] flex justify-center items-center">
+                <img
+                  src={"/images/landingPages/landingPage_2_2.png"}
+                  alt="Thumbnail"
+                  className="w-48 h-48 md:w-64 md:h-64 object-cover rounded-xl"
+                />
+              </div>
 
-                  <div className="flex flex-[2] flex-col gap-6 justify-between">
-                    <div className="flex-2">
-                      <div
-                        className="font-bold text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl "
-                        style={{ fontFamily: "'Space Mono', monospace" }}
-                      >
-                        {serviceDetail?.title}
-                      </div>
-                      <div className="whitespace-normal text-justify my-4 text-xs xl:text-sm 2xl:text-[1rem] 3xl:text-xl">{serviceDetail?.description} </div>
-                      
-                      {serviceDetail?.descriptionListKeys?.map((descriptionListKey, index) => (
-                        <div key={index} className="flex flex-col gap-2">
-                          {Object.entries(descriptionListKey).map(([key, value]) => (
-                            <li key={key} className="flex text-xs xl:text-sm 2xl:text-[1rem] 3xl:text-xl">
-                              <span className="font-semibold whitespace-nowrap">{key}:</span>
-                              <span className="ml-2">{value}</span>
-                            </li>
-                          ))}
-                        </div>
+              <div className="flex-[2] flex flex-col gap-6 justify-between">
+                <div>
+                  <div
+                    className="font-bold text-lg md:text-xl lg:text-2xl xl:text-3xl"
+                    style={{ fontFamily: "'Space Mono', monospace" }}
+                  >
+                    {serviceDetail?.title}
+                  </div>
+                  <div className="text-justify my-4 text-sm md:text-base lg:text-lg">
+                    {serviceDetail?.description}
+                  </div>
+                  
+                  {serviceDetail?.descriptionListKeys?.map((descriptionListKey, index) => (
+                    <div key={index} className="flex flex-col gap-2">
+                      {Object.entries(descriptionListKey).map(([key, value]) => (
+                        <li key={key} className="text-sm md:text-base lg:text-lg">
+                          <span className="font-semibold">{key}:</span>
+                          <span className="ml-2">{value}</span>
+                        </li>
                       ))}
-
                     </div>
-
-                    <div className="text-center">
-                      <Button
-                        variant="outlined"
-                        sx={{
-                          color: "black",
-                          borderColor: "black",
-                          backgroundColor: "transparent",
-                          minWidth: "12rem",
-                          "&:hover": {
-                            backgroundColor: "black",
-                            color: "white",
-                          },
-                        }}
-                        className="!text-xs xl:!text-sm 2xl:!text-[1rem] !p-[0.5rem] 2xl:!p-[1rem]"
-                      >
-                        {serviceDetail?.buttonName}
-                      </Button>
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              </motion.div>
-            </>
+
+                <div className="text-center">
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      color: "black",
+                      borderColor: "black",
+                      backgroundColor: "transparent",
+                      minWidth: "10rem",
+                      "&:hover": {
+                        backgroundColor: "black",
+                        color: "white",
+                      },
+                    }}
+                    className="!text-xs md:!text-sm lg:!text-base !p-2"
+                  >
+                    {serviceDetail?.buttonName}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
           );
         })}
       </motion.div>

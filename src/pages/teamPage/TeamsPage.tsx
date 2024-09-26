@@ -9,7 +9,6 @@ import { IconButton } from "@mui/material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
-// Define a type for the member details
 interface Member {
   id: number;
   name: string;
@@ -156,30 +155,35 @@ const TeamsPage = () => {
 
   return (
     <BasicLayout>
-      <div className="bg-[#e6e6e6] w-screen mt-[10rem] px-6 py-8 flex flex-col gap-8" 
-      style={{ fontFamily: "Poppins" }}
+      <div
+        className="bg-[#e6e6e6] w-screen  mt-[10rem] px-4 sm:px-6 py-8 flex flex-col gap-6 sm:gap-8 relative"
+        style={{ fontFamily: "Poppins" }}
       >
-        <div className="flex mx-4 items-center">
-          <div className="text-6xl font-semibold flex-1" >Our Team</div>
+        {/* Header Section */}
+        <div className="flex mx-4 items-center z-20 relative">
+          <div className="text-3xl sm:text-6xl font-semibold flex-1">Our Team</div>
           <div className="flex justify-evenly items-center">
             <IconButton
-              className="text-3xl cursor-pointer"
+              className="text-2xl sm:text-3xl cursor-pointer"
               onClick={handlePreviousDepartment}
+              style={{ zIndex: 10 }}
             >
               <ArrowCircleLeftIcon fontSize="large" />
             </IconButton>
-            <div className="text-3xl min-w-36 text-center" >
+            <div className="text-xl sm:text-3xl min-w-20 sm:min-w-36 text-center">
               {currentDepartment}
             </div>
             <IconButton
-              className="text-3xl cursor-pointer"
+              className="text-2xl sm:text-3xl cursor-pointer"
               onClick={handleNextDepartment}
+              style={{ zIndex: 10 }}
             >
               <ArrowCircleRightIcon fontSize="large" />
             </IconButton>
           </div>
         </div>
 
+        {/* Team Member Cards Section */}
         <div
           className={`flex whitespace-nowrap overflow-x-hidden gap-4 relative ${
             selectedDepartmentMembers.length < totalCards
@@ -188,10 +192,10 @@ const TeamsPage = () => {
           }`}
         >
           <button
-            className={`absolute left-0 top-[50%] transform translate-y-[-50%] rounded-full p-1 ${
+            className={`absolute left-0 top-[50%] transform translate-y-[-50%] rounded-full p-1 z-20 bg-white ${
               startCardMember > 0
-                ? "active:shadow-md bg-opacity-70 bg-white"
-                : "bg-opacity-100 bg-[EBEBE4]"
+                ? "active:shadow-md bg-opacity-70 !bg-white"
+                : "bg-opacity-100 !bg-[EBEBE4]"
             }`}
             onClick={handlePrevCard}
             disabled={startCardMember === 0}
@@ -200,10 +204,10 @@ const TeamsPage = () => {
           </button>
 
           <button
-            className={`absolute right-0 top-[50%] transform translate-y-[-50%] rounded-full p-1 ${
+            className={`absolute right-0 top-[50%] transform translate-y-[-50%] rounded-full p-1 z-20 bg-white ${
               startCardMember + totalCards < selectedDepartmentMembers.length
-                ? "active:shadow-md bg-opacity-70 bg-white"
-                : "bg-opacity-100 bg-[#EBEBE4]"
+                ? "active:shadow-md bg-opacity-70 !bg-white"
+                : "bg-opacity-100 !bg-[#EBEBE4]"
             }`}
             onClick={handleNextCard}
             disabled={
@@ -215,29 +219,33 @@ const TeamsPage = () => {
 
           {selectedDepartmentMembers.length > 0 &&
             selectedDepartmentMembers
-              .slice(
-                startCardMember,
-                startCardMember + 4
-              )
+              .slice(startCardMember, startCardMember + totalCards)
               .map((member) => (
-                <div key={member.id} className="p-4 flex flex-col gap-4">
-                  <div className="min-w-[19rem]">
+                <div
+                  key={member.id}
+                  className="p-4 flex flex-col gap-4 mt-2 bg-white rounded-2xl transform transition-transform duration-300 hover:-translate-y-1 z-10 min-w-[14rem] sm:min-w-[19rem]"
+                >
+                  <div className="min-w-[14rem] sm:min-w-[19rem]">
                     <img
-                      src={"/images/landingPages/landingPage_2_2.png"}
+                      src={"/images/landingPages/landingPage_1_2.png"}
                       alt="Thumbnail"
-                      className="w-[19rem] h-[20rem] rounded-2xl"
+                      className="w-full h-[16rem] sm:h-[20rem] rounded-2xl"
                     />
                   </div>
                   <div className="flex flex-col">
-                    <div className="text-3xl font-semibold">{member.name}</div>
-                    <div className="text-xl text-[gray]">{member.role}</div>
+                    <div className="text-xl sm:text-3xl font-semibold">
+                      {member.name}
+                    </div>
+                    <div className="text-sm sm:text-xl text-[gray]">
+                      {member.role}
+                    </div>
                   </div>
                   <div>
                     <div
                       className="cursor-pointer w-fit flex items-center"
                       onClick={() => handleOpenDetailedView(member.id)}
                     >
-                      <span className="">View Profile</span>
+                      <span>View Profile</span>
                       <span className="text-blue-500 transition-transform duration-300 transform hover:translate-x-1">
                         <ArrowRightAltIcon />
                       </span>
@@ -248,6 +256,7 @@ const TeamsPage = () => {
         </div>
       </div>
 
+      {/* Modal Drawer */}
       <SwipeableDrawer
         anchor="right"
         open={selectedMember !== null}
@@ -255,7 +264,8 @@ const TeamsPage = () => {
         onOpen={() => {}}
         sx={{
           "& .MuiDrawer-paper": {
-            width: "50%",
+            width: "100%", // Full screen on mobile
+            sm: { width: "50%" }, // Half screen on larger devices
             backgroundColor: "#232323",
           },
         }}

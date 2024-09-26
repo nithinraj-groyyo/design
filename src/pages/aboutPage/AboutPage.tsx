@@ -3,50 +3,24 @@ import BasicLayout from "../../layouts/BasicLayout";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import ClientsLogosSlider from "./ClientsLogoSlider";
-// import NewsSection from "./NewsSection";
 
 const AboutPage = () => {
-  // const aboutDetails = [
-  //   {
-  //     title: "LAUNCHED IN",
-  //     value: "2021",
-  //   },
-  //   {
-  //     title: "TEAM",
-  //     value: "100+",
-  //   },
-  //   {
-  //     title: "FACTORIES",
-  //     value: "360+",
-  //   },
-  //   {
-  //     title: "BRANDS",
-  //     value: "110+",
-  //   },
-  // ];
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [])
+  }, []);
 
   return (
     <BasicLayout>
-      <div className="mt-[10rem]" style={{ fontFamily: "Poppins" }}>
-        <div
-          className="flex flex-col gap-8 py-4"
-          style={{ background: "linear-gradient(0deg, #f9f9f9, transparent)" }}
-        >
+      <div className="md:mt-[10rem] mt-[6rem]" style={{ fontFamily: "Poppins" }}>
+        <div className="flex flex-col gap-8 py-4 bg-gradient-to-t from-[#f9f9f9] to-transparent">
           <div
-            className="text-center font-bold tracking-wide text-4xl"
+            className="text-center font-bold tracking-wide text-2xl md:text-4xl md:text-5xl"
             style={{ fontFamily: "'Space Mono', monospace" }}
           >
             ABOUT GROYYO DESIGN STUDIO
           </div>
           <div className="text-center w-full flex justify-center">
-            <div
-              className="w-[75%]  tracking-wider text-justify"
-              // style={{ fontFamily: "'Space Mono', monospace" }}
-            >
+            <div className="w-[90%] md:w-[75%] tracking-wider text-justify text-base md:text-lg">
               Founded in 2021 and based in Gurgaon, Groyyo Design Studio is a
               one-stop solution for fashion and lifestyle design needs. Blending
               creativity with innovation, the studio crafts unique,
@@ -68,12 +42,18 @@ const AboutPage = () => {
                   color: "white",
                   borderColor: "black",
                   backgroundColor: "black",
-                  padding: "1rem",
-                  minWidth: "15rem",
+                  padding: "0.75rem 1.5rem",
+                  minWidth: "12rem",
+                  fontSize: "1rem",
                   "&:hover": {
                     backgroundColor: "transparent",
                     borderColor: "black",
                     color: "black",
+                  },
+                  "@media(min-width: 768px)": {
+                    padding: "1rem",
+                    minWidth: "15rem",
+                    fontSize: "1.125rem",
                   },
                 }}
               >
@@ -81,33 +61,12 @@ const AboutPage = () => {
               </Button>
             </Link>
           </div>
-          {/* <div className="flex text-center w-full gap-6 justify-center my-4">
-            {aboutDetails.map((aboutDetail, aboutDetailKey) => {
-              return (
-                <>
-                  <div className="flex flex-col gap-4 border border-none px-[3.5rem] py-[2.5rem] rounded-xl shadow-lg bg-white">
-                    <div className="font-semibold">{aboutDetail?.title}</div>
-                    <div
-                      className="text-7xl"
-                      style={{ fontFamily: "'Space Mono', monospace" }}
-                    >
-                      {aboutDetail?.value}
-                    </div>
-                  </div>
-                </>
-              );
-            })}
-          </div> */}
         </div>
-        
 
-        <ClientsLogosSlider/>
-
-        {/* <NewsSection /> */}
+        <ClientsLogosSlider />
       </div>
     </BasicLayout>
   );
 };
 
 export default AboutPage;
-
