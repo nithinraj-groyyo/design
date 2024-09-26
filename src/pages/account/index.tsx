@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import BasicLayout from "../../layouts/BasicLayout";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -80,10 +80,11 @@ const adminMenuItems = [
 
 const AccountPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = JSON.parse(localStorage.getItem("roles") as string);
 
-  const onClickHandler = (route: string) => {
-    navigate(route);
+  const handleSelectedList = (selectedRoute: string) => {
+    navigate(selectedRoute);
   };
 
   return (
@@ -106,17 +107,20 @@ const AccountPage = () => {
                     {menuItem.subItems.map((subItem, subIndex) => (
                       <ListItem
                         key={subIndex}
-                        onClick={() => onClickHandler(subItem.route)}
+                        onClick={() => handleSelectedList(subItem.route)}
                         className="cursor-pointer"
+                        style={{
+                          backgroundColor: location.pathname === subItem.route ? "#e0e0e0" : "transparent",                           
+                        }}
                       >
                         <ListItemText
                           primary={subItem.title}
                           primaryTypographyProps={{
                             style: {
-                              fontWeight: "lighter",
+                              fontWeight: location.pathname === subItem.route ? "bold" : "lighter",
                               fontSize: "1rem",
                               lineHeight: "0.65",
-                              color: "#7f7f7f",
+                              color: location.pathname === subItem.route ? "#000" : "#7f7f7f",                               
                             },
                           }}
                         />
@@ -146,17 +150,20 @@ const AccountPage = () => {
                       {menuItem.subItems.map((subItem, subIndex) => (
                         <ListItem
                           key={subIndex}
-                          onClick={() => onClickHandler(subItem.route)}
+                          onClick={() => handleSelectedList(subItem.route)}
                           className="cursor-pointer"
+                          style={{
+                            backgroundColor: location.pathname === subItem.route ? "#e0e0e0" : "transparent",
+                          }}
                         >
                           <ListItemText
                             primary={subItem.title}
                             primaryTypographyProps={{
                               style: {
-                                fontWeight: "lighter",
+                                fontWeight: location.pathname === subItem.route ? "bold" : "lighter",
                                 fontSize: "1rem",
                                 lineHeight: "0.65",
-                                color: "#7f7f7f",
+                                color: location.pathname === subItem.route ? "#000" : "#7f7f7f",
                               },
                             }}
                           />
