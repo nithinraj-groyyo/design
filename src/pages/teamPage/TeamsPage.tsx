@@ -9,7 +9,6 @@ import { IconButton } from "@mui/material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
-// Define a type for the member details
 interface Member {
   id: number;
   name: string;

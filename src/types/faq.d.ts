@@ -1,5 +1,6 @@
 export interface FAQ {
-    id: string;
+    id: string | number;
     question: string;
     answer: string;
-}
+  }
+  
