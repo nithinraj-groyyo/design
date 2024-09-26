@@ -264,8 +264,8 @@ const TeamsPage = () => {
         onOpen={() => {}}
         sx={{
           "& .MuiDrawer-paper": {
-            width: "100%", // Full screen on mobile
-            sm: { width: "50%" }, // Half screen on larger devices
+            width: "50%", 
+            sm: { width: "50%" },
             backgroundColor: "#232323",
           },
         }}
