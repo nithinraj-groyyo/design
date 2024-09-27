@@ -38,7 +38,7 @@ const FAQList: React.FC<FAQListProps> = ({ faqs, onEdit, onConfirmDelete }) => {
       }}
     >
       <List>
-        {faqs?.length > 0 ? faqs.map((faq, index) => (
+        {faqs?.length > 0 ? faqs?.map((faq, index) => (
           <motion.div
             key={faq.id}
             variants={{
