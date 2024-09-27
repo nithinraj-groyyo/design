@@ -1,7 +1,7 @@
 import BasicLayout from "../../layouts/BasicLayout";
 import React from "react";
 import ContactUsForm from "./ContactUsForm";
-import FAQ from "./FAQ";
+import UserFAQ from "./UserFAQ";
 
 export const ContactUs = () => {
   return (
@@ -48,8 +48,8 @@ export const ContactUs = () => {
         </div>
 
         
-          {/* <FAQ /> */}
-          <ContactUsForm />
+          <UserFAQ />
+          {/* <ContactUsForm /> */}
       </div>
     </BasicLayout>
   );

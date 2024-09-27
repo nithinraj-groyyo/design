@@ -5,7 +5,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
 import ContactUsForm from "./ContactUsForm";
-import FAQ from "./FAQ";
+// import FAQ from "./FAQ";
 
 const CustomAccordion = styled(Accordion)(({ theme }) => ({
   border: "none",
@@ -28,10 +28,10 @@ const AccordionComponent: React.FC = () => {
   };
 
   const accordionData = [
-    {
-      title: "How to cancel an order or start a return",
-      content: <FAQ />,
-    },
+    // {
+    //   title: "How to cancel an order or start a return",
+    //   content: <FAQ />,
+    // },
     {
       title: "Email our Customer Service Team",
       content: <ContactUsForm />,
