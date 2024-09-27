@@ -2,7 +2,9 @@ import axios from 'axios';
 import { Service } from '../types/service';
 import { ResponseFormat } from '../types/responseFormat';
 
-const BASE_URL = 'http://localhost:8000/services';
+// const BASE_URL = 'http://localhost:8000/services';
+const BASE_URL = 'http://192.168.1.19:8000/services';
+
 
 export const fetchAllServices = async (): Promise<Service[]> => {
     const response = await axios.get<Service[]>(`${BASE_URL}`);

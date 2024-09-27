@@ -4,6 +4,11 @@ import { Button } from "@mui/material";
 import { motion } from "framer-motion";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import { fetchAllServices } from "../../api/servicesApi";
+import { setError, setLoading } from "../../redux/shoppingBagSlice";
+import { Service } from "../../types/service";
+
+
 
 const carouselDetails = [
   {
@@ -79,6 +84,7 @@ const serviceDetails = [
 const ServicePage = () => {
   const [expandedCard, setExpandedCard] = useState<number | null>(null); // Track which card is expanded
   const [currentService, setCurrentService] = useState(0);
+  const [services, setServices] = useState<Service[]>([]);
   const handleIndex = (val: number) => {
     setCurrentService((currentService + val + 3) % 3);
   };
@@ -86,6 +92,21 @@ const ServicePage = () => {
   const handleToggleDetails = (index: number) => {
     setExpandedCard(expandedCard === index ? null : index);
   };
+
+  const loadServices = async () => {
+    setLoading(true);
+    try {
+        const data: any = await fetchAllServices();
+        setServices(data?.data);
+    } catch (error) {
+        setError('Failed to fetch services');
+    } finally {
+        setLoading(false);
+    }
+};
+useEffect(() => {
+  loadServices();
+}, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -201,7 +222,7 @@ const ServicePage = () => {
         <div className="text-center font-semibold text-4xl">Services</div>
 
         <div className="flex flex-row gap-16 flex-wrap justify-center">
-          {serviceDetails.map((serviceDetail, index) => {
+          {services.map((serviceDetail, index) => {
             return (
               <motion.div
                 key={index}
@@ -213,7 +234,7 @@ const ServicePage = () => {
                 <div className="flex flex-col gap-6 justify-between">
                   <div className="flex justify-center items-center">
                     <img
-                      src={serviceDetail?.img}
+                      src={serviceDetail?.imagePath}
                       alt="Thumbnail"
                       className="h-48 w-64 object-cover rounded-xl"
                     />
@@ -227,11 +248,22 @@ const ServicePage = () => {
                       {serviceDetail?.description}
                     </div>
 
-                    {expandedCard === index &&
-                      serviceDetail?.descriptionListKeys?.map(
-                        (descriptionListKey, i) => (
+                    {expandedCard===index && serviceDetail?.featuresList?.map((feature,featureIndex)=>{
+                      return <>
+                        <div className="flex flex-col gap-2">
+                          <li className="text-xs">
+                            <span className="font-semibold">{feature?.featureName}</span>
+                            <span className="ml-2">{feature?.featureDetail}</span>
+                          </li>
+                            </div>
+                      </>
+                    })}
+
+                    {/* {expandedCard === index &&
+                      serviceDetail?.featuresList?.map(
+                        (featureList, i) => (
                           <div key={i} className="flex flex-col gap-2">
-                            {Object.entries(descriptionListKey).map(
+                            {Object.entries(featureList).map(
                               ([key, value]) => (
                                 <li key={key} className="text-xs">
                                   <span className="font-semibold">{key}:</span>
@@ -241,7 +273,7 @@ const ServicePage = () => {
                             )}
                           </div>
                         )
-                      )}
+                      )} */}
 
                     <Button
                       onClick={() => handleToggleDetails(index)}
@@ -269,7 +301,7 @@ const ServicePage = () => {
                         },
                       }}
                     >
-                      {serviceDetail?.buttonName}
+                      {serviceDetail?.buttonLabel}
                     </Button>
                   </div>
                 </div>
