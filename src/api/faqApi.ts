@@ -3,7 +3,8 @@ import { FAQ } from '../types/faq';
 import { ResponseFormat } from '../types/responseFormat';
 import { handleError } from '.';
 
-const BASE_URL = 'http://localhost:8000/faq';
+// const BASE_URL = 'http://localhost:8000/faq';
+const BASE_URL = 'http://192.168.1.19:8000/faq';
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
