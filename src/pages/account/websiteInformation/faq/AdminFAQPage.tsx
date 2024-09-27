@@ -16,19 +16,16 @@ const AdminFAQPage: React.FC = () => {
     const [editFAQ, setEditFAQ] = useState<FAQ | null>(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
     const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [faqsLoading, setfaqsLoading] = useState(false);
+
+    const loadFaqs = async () => {
+        setfaqsLoading(true)
+        const loadedFaqs = await fetchFaqs();
+        setFaqs(loadedFaqs);
+        setfaqsLoading(false)
+    };
 
     useEffect(() => {
-        const loadFaqs = async () => {
-            try {
-                const loadedFaqs = await fetchFaqs();
-                setFaqs(loadedFaqs);
-            } catch (error) {
-                toast.error('Failed to load FAQs.');
-            } finally {
-                setLoading(false);
-            }
-        };
         loadFaqs();
     }, []);
 
@@ -38,16 +35,60 @@ const AdminFAQPage: React.FC = () => {
     };
 
     const handleAddEditFAQ = async (faq: Partial<FAQ>) => {
-        //... (same as before)
+        try {
+            let response: ResponseFormat<FAQ> | undefined;
+
+            if (faq?.id) {
+                response = await updateFaq(faq?.id as number, faq);
+
+            } else {
+                response = await createFaq(faq);
+            }
+
+            if (response?.statusCode === 200 || response?.statusCode === 201) {
+                
+                if (faq?.id) {
+                    toast.success('FAQ updated successfully!');
+                }
+                toast.success('FAQ added successfully!');
+                loadFaqs()
+            } else {
+                toast.error('An unexpected error occurred while processing your request.');
+            }
+        } catch (error) {
+            if (error instanceof ApiError) {
+                console.error(`Error ${error.statusCode}: ${error.message}`);
+            } else {
+                toast.error('An unexpected error occurred while processing your request.');
+            }
+        } finally {
+            setOpenDialog(false);
+        }
     };
 
     const handleDeleteFAQ = (faqId: string | number) => {
-        //... (same as before)
+        setConfirmDeleteId(faqId);
+        setOpenConfirmDialog(true);
     };
 
     const confirmDelete = async () => {
-        //... (same as before)
+        if (confirmDeleteId) {
+            try {
+                const response: ResponseFormat<void> = await deleteFaq(confirmDeleteId as number);
+                if (response?.statusCode === 200) {
+                    toast.success(response?.message || 'FAQ deleted successfully!');
+                    loadFaqs()
+                } else {
+                    toast.error(response?.message || 'Failed to delete FAQ?.');
+                }
+            } catch (error) {
+                toast.error('An error occurred while deleting the FAQ?.');
+            }
+        }
+        setConfirmDeleteId(null);
+        setOpenConfirmDialog(false);
     };
+
 
     return (
         <AccountSettingsLayout>
@@ -57,7 +98,7 @@ const AdminFAQPage: React.FC = () => {
                 </Button>
             </AccountSettingsLayout.Header>
             <AccountSettingsLayout.Body>
-                {loading ? (
+                {faqsLoading ? (
                     <FAQListSkeleton />
                 ) : (
                     <FAQList faqs={faqs} onEdit={handleOpenDialog} onConfirmDelete={handleDeleteFAQ} />
