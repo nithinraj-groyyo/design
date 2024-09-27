@@ -1,185 +1,150 @@
-import React, { useState } from 'react';
-import { Button, FormControl, MenuItem, Select, TextField } from '@mui/material';
+import React, { useState } from "react";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
-import { toast } from 'react-toastify';
-import { submitContactForm } from '../../api/categoriesApi';
-import { SelectChangeEvent } from '@mui/material';
+import { toast } from "react-toastify";
+import { SelectChangeEvent } from "@mui/material";
 
 const VisuallyHiddenInput = styled("input")({
-    clip: "rect(0 0 0 0)",
-    clipPath: "inset(50%)",
-    height: 1,
-    overflow: "hidden",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    whiteSpace: "nowrap",
-    width: 1,
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  whiteSpace: "nowrap",
+  width: 1,
 });
 
-const ContactUsForm = () => {
-    const [formValues, setFormValues] = useState({
-        name: '',
-        email: '',
-        contactPreference: '',
-        countryId: '',
-        queryType: '',
-        subject: '',
-        message: '',
-    });
+export const ContactUsForm = () => {
+  const [formValues, setFormValues] = useState({
+    name: "",
+    email: "",
+    contactPreference: "",
+    countryId: "",
+    subject: "",
+    message: "",
+  });
+  const [file, setFile] = useState<File | null>(null);
 
-    const [file, setFile] = useState<File | null>(null);
+  const handleInputChange = (
+    event:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | SelectChangeEvent<string>
+  ) => {
+    const { name, value } = event.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
 
-    const handleInputChange = (
-        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>
-    ) => {
-        const { name, value } = event.target as { name: string; value: string };
-        setFormValues(prevValues => ({
-            ...prevValues,
-            [name]: value,
-        }));
-    };
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) setFile(event.target.files[0]);
+  };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            setFile(event.target.files[0]);
-        }
-    };
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  };
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+  return (
+    <div className="md:w-[65%] bg-white shadow-lg px-10 py-16 rounded-r-xl">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+          <TextField
+            label="Name"
+            name="name"
+            value={formValues.name}
+            onChange={handleInputChange}
+            required
+            fullWidth
+          />
+          <TextField
+            label="Email"
+            name="email"
+            value={formValues.email}
+            onChange={handleInputChange}
+            required
+            fullWidth
+          />
+        </div>
+        <div className="flex flex-col gap-4 md:flex-row md:gap-8">
+          <FormControl fullWidth>
+            <InputLabel id="contact-preference-label">
+              Contact Preference
+            </InputLabel>
+            <Select
+              labelId="contact-preference-label"
+              name="contactPreference"
+              value={formValues.contactPreference}
+              onChange={handleInputChange}
+              label="Contact Preference"
+              fullWidth
+            >
+              <MenuItem value="">Select Preference</MenuItem>
+              <MenuItem value="email">Email</MenuItem>
+            </Select>
+          </FormControl>
 
-        const formData = new FormData();
-        Object.keys(formValues).forEach(key => formData.append(key, formValues[key as keyof typeof formValues]));
-        if (file) {
-            formData.append('filePath', file);
-        }
+          <TextField
+            label="Phone Number"
+            name="phone"
+            value={formValues.email}
+            onChange={handleInputChange}
+            required
+            fullWidth
+          />
 
-        try {
-            await submitContactForm(formData);
-            setFormValues({
-                name: '',
-                email: '',
-                contactPreference: '',
-                countryId: '',
-                queryType: '',
-                subject: '',
-                message: '',
-            });
-            setFile(null);
-            toast.success("Submitted Successfully");
-        } catch (error) {
-            toast.error("Submission Failed");
-            console.error('Error:', error);
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <div className="mb-3 font-semibold">Help Center</div>
-            <div className="flex flex-col gap-3">
-                <div className="flex flex-col gap-2">
-                    <div>Name</div>
-                    <TextField
-                        name="name"
-                        value={formValues.name}
-                        onChange={handleInputChange}
-                        className="xxs:w-full lg:w-[60%]"
-                    />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div>Email id</div>
-                    <TextField
-                        name="email"
-                        value={formValues.email}
-                        onChange={handleInputChange}
-                        className="xxs:w-full lg:w-[60%]"
-                    />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div>Contact Preference</div>
-                    <FormControl className="w-full">
-                        <Select
-                            name="contactPreference"
-                            value={formValues.contactPreference}
-                            onChange={handleInputChange}
-                            displayEmpty
-                            className="xxs:w-full lg:w-[60%]"
-                        >
-                            <MenuItem value="poa">POA</MenuItem>
-                        </Select>
-                    </FormControl>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div>Country ID</div>
-                    <FormControl className="w-full">
-                        <Select
-                            name="countryId"
-                            value={formValues.countryId}
-                            onChange={handleInputChange}
-                            displayEmpty
-                            className="xxs:w-full lg:w-[60%]"
-                        >
+          {/* <FormControl fullWidth>
+                        <InputLabel>Country ID</InputLabel>
+                        <Select name="countryId" value={formValues.countryId} onChange={handleInputChange} fullWidth>
+                            <MenuItem value="">Select Country</MenuItem>
                             <MenuItem value="IN">India</MenuItem>
                         </Select>
-                    </FormControl>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div>Query Type</div>
-                    <FormControl className="w-full">
-                        <Select
-                            name="queryType"
-                            value={formValues.queryType}
-                            onChange={handleInputChange}
-                            displayEmpty
-                            className="xxs:w-full lg:w-[60%]"
-                        >
-                            <MenuItem value="jx">JX</MenuItem>
-                        </Select>
-                    </FormControl>
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div>Subject</div>
-                    <TextField
-                        name="subject"
-                        value={formValues.subject}
-                        onChange={handleInputChange}
-                        className="xxs:w-full lg:w-[60%]"
-                    />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <div>Message</div>
-                    <TextField
-                        name="message"
-                        value={formValues.message}
-                        onChange={handleInputChange}
-                        className="xxs:w-full lg:w-[60%]"
-                    />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <Button
-                        component="label"
-                        className="xxs:w-full lg:w-[60%] h-[3.5rem] text-black border shadow-none !bg-black"
-                        variant="contained"
-                        startIcon={<CloudUploadIcon />}
-                    >
-                        Upload file
-                        <VisuallyHiddenInput type="file" onChange={handleFileChange} />
-                    </Button>
-                </div>
-                <div>
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        className="xxs:w-full lg:w-[60%] h-[3.5rem] !bg-black text-white"
-                    >
-                        Send
-                    </Button>
-                </div>
-            </div>
-        </form>
-    );
+                    </FormControl> */}
+        </div>
+        <TextField
+          label="Subject"
+          name="subject"
+          value={formValues.subject}
+          onChange={handleInputChange}
+          required
+          fullWidth
+        />
+        <TextField
+          label="Message"
+          name="message"
+          value={formValues.message}
+          onChange={handleInputChange}
+          required
+          fullWidth
+          multiline
+          rows={4}
+        />
+        <Button
+          component="label"
+          variant="outlined"
+          className="!border !border-black !text-black h-12"
+          fullWidth
+          startIcon={<CloudUploadIcon />}
+        >
+          Upload file
+          <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          className="!bg-black text-white h-12"
+        >
+          Send
+        </Button>
+      </form>
+    </div>
+  );
 };
 
 export default ContactUsForm;

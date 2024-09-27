@@ -5,83 +5,87 @@ import { motion } from "framer-motion";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
+const carouselDetails = [
+  {
+    title: "Exclusive Apparel Designs",
+    description: "Discover ready-made, trend-driven apparel for your brand.",
+    buttonName: "Explore our Designs",
+  },
+  {
+    title: "Customization Services",
+    description: "Create apparel tailored to your brand’s unique vision.",
+    buttonName: "Book an appointment",
+  },
+  {
+    title: "Design Consultation",
+    description: "Expert guidance to perfect your design ideas.",
+    buttonName: "Contact us",
+  },
+];
+
+const serviceDetails = [
+  {
+    title: "Exclusive Apparel Designs",
+    img: "/images/DummyImages/service1.png",
+    description:
+      "Explore our collection of unique, pre-designed apparel. Each design is carefully crafted by our in-house designers, tailored to the latest trends and market demands.",
+    descriptionListKeys: [
+      {
+        "Industry Expertise":
+          " Leverage our experience in the apparel sector to get design recommendations tailored to your target market.",
+      },
+      {
+        "Trend Forecasting":
+          " Stay ahead with our trend analysis and market insights.",
+      },
+    ],
+    buttonName: "Explore our Designs",
+  },
+  {
+    title: "Customization Services",
+    img: "/images/DummyImages/service2.png",
+    description:
+      " We offer customization services to tailor designs to your specific needs.",
+    descriptionListKeys: [
+      {
+        "Tailored for You":
+          " Modify colors, patterns, or fabrics to match your brand.",
+      },
+      {
+        "Bespoke Creations":
+          " Work with us to develop a design from scratch that aligns with your vision.",
+      },
+    ],
+    buttonName: "Book an appointment",
+  },
+  {
+    title: "Design Consultation",
+    img: "/images/DummyImages/service3.png",
+    description: "Expert guidance to perfect your design ideas.",
+    descriptionListKeys: [
+      {
+        "Industry Expertise":
+          " Leverage our experience in the apparel sector to get design recommendations tailored to your market.",
+      },
+      {
+        "Trend Forecasting":
+          " Stay ahead with our trend analysis and insights.",
+      },
+    ],
+    buttonName: "Contact us",
+  },
+];
+
 const ServicePage = () => {
-  const carouselDetails = [
-    {
-      title: "Exclusive Apparel Designs",
-      description: "Discover ready-made, trend-driven apparel for your brand.",
-      buttonName: "Explore our Designs",
-    },
-    {
-      title: "Customization Services",
-      description: "Create apparel tailored to your brand’s unique vision.",
-      buttonName: "Book an appointment",
-    },
-    {
-      title: "Design Consultation",
-      description: "Expert guidance to perfect your design ideas.",
-      buttonName: "Contact us",
-    },
-  ];
-  const serviceDetails = [
-    {
-      title: "Exclusive Apparel Designs",
-      description:
-        "Explore our collection of unique, pre-designed apparel. Each design is carefully crafted by our in-house designers, tailored to the latest trends and market demands.",
-      descriptionListKeys: [
-        {
-          "Industry Expertise":
-            " Leverage our experience in the apparel sector to get design recommendations tailored to your target market.",
-        },
-
-        {
-          "Trend Forecasting":
-            " Stay ahead with our trend analysis and market insights.",
-        },
-      ],
-      buttonName: "Explore our Designs",
-    },
-    {
-      title: "Customization Services",
-      description:
-        " We offer customization services to tailor designs to your specific needs.",
-      descriptionListKeys: [
-        {
-          "Tailored for You":
-            " Modify colors, patterns, or fabrics to match your brand.",
-        },
-        {
-          "Bespoke Creations":
-            " Work with us to develop a design from scratch that aligns with your vision.",
-        },
-      ],
-      buttonName: "Book an appointment",
-    },
-    {
-      title: "Design Consultation",
-      description: "Expert guidance to perfect your design ideas.",
-      descriptionListKeys: [
-        {
-          "Industry Expertise":
-            " Leverage our experience in the apparel sector to get design recommendations tailored to your market.",
-        },
-        {
-          "Trend Forecasting":
-            " Stay ahead with our trend analysis and insights.",
-        },
-      ],
-      buttonName: "Contact us",
-    },
-  ];
+  const [expandedCard, setExpandedCard] = useState<number | null>(null); // Track which card is expanded
   const [currentService, setCurrentService] = useState(0);
-
   const handleIndex = (val: number) => {
     setCurrentService((currentService + val + 3) % 3);
   };
 
-  // useEffect(() => {
-  //   window.scrollTo({ top: 0, behavior: "smooth" });
-  // }, []);
+  const handleToggleDetails = (index: number) => {
+    setExpandedCard(expandedCard === index ? null : index);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -137,7 +141,6 @@ const ServicePage = () => {
           >
             <div
               className="text-4xl font-bold whitespace-nowrap"
-              style={{ fontFamily: "'Space Mono', monospace" }}
             >
               {carouselDetails[currentService]?.title}
             </div>
@@ -176,8 +179,9 @@ const ServicePage = () => {
             {carouselDetails.map((_, index) => (
               <motion.div
                 key={index}
-                className={`w-3 h-3 rounded-full cursor-pointer ${index === currentService ? "bg-black" : "bg-gray-400"
-                  }`}
+                className={`w-3 h-3 rounded-full cursor-pointer ${
+                  index === currentService ? "bg-black" : "bg-gray-400"
+                }`}
                 onClick={() => setCurrentService(index)}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -190,79 +194,89 @@ const ServicePage = () => {
 
       <motion.div
         className="px-32 py-8 flex flex-col gap-8"
-        style={{ fontFamily: "Poppins" }}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2 }}
       >
-        <div className="text-center font-semibold text-lg">Services</div>
+        <div className="text-center font-semibold text-4xl">Services</div>
 
-        {serviceDetails.map((serviceDetail, serviceDetailIndex) => {
-          return (
-            <>
+        <div className="flex flex-row gap-16 flex-wrap justify-center">
+          {serviceDetails.map((serviceDetail, index) => {
+            return (
               <motion.div
-                className="px-20 2xl:mx-12 py-8 flex flex-col gap-16 shadow-lg rounded-lg border border-none bg-[#f5f5f5] bg-opacity-40"
+                key={index}
+                className="px-10 py-8 flex flex-col gap-16 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 max-w-xs h-fit"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 1 }}
-              // viewport={{ once: true }}
               >
-                <div className="flex gap-16">
-                  <div className="flex-[1] flex justify-center items-center">
+                <div className="flex flex-col gap-6 justify-between">
+                  <div className="flex justify-center items-center">
                     <img
-                      src={"/images/landingPages/landingPage_2_2.png"}
+                      src={serviceDetail?.img}
                       alt="Thumbnail"
-                      className="xl:w-64 xl:h-5w-64 2xl:w-64 2xl:h-64 object-cover rounded-xl"
+                      className="h-48 w-64 object-cover rounded-xl"
                     />
                   </div>
 
-                  <div className="flex flex-[2] flex-col gap-6 justify-between">
-                    <div className="flex-2">
-                      <div
-                        className="font-bold text-xl xl:text-2xl 2xl:text-3xl 3xl:text-4xl "
-                        style={{ fontFamily: "'Space Mono', monospace" }}
-                      >
-                        {serviceDetail?.title}
-                      </div>
-                      <div className="whitespace-normal text-justify my-4 text-xs xl:text-sm 2xl:text-[1rem] 3xl:text-xl">{serviceDetail?.description} </div>
-                      
-                      {serviceDetail?.descriptionListKeys?.map((descriptionListKey, index) => (
-                        <div key={index} className="flex flex-col gap-2">
-                          {Object.entries(descriptionListKey).map(([key, value]) => (
-                            <li key={key} className="flex text-xs xl:text-sm 2xl:text-[1rem] 3xl:text-xl">
-                              <span className="font-semibold whitespace-nowrap">{key}:</span>
-                              <span className="ml-2">{value}</span>
-                            </li>
-                          ))}
-                        </div>
-                      ))}
-
+                  <div className="flex-2">
+                    <div className="font-bold text-lg text-center">
+                      {serviceDetail?.title}
+                    </div>
+                    <div className="whitespace-normal text-justify my-4 text-xs min-h-20">
+                      {serviceDetail?.description}
                     </div>
 
-                    <div className="text-center">
-                      <Button
-                        variant="outlined"
-                        sx={{
-                          color: "black",
-                          borderColor: "black",
-                          backgroundColor: "transparent",
-                          minWidth: "12rem",
-                          "&:hover": {
-                            backgroundColor: "black",
-                            color: "white",
-                          },
-                        }}
-                        className="!text-xs xl:!text-sm 2xl:!text-[1rem] !p-[0.5rem] 2xl:!p-[1rem]"
-                      >
-                        {serviceDetail?.buttonName}
-                      </Button>
-                    </div>
+                    {expandedCard === index &&
+                      serviceDetail?.descriptionListKeys?.map(
+                        (descriptionListKey, i) => (
+                          <div key={i} className="flex flex-col gap-2">
+                            {Object.entries(descriptionListKey).map(
+                              ([key, value]) => (
+                                <li key={key} className="text-xs">
+                                  <span className="font-semibold">{key}:</span>
+                                  <span className="ml-2">{value}</span>
+                                </li>
+                              )
+                            )}
+                          </div>
+                        )
+                      )}
+
+                    <Button
+                      onClick={() => handleToggleDetails(index)}
+                      className="cursor-pointer"
+                      sx={{
+                        fontSize: "0.725rem",
+                        borderRadius: "0.5rem",
+                      }}
+                    >
+                      {expandedCard === index ? "View Less" : "View More"}
+                    </Button>
+                  </div>
+
+                  <div className="text-center">
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        color: "black",
+                        borderColor: "black",
+                        backgroundColor: "transparent",
+                        minWidth: "12rem",
+                        "&:hover": {
+                          backgroundColor: "black",
+                          color: "white",
+                        },
+                      }}
+                    >
+                      {serviceDetail?.buttonName}
+                    </Button>
                   </div>
                 </div>
               </motion.div>
-            </>
-          );
-        })}
+            );
+          })}
+        </div>
       </motion.div>
     </BasicLayout>
   );
