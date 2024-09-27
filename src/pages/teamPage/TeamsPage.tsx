@@ -1,115 +1,97 @@
 import React, { useState } from "react";
 import BasicLayout from "../../layouts/BasicLayout";
-import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
-import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
-import SwipeableDrawer from '@mui/material/SwipeableDrawer';
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import TeamPageModal from "./TeamPageModal";
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+
+const memberDetails = [
+  {
+    id: 11,
+    name: "Emma Robinson",
+    img: "/images/landingPages/landingPage_3_2.png",
+    role: "Consulting Director",
+    description:
+      "Emma Robinson: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer gravida nisi at sem iaculis, sed lobortis nisi viverra. Aliquam at elementum lectus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Duis a finibus nibh. Sed sapien tortor, consequat sed mi sit amet, tincidunt fermentum nunc. Fusce eu nunc sed lacus tincidunt condimentum. Morbi tortor mauris, rhoncus imperdiet mattis non, mattis a tortor. In ut lorem ac enim ullamcorper molestie sed at justo. Vivamus consectetur feugiat nibh in vestibulum. Pellentesque quis imperdiet velit. In sed neque vitae turpis sagittis dapibus quis euismod felis. Donec congue elit nec tortor lobortis vestibulum. Sed ut egestas ipsum. Nam pulvinar id felis vitae fermentum",
+    linkedin: "https://linkedin.com/in/emma-robinson",
+  },
+  {
+    id: 12,
+    name: "James Smith",
+    img: "/images/landingPages/landingPage_1_2.png",
+    role: "Senior Consultant",
+    description:
+      "James Smith: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer gravida nisi at sem iaculis, sed lobortis nisi viverra. Aliquam at elementum lectus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Duis a finibus nibh. Sed sapien tortor, consequat sed mi sit amet, tincidunt fermentum nunc. Fusce eu nunc sed lacus tincidunt condimentum. Morbi tortor mauris, rhoncus imperdiet mattis non, mattis a tortor. In ut lorem ac enim ullamcorper molestie sed at justo. Vivamus consectetur feugiat nibh in vestibulum. Pellentesque quis imperdiet velit. In sed neque vitae turpis sagittis dapibus quis euismod felis. Donec congue elit nec tortor lobortis vestibulum. Sed ut egestas ipsum. Nam pulvinar id felis vitae fermentum",
+    linkedin: "https://linkedin.com/in/james-smith",
+  },
+];
 
 const TeamsPage = () => {
-  const [selectedMember, setSelectedMember] = useState<number | null>(null);  // Store the ID of selected team member
+  const [selectedMember, setSelectedMember] = useState<number | null>(null);
 
   const handleOpenDetailedView = (id: number) => {
-    setSelectedMember(id); 
+    setSelectedMember(id);
   };
 
   const handleCloseModal = () => {
-    setSelectedMember(null); 
+    setSelectedMember(null);
   };
 
-  const memberDetails = [
-    {
-      id: 1,
-      name: "Devin Burns",
-      role: "Cheif Executive Officer",
-      description: "Devin Burns, MBA, CPA, brings a wealth of experience to Inspectorio as CEO. He has over two decades of leadership experience in scaling high-growth companies. Under his guidance, the company has expanded its global reach and embraced innovative solutions for quality control in the supply chain. Devin's passion for technology and operations management drives his commitment to continuous improvement. As a result, Inspectorio has been recognized as a leader in quality assurance. Devin also prioritizes employee development, ensuring a strong, motivated team at every level.",
-      linkedin: "https://linkedin.com/in/devin-burns"
-    },
-    {
-      id: 2,
-      name: "Jordan Keny",
-      role: "Cheif Techincal Officer",
-      description: "Jordan Keny is the CTO at our company, leading the technology team in developing cutting-edge solutions. With a deep background in software engineering, Jordan has been instrumental in shaping our technology roadmap. He excels in driving complex projects to completion, from concept to production. Jordan is a strong advocate for agile methodologies, fostering collaboration and iterative development across teams. His hands-on approach ensures that technical challenges are swiftly addressed, and his ability to innovate keeps us ahead of industry trends. Jordan's vision is key to our success in the digital age.",
-      linkedin: "https://linkedin.com/in/jordan-keny"
-    },
-    {
-      id: 3,
-      name: "Samantha Lee",
-      role: "Chief Marketing Officer",
-      description: "Samantha Lee has been the CMO for over five years, driving the company's marketing strategy with creativity and data-driven insights. Her extensive experience in both digital and traditional marketing campaigns has helped increase brand visibility and customer engagement. Samantha's approach focuses on building meaningful connections with our target audience while leveraging the latest tools and technologies. She is known for her innovative thinking and ability to adapt quickly to market changes. Samantha has played a pivotal role in launching several successful campaigns that have enhanced our brand recognition globally.",
-      linkedin: "https://linkedin.com/in/samantha-lee"
-    },
-    {
-      id: 4,
-      name: "Rajesh Patel",
-      role: "Chief Financial Officer",
-      description: "Rajesh Patel, CFA, serves as the CFO, where he oversees all financial aspects of the company. With over 15 years of experience in corporate finance, Rajesh brings a strategic mindset to financial planning and analysis. He has a proven track record in managing company resources, optimizing budgets, and improving profitability. Rajesh's expertise in risk management has ensured our financial stability through various market challenges. His collaborative approach allows him to work closely with other executives to align financial goals with business strategy. Rajesh is passionate about driving long-term growth and sustainability.",
-      linkedin: "https://linkedin.com/in/rajesh-patel"
-    },
-    {
-      id: 5,
-      name: "Emily Johnson",
-      role: "Head of Product",
-      description: "Emily Johnson is the Head of Product and has been responsible for overseeing the development and launch of our most successful products. With a background in UX design and product management, Emily ensures that our products are user-friendly and aligned with market demands. She has an exceptional ability to translate customer needs into actionable product features. Emily works closely with engineering, design, and marketing teams to bring products to life. Her leadership has been critical in maintaining our competitive edge in a rapidly evolving industry. She is committed to delivering value to our customers through continuous innovation.",
-      linkedin: "https://linkedin.com/in/emily-johnson"
-    },
-    {
-      id: 6,
-      name: "Carlos Mendoza",
-      role: "Chief Operating Officer",
-      description: "Carlos Mendoza, our COO, oversees the day-to-day operations of the company. With over 20 years of experience in operational management, Carlos has a deep understanding of how to scale and optimize processes. His expertise in supply chain management and logistics has been pivotal in streamlining operations across our global offices. Carlos's leadership ensures that our teams remain efficient and aligned with the company's long-term goals. He is committed to operational excellence and drives continuous improvement initiatives to enhance performance across the board. Carlos is known for his problem-solving skills and ability to execute complex strategies.",
-      linkedin: "https://linkedin.com/in/carlos-mendoza"
-    },
-    {
-      id: 7,
-      name: "Lisa Nguyen",
-      role: "Director of Human Resources",
-      description: "Lisa Nguyen leads the Human Resources department with a focus on creating a positive and inclusive workplace culture. She has over a decade of experience in talent acquisition, employee relations, and organizational development. Lisa is dedicated to fostering a diverse work environment where all employees can thrive. Her efforts have been instrumental in reducing turnover and increasing employee satisfaction. Lisa implements programs that promote professional growth, employee well-being, and leadership development. She also ensures compliance with labor laws and best practices, helping the company navigate complex HR challenges with ease.",
-      linkedin: "https://linkedin.com/in/lisa-nguyen"
-    },
-    {
-      id: 8,
-      name: "Ahmed Farouk",
-      role: "Chief Legal Officer",
-      description: "Ahmed Farouk serves as the Chief Legal Officer, providing strategic legal advice to the company. With over 15 years of experience in corporate law, Ahmed has successfully managed legal risks and ensured compliance across multiple jurisdictions. He specializes in contract negotiation, intellectual property rights, and regulatory issues. Ahmed works closely with other departments to align legal strategies with business objectives. His proactive approach has minimized legal exposure and protected the company's interests. Ahmed is passionate about navigating the complexities of the legal landscape and ensuring that our operations remain lawful and ethical.",
-      linkedin: "https://linkedin.com/in/ahmed-farouk"
-    }
-  ];
-  
-
-  const selectedMemberDetails = memberDetails.find((member) => member.id === selectedMember); // Find the selected member's details
+  const selectedMemberDetails = memberDetails.find(
+    (member) => member.id === selectedMember
+  );
 
   return (
     <BasicLayout>
-      <div className="bg-[#e6e6e6] w-screen mt-[10rem] p-8 flex flex-col gap-8">
-        <div className="flex justify-between">
-          <div className="text-6xl font-semibold">Our Team</div>
-          <div className="flex gap-8">
-            <div className="text-3xl">
-              <ArrowCircleLeftIcon fontSize='large' />
-            </div>
-            <div className="text-3xl">
-              <ArrowCircleRightIcon fontSize='large' />
-            </div>
-          </div>
+      <div
+        className="w-full px-6 py-16 flex flex-col gap-12 mt-[10rem]"
+        style={{
+          position: "relative",
+          backgroundImage: "url('https://img.freepik.com/free-vector/gorgeous-clouds-background-with-blue-sky-design_1017-25501.jpg')",
+          backgroundSize: "cover", 
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute -top-24 -right-12 w-96 h-96 bg-blue-500 opacity-10 rounded-full"
+            style={{ filter: "blur(100px)" }}
+          />
+          <div
+            className="absolute -bottom-32 -left-16 w-80 h-80 bg-green-500 opacity-10 rounded-full"
+            style={{ filter: "blur(100px)" }}
+          />
         </div>
-        <div className="flex gap-4 overflow-x-auto whitespace-nowrap">
+
+        <div className="text-center z-10">
+          <h1 className="text-5xl font-bold text-gray-800">Meet Our Team</h1>
+          <p className="text-lg text-gray-600 mt-4">
+            Our dedicated professionals are here to help.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-12 z-10">
           {memberDetails.map((member) => (
-            <div key={member.id} className="p-4 flex flex-col gap-4">
-              <div className="min-w-[19rem]">
+            <div
+              key={member.id}
+              className="rounded-2xl shadow-lg p-6 bg-white hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-2 hover:scale-105"
+              // style={{ width: "280px" }}
+            >
+              <div className="relative group">
                 <img
-                  src={"/images/landingPages/landingPage_2_2.png"}
-                  alt="Thumbnail"
-                  className="w-[19rem] h-[20rem] rounded-2xl"
+                  src={member.img}
+                  alt={member.name}
+                  className="w-full h-[320px] object-cover rounded-full transform group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="flex flex-col">
-                <div className="text-3xl font-semibold">{member.name}</div>
-                <div className="text-xl text-[gray]">{member.role}</div>
-              </div>
-              <div>
-                <div className="cursor-pointer w-fit" onClick={() => handleOpenDetailedView(member.id)}>
-                  View Profile <ArrowRightAltIcon />
+              <div className="text-center mt-6">
+                <h2 className="text-2xl font-semibold text-gray-800">{member.name}</h2>
+                <p className="text-base text-gray-500">{member.role}</p>
+                <div className="mt-4">
+                  <button
+                    onClick={() => handleOpenDetailedView(member.id)}
+                    className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-300"
+                  >
+                    View Profile
+                  </button>
                 </div>
               </div>
             </div>
@@ -119,19 +101,19 @@ const TeamsPage = () => {
 
       <SwipeableDrawer
         anchor="right"
-        open={selectedMember !== null}  
+        open={selectedMember !== null}
         onClose={handleCloseModal}
-        onOpen={() => {}} 
+        onOpen={() => {}}
         sx={{
           "& .MuiDrawer-paper": {
-            width: "50%",       
-            backgroundColor: "#232323"
-          }
-        }} 
+            width: "50%",
+            backgroundColor: "#232323",
+          },
+        }}
       >
         {selectedMemberDetails && (
           <TeamPageModal
-            memberDetails={selectedMemberDetails}  
+            memberDetails={selectedMemberDetails}
             onClose={handleCloseModal}
           />
         )}

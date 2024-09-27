@@ -1,34 +1,32 @@
 import BasicLayout from "../../layouts/BasicLayout";
-import AccordionComponent from "./AccordianDetails";
+import React from "react";
+import ContactUsForm from "./ContactUsForm";
+import UserFAQ from "./UserFAQ";
 
 export const ContactUs = () => {
   return (
-    <>
-      <BasicLayout>
-        <div className="xxs:mt-[8rem] lg:mt-32 md:px-10 lg:pl-32 lg:pr-8 xs:py-16 xxs:px-2  flex w-full gap-[8rem] flex-row md:flex-col  sm:flex-col">
-          <div className="xxs:hidden form-section flex flex-col gap-[0.70rem] flex-2">
-            {[
-              "Contact Us",
-              "FAQs",
-              "Order and Delivery",
-              "Returns and Refunds",
-              "Payments and Pricing",
-              // "Groyyo Studio Customer Promise",
-            ].map((item, index) => (
-              <div key={index} className="font-light tracking-widest">
-                {item}
-              </div>
-            ))}
+    <BasicLayout>
+      <div className="w-full p-10 bg-gray-100 mt-[10rem] flex flex-col md:flex-row justify-cente ">
+
+        <div className="md:w-[35%] bg-[#1E201E] p-8 text-center text-xl font-bold flex flex-col items-center">
+        {/* <div className="text-3xl mb-8 tracking-[0.145em] text-white">Contact Us</div> */}
+
+          <div className="mb-4">
+            <img
+              alt="Contact Us"
+              src="/images/DummyImages/contact.png"
+              className="rounded-md shadow-lg w-full h-auto flex text-center"
+            />
           </div>
-          <div className="contact-section flex-1 ">
-            <div className="text-3xl mb-8 tracking-[0.145em]">Contact Us</div>
-            <div className="flex flex-col gap-3 mb-8 ">
+      
+          <div className="contact-section flex-1 text-white">
+            <div className="flex flex-col gap-3 mb-8">
               <div className="font-light text-xs tracking-[0.145em]">
                 Customer Service
               </div>
               <div className="flex flex-col gap-[0.65rem]">
                 <div className="font-normal text-xs tracking-[0.145em]">
-                  Email Service: design@groyyo.com
+                  Email Service: <a href="mailto:design@groyyo.com" className="text-blue-300">design@groyyo.com</a>
                 </div>
                 <div className="font-[275] text-xs tracking-[0.145em] italic">
                   Monday to Friday: 24 hours a day
@@ -46,10 +44,13 @@ export const ContactUs = () => {
                 </div>
               </div>
             </div>
-            <AccordionComponent />
           </div>
         </div>
-      </BasicLayout>
-    </>
+
+        
+          <UserFAQ />
+          {/* <ContactUsForm /> */}
+      </div>
+    </BasicLayout>
   );
 };

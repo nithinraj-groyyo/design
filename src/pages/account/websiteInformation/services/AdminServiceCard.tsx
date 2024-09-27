@@ -12,7 +12,7 @@ interface AdminServiceCardProps {
 const AdminServiceCard: React.FC<AdminServiceCardProps> = ({ service, onEdit, onDelete }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const limitWords = (text: string, limit: number = 20) => {
+  const limitWords = (text: string, limit: number = 10) => {
     const words = text.split(' ');
     return words.length > limit ? words.slice(0, limit).join(' ') + '...' : text;
   };
@@ -26,8 +26,8 @@ const AdminServiceCard: React.FC<AdminServiceCardProps> = ({ service, onEdit, on
       className="bg-white shadow-md rounded-lg p-4 m-2 flex flex-col justify-between gap-4 min-h-[55vh]"
     > 
       <div>
-        {service.imageUrl?.length > 0 && (
-          <img src={service.imageUrl} alt={service.title} className="aspect-[4/3] object-cover rounded-xl mb-2" />
+        {service.imagePath?.length > 0 && (
+          <img src={service.imagePath} alt={service.title} className="aspect-[4/3] object-cover rounded-xl mb-2" />
         )}
         <h3 className="text-lg font-bold">{service.title}</h3>
                 
@@ -37,9 +37,9 @@ const AdminServiceCard: React.FC<AdminServiceCardProps> = ({ service, onEdit, on
         
         {isExpanded && (
           <ul className="list-disc list-inside mt-2">
-            {service.descriptionListKeys?.map((desc, index) => (
+            {service.featuresList?.map((desc, index) => (
               <li key={index} className="text-gray-500">
-                <strong>{desc.key}: </strong>{desc.detail}
+                <strong>{desc.featureName}: </strong>{desc.featureDetail}
               </li>
             ))}
           </ul>

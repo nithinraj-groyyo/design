@@ -1,5 +1,6 @@
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 interface TeamPageModalProps {
   memberDetails: {
@@ -25,7 +26,7 @@ const TeamPageModal: React.FC<TeamPageModalProps> = ({ memberDetails, onClose })
         <div className='flex flex-col gap-8'>
           <div className='text-2xl font-extralight '>{memberDetails.description}</div>
           <div className='font-semibold'>
-            <a href={memberDetails.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href={memberDetails.linkedin} target="_blank" rel="noopener noreferrer"><span className='text-[#0077b5]'><LinkedInIcon fontSize='large'/></span></a>
           </div>
         </div>
       </div>

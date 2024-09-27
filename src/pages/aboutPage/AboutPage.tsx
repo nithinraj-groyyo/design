@@ -3,6 +3,8 @@ import BasicLayout from "../../layouts/BasicLayout";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import ClientsLogosSlider from "./ClientsLogoSlider";
+import {MISC} from '../../utilities/enum'
+// import NewsSection from "./NewsSection";
 // import NewsSection from "./NewsSection";
 
 const AboutPage = () => {
@@ -38,9 +40,9 @@ const AboutPage = () => {
         >
           <div
             className="text-center font-bold tracking-wide text-4xl"
-            style={{ fontFamily: "'Space Mono', monospace" }}
+            style={{ fontFamily: "Poppins" }}
           >
-            ABOUT GROYYO DESIGN STUDIO
+            {MISC.ABOUT_US}
           </div>
           <div className="text-center w-full flex justify-center">
             <div
@@ -77,7 +79,8 @@ const AboutPage = () => {
                   },
                 }}
               >
-                Go to our Services
+                
+                {MISC.Go_to_our_Services}
               </Button>
             </Link>
           </div>
@@ -110,3 +113,4 @@ const AboutPage = () => {
 };
 
 export default AboutPage;
+
