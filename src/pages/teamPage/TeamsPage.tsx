@@ -44,8 +44,10 @@ const TeamsPage = () => {
       <div
         className="w-full px-6 py-16 flex flex-col gap-12 mt-[10rem]"
         style={{
-          background: "linear-gradient(to bottom, #f0f4f8, #d9e2ec)",
           position: "relative",
+          backgroundImage: "url('https://img.freepik.com/free-vector/gorgeous-clouds-background-with-blue-sky-design_1017-25501.jpg')",
+          backgroundSize: "cover", 
+          backgroundPosition: "center",
         }}
       >
         <div className="absolute inset-0 pointer-events-none overflow-hidden">

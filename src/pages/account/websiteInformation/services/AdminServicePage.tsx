@@ -6,49 +6,86 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import AccountSettingsLayout from '../../../../layouts/AccountSettingsLayout';
 import AdminServiceCard from './AdminServiceCard';
 import { Service } from '../../../../types/service';
-import { initialServices } from '../../../../utilities/constants';
+import { createService, deleteService, fetchAllServices, updateService } from '../../../../api/servicesApi';
+import { toast } from 'react-toastify';
+import { ResponseFormat } from '../../../../types/responseFormat';
 
 const AdminServicePage: React.FC = () => {
-    const [services, setServices] = useState<Service[]>(initialServices);
+    const [services, setServices] = useState<Service[]>([]);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [editService, setEditService] = useState<Service | null>(null);
     const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
     const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
-        
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+
     const descriptionKeyRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+    const loadServices = async () => {
+        setLoading(true);
+        try {
+            const data: any = await fetchAllServices();
+            setServices(data?.data);
+        } catch (error) {
+            setError('Failed to fetch services');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadServices();
+    }, []);
 
     const handleOpenDialog = (service: Service | null = null) => {
         setEditService(service || {
             title: '',
             description: '',
-            buttonName: '',
-            imageUrl: '',
-            buttonRedirectionUrl: '',
-            descriptionListKeys: []
+            buttonLabel: '',
+            imagePath: '',
+            buttonUrl: '',
+            featuresList: [] 
         });
         setOpenDialog(true);
     };
 
-    const handleAddEditService = () => {
+    const handleAddEditService = async () => {
         if (!editService) return;
 
-        if (editService.title) {
-            if (services.some(service => service.title === editService.title)) {
-                setServices((prev) =>
-                    prev.map((service) => service.title === editService.title ? editService : service)
-                );
+        try {
+            if (editService.id) {
+                const updatedServiceResponse: any= await updateService(editService.id, editService);
+               if(updatedServiceResponse?.statusCode === 200){
+                    loadServices()
+                    setOpenDialog(false);
+                    setEditService(null);
+                    toast.success(updatedServiceResponse?.message)
+               }
             } else {
-                setServices((prev) => [...prev, editService]);
-            }
+                const newServiceResponse: any = await createService(editService);
+                if(newServiceResponse?.statusCode === 200){
+                    loadServices()
+                    setOpenDialog(false);
+                    setEditService(null);
+                    toast.success(newServiceResponse?.message)
+               }
+            }            
+        } catch (error) {
+            setError('Failed to save service');
         }
-
-        setOpenDialog(false);
-        setEditService(null);
     };
 
-    const handleDeleteService = (serviceToDelete: Service) => {
-        setServices((prev) => prev.filter((service) => service.title !== serviceToDelete.title));
-        handleCloseConfirmDialog(); 
+    const handleDeleteService = async (serviceToDelete: Service) => {
+        try {
+            const response = await deleteService(serviceToDelete.id!);
+            if(response?.statusCode === 200){
+                loadServices()
+                handleCloseConfirmDialog();
+                toast.success(response?.message)
+            }
+        } catch (error) {
+            setError('Failed to delete service');
+        }
     };
 
     const handleCloseDialog = () => {
@@ -59,21 +96,21 @@ const AdminServicePage: React.FC = () => {
     const handleAddDescriptionKey = () => {
         setEditService((prev) => ({
             ...prev!,
-            descriptionListKeys: [...(prev?.descriptionListKeys || []), { key: '', detail: '' }],
+            featuresList: [...(prev?.featuresList || []), { featureName: '', featureDetail: '' }] 
         }));
     };
 
     const handleRemoveDescriptionKey = (index: number) => {
         setEditService((prev) => ({
             ...prev!,
-            descriptionListKeys: prev?.descriptionListKeys.filter((_, i) => i !== index) || [],
+            featuresList: prev?.featuresList?.filter((_, i) => i !== index) || [], 
         }));
     };
 
-    const handleUpdateDescriptionKey = (index: number, field: 'key' | 'detail', value: string) => {
+    const handleUpdateDescriptionKey = (index: number, field: 'featureName' | 'featureDetail', value: string) => {
         setEditService((prev) => ({
             ...prev!,
-            descriptionListKeys: prev?.descriptionListKeys.map((desc, i) =>
+            featuresList: prev?.featuresList?.map((desc, i) =>
                 i === index ? { ...desc, [field]: value } : desc
             ) || [],
         }));
@@ -85,13 +122,13 @@ const AdminServicePage: React.FC = () => {
     };
 
     useEffect(() => {
-        if (editService?.descriptionListKeys) {
-            const lastIndex = editService.descriptionListKeys.length - 1;
+        if (editService?.featuresList) {
+            const lastIndex = editService?.featuresList?.length - 1;
             if (descriptionKeyRefs.current[lastIndex]) {
                 descriptionKeyRefs.current[lastIndex]?.focus();
             }
         }
-    }, [editService?.descriptionListKeys]);
+    }, [editService?.featuresList]);
 
     return (
         <>
@@ -103,7 +140,7 @@ const AdminServicePage: React.FC = () => {
                 </AccountSettingsLayout.Header>
 
                 <motion.div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4'>
-                    {services.map((service, index) => (
+                    {services?.map((service, index) => (
                         <motion.div
                             key={service.title}
                             initial={{ opacity: 0, scale: 0.8 }}
@@ -144,22 +181,22 @@ const AdminServicePage: React.FC = () => {
                         value={editService?.description || ''}
                         onChange={(e) => setEditService(prev => ({ ...prev!, description: e.target.value }))}
                     />
-                    {editService?.descriptionListKeys?.map((desc, index) => (
+                    {editService?.featuresList?.map((desc, index) => (
                         <div key={index} className="flex items-center gap-4 mt-4">
                             <TextField
-                                inputRef={(ref) => descriptionKeyRefs.current[index] = ref} 
-                                label={`Key ${index + 1}`}
+                                inputRef={(ref) => descriptionKeyRefs.current[index] = ref}
+                                label={`Feature Name ${index + 1}`}
                                 type="text"
                                 fullWidth
-                                value={desc.key}
-                                onChange={(e) => handleUpdateDescriptionKey(index, 'key', e.target.value)}
+                                value={desc.featureName}
+                                onChange={(e) => handleUpdateDescriptionKey(index, 'featureName', e.target.value)}
                             />
                             <TextField
-                                label={`Detail ${index + 1}`}
+                                label={`Feature Detail ${index + 1}`}
                                 type="text"
                                 fullWidth
-                                value={desc.detail}
-                                onChange={(e) => handleUpdateDescriptionKey(index, 'detail', e.target.value)}
+                                value={desc.featureDetail}
+                                onChange={(e) => handleUpdateDescriptionKey(index, 'featureDetail', e.target.value)}
                             />
                             <IconButton onClick={() => handleRemoveDescriptionKey(index)} color="secondary">
                                 <RemoveIcon />
@@ -180,24 +217,24 @@ const AdminServicePage: React.FC = () => {
                         label="Button Name"
                         type="text"
                         fullWidth
-                        value={editService?.buttonName || ''}
-                        onChange={(e) => setEditService(prev => ({ ...prev!, buttonName: e.target.value }))}
+                        value={editService?.buttonLabel || ''}
+                        onChange={(e) => setEditService(prev => ({ ...prev!, buttonLabel: e.target.value }))}
                     />
                     <TextField
                         margin="dense"
                         label="Image URL"
                         type="text"
                         fullWidth
-                        value={editService?.imageUrl || ''}
-                        onChange={(e) => setEditService(prev => ({ ...prev!, imageUrl: e.target.value }))}
+                        value={editService?.imagePath || ''}
+                        onChange={(e) => setEditService(prev => ({ ...prev!, imagePath: e.target.value }))}
                     />
                     <TextField
                         margin="dense"
                         label="Button Redirection URL"
                         type="text"
                         fullWidth
-                        value={editService?.buttonRedirectionUrl || ''}
-                        onChange={(e) => setEditService(prev => ({ ...prev!, buttonRedirectionUrl: e.target.value }))}
+                        value={editService?.buttonUrl || ''}
+                        onChange={(e) => setEditService(prev => ({ ...prev!, buttonUrl: e.target.value }))}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -225,7 +262,6 @@ const AdminServicePage: React.FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-
         </>
     );
 };
