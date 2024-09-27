@@ -2,7 +2,7 @@ import React from 'react'
 
 const FAQ = () => {
     return (
-        <div className="flex flex-col gap-4 font-normal text-sm">
+        <div className="md:w-[65%] bg-white shadow-lg px-10 py-16 flex flex-col gap-4 font-normal text-sm">
             <div className="flex flex-col gap-3 tracking-wider">
                 <div className="font-semibold">To cancel your order:</div>
                 <div className="flex flex-col">

@@ -38,7 +38,7 @@ const AboutPage = () => {
         >
           <div
             className="text-center font-bold tracking-wide text-4xl"
-            style={{ fontFamily: "'Space Mono', monospace" }}
+            style={{ fontFamily: "Poppins" }}
           >
             ABOUT GROYYO DESIGN STUDIO
           </div>
