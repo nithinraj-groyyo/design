@@ -7,6 +7,7 @@ const memberDetails = [
   {
     id: 11,
     name: "Emma Robinson",
+    img: "/images/landingPages/landingPage_3_2.png",
     role: "Consulting Director",
     description:
       "Emma Robinson: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer gravida nisi at sem iaculis, sed lobortis nisi viverra. Aliquam at elementum lectus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Duis a finibus nibh. Sed sapien tortor, consequat sed mi sit amet, tincidunt fermentum nunc. Fusce eu nunc sed lacus tincidunt condimentum. Morbi tortor mauris, rhoncus imperdiet mattis non, mattis a tortor. In ut lorem ac enim ullamcorper molestie sed at justo. Vivamus consectetur feugiat nibh in vestibulum. Pellentesque quis imperdiet velit. In sed neque vitae turpis sagittis dapibus quis euismod felis. Donec congue elit nec tortor lobortis vestibulum. Sed ut egestas ipsum. Nam pulvinar id felis vitae fermentum",
@@ -15,6 +16,7 @@ const memberDetails = [
   {
     id: 12,
     name: "James Smith",
+    img: "/images/landingPages/landingPage_1_2.png",
     role: "Senior Consultant",
     description:
       "James Smith: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer gravida nisi at sem iaculis, sed lobortis nisi viverra. Aliquam at elementum lectus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Duis a finibus nibh. Sed sapien tortor, consequat sed mi sit amet, tincidunt fermentum nunc. Fusce eu nunc sed lacus tincidunt condimentum. Morbi tortor mauris, rhoncus imperdiet mattis non, mattis a tortor. In ut lorem ac enim ullamcorper molestie sed at justo. Vivamus consectetur feugiat nibh in vestibulum. Pellentesque quis imperdiet velit. In sed neque vitae turpis sagittis dapibus quis euismod felis. Donec congue elit nec tortor lobortis vestibulum. Sed ut egestas ipsum. Nam pulvinar id felis vitae fermentum",
@@ -73,14 +75,14 @@ const TeamsPage = () => {
             >
               <div className="relative group">
                 <img
-                  src={"/images/landingPages/landingPage_2_2.png"}
+                  src={member.img}
                   alt={member.name}
                   className="w-full h-[320px] object-cover rounded-full transform group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="text-center mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800">{member.name}</h2>
-                <p className="text-xl text-gray-500">{member.role}</p>
+                <p className="text-base text-gray-500">{member.role}</p>
                 <div className="mt-4">
                   <button
                     onClick={() => handleOpenDetailedView(member.id)}

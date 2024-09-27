@@ -9,13 +9,13 @@ export const ContactUs = () => {
       <div className="w-full p-10 bg-gray-100 mt-[10rem] flex flex-col md:flex-row justify-cente ">
 
         <div className="md:w-[35%] bg-[#1E201E] p-8 text-center text-xl font-bold flex flex-col items-center">
-        <div className="text-3xl mb-8 tracking-[0.145em] text-white">Contact Us</div>
+        {/* <div className="text-3xl mb-8 tracking-[0.145em] text-white">Contact Us</div> */}
 
           <div className="mb-4">
             <img
               alt="Contact Us"
               src="/images/DummyImages/contact.png"
-              className="rounded-md shadow-lg w-[80%] h-auto flex text-center"
+              className="rounded-md shadow-lg w-full h-auto flex text-center"
             />
           </div>
       
@@ -47,7 +47,6 @@ export const ContactUs = () => {
           </div>
         </div>
 
-        {/* Right Side: FAQ and Contact Form */}
         
           {/* <FAQ /> */}
           <ContactUsForm />

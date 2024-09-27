@@ -141,7 +141,6 @@ const ServicePage = () => {
           >
             <div
               className="text-4xl font-bold whitespace-nowrap"
-              style={{ fontFamily: "Poppins" }}
             >
               {carouselDetails[currentService]?.title}
             </div>
@@ -195,7 +194,6 @@ const ServicePage = () => {
 
       <motion.div
         className="px-32 py-8 flex flex-col gap-8"
-        style={{ fontFamily: "Poppins" }}
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2 }}
@@ -207,7 +205,7 @@ const ServicePage = () => {
             return (
               <motion.div
                 key={index}
-                className="px-10 py-8 flex flex-col gap-16 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 max-w-xs"
+                className="px-10 py-8 flex flex-col gap-16 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 max-w-xs h-fit"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 1 }}
@@ -225,7 +223,7 @@ const ServicePage = () => {
                     <div className="font-bold text-lg text-center">
                       {serviceDetail?.title}
                     </div>
-                    <div className="whitespace-normal text-justify my-4 text-xs">
+                    <div className="whitespace-normal text-justify my-4 text-xs min-h-20">
                       {serviceDetail?.description}
                     </div>
 
