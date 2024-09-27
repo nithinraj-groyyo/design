@@ -193,19 +193,19 @@ const ServicePage = () => {
       </motion.div>
 
       <motion.div
-        className="px-32 py-8 flex flex-col gap-8"
+        className="px-32 py-8 flex flex-col gap-8 "
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2 }}
       >
         <div className="text-center font-semibold text-4xl">Services</div>
 
-        <div className="flex flex-row gap-16 flex-wrap justify-center">
+        <div className="flex flex-row gap-16 flex-wrap justify-center ">
           {serviceDetails.map((serviceDetail, index) => {
             return (
               <motion.div
                 key={index}
-                className="px-10 py-8 flex flex-col gap-16 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 max-w-xs h-fit"
+                className="px-10 py-8 flex flex-col gap-16 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 max-w-xs h-fit "
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 1 }}

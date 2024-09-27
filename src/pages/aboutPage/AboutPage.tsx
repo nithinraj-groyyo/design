@@ -46,7 +46,7 @@ const AboutPage = () => {
           </div>
           <div className="text-center w-full flex justify-center">
             <div
-              className="w-[75%]  tracking-wider text-justify"
+              className="w-[75%]  tracking-wider text-justify leading-7"
               // style={{ fontFamily: "'Space Mono', monospace" }}
             >
               Founded in 2021 and based in Gurgaon, Groyyo Design Studio is a

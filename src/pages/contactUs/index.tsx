@@ -48,8 +48,8 @@ export const ContactUs = () => {
         </div>
 
         
-          {/* <FAQ /> */}
-          <ContactUsForm />
+          <FAQ />
+          {/* <ContactUsForm /> */}
       </div>
     </BasicLayout>
   );
