@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Service } from '../types/service';
 import { ResponseFormat } from '../types/responseFormat';
 
-const BASE_URL = 'http://localhost:8000/services';
+const BASE_URL = process.env.REACT_APP_NEW_SERVICE_API + 'services';
 
 export const fetchAllServices = async (): Promise<Service[]> => {
     const response = await axios.get<Service[]>(`${BASE_URL}`);
