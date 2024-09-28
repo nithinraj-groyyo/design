@@ -69,35 +69,30 @@ const AboutUsInfo = () => {
 
   return (
     <AccountSettingsLayout>
-      <div className='py-4 px-8 flex items-center justify-between flex-row'>
-        <p className='text-xl font-bold'>About Us</p>
+      <AccountSettingsLayout.Header title='Manage Admin'>
         {state.editAboutPage ? (
           <div className='flex items-center gap-4'>
             <Button
               variant="contained"
-              className="w-[12rem] h-[3rem] !rounded-full !bg-white !text-black"
+              className=" !bg-white !text-black"
               onClick={cancelAboutHandler}
             >
               <p className="text-base font-semibold">Cancel</p>
             </Button>
             <Button
               variant="contained"
-              className="w-[12rem] h-[3rem] !rounded-full !bg-[#a3865b]"
+              // className="w-[12rem] h-[3rem] !rounded-full !bg-[#a3865b]"
               onClick={updateAboutHandler}
             >
               <p className="text-base font-semibold">Save</p>
             </Button>
           </div>
         ) : (
-          <Button
-            variant="contained"
-            className="w-[12rem] h-[3rem] !rounded-full !bg-[#a3865b]"
-            onClick={editAboutHandler}
-          >
-            <p className="text-base font-semibold">Edit</p>
+          <Button variant="contained" color="primary" onClick={editAboutHandler}>
+            Edit
           </Button>
         )}
-      </div>
+      </AccountSettingsLayout.Header>
       <div>
         {state.editAboutPage ? (
           <EditForm
