@@ -53,7 +53,7 @@ const AdminTeamCard: React.FC<AdminTeamCardProps> = ({ teamMember, onEdit, onDel
           className="mt-4"
           onClick={() => onEdit(teamMember)}
         >
-          Edit
+          {teamMember?.id ? "Edit" :"Create" }
         </Button>
         <Button
           variant="outlined"
