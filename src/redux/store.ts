@@ -7,9 +7,11 @@ import productSizeSlice from "./productSizeSlice";
 import cartSlice from "./cartSlice";
 import shoppingBagSlice from "./shoppingBagSlice";
 import wishlistSlice from "./wishlistSlice";
+import apiSlice from '../rtk-query/apiSlice';
 
 export const store = configureStore({
   reducer: {
+    [apiSlice.reducerPath]: apiSlice.reducer,
     categories: categoriesSlice,
     products: productsSlice,
     productSize: productSizeSlice,
@@ -17,6 +19,9 @@ export const store = configureStore({
     shoppingBag: shoppingBagSlice,
     wishlist: wishlistSlice
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: false 
+  }).concat(apiSlice.middleware)
 });
 
 export type RootState = ReturnType<typeof store.getState>;

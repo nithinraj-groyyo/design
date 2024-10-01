@@ -1,41 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, DialogContentText } from '@mui/material';
+import { Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, DialogContentText, Skeleton, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AccountSettingsLayout from '../../../../layouts/AccountSettingsLayout';
 import AdminServiceCard from './AdminServiceCard';
 import { Service } from '../../../../types/service';
-import { createService, deleteService, fetchAllServices, updateService } from '../../../../api/servicesApi';
 import { toast } from 'react-toastify';
-import { ResponseFormat } from '../../../../types/responseFormat';
+import { useCreateServiceMutation, useDeleteServiceMutation, useFetchAllServicesQuery, useUpdateServiceMutation } from '../../../../rtk-query/serviceApiSlice';
 
 const AdminServicePage: React.FC = () => {
-    const [services, setServices] = useState<Service[]>([]);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [editService, setEditService] = useState<Service | null>(null);
     const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
     const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
-
+    
     const descriptionKeyRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-    const loadServices = async () => {
-        setLoading(true);
-        try {
-            const data: any = await fetchAllServices();
-            setServices(data?.data);
-        } catch (error) {
-            setError('Failed to fetch services');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadServices();
-    }, []);
+    const { data: services = [], isLoading, isError, refetch } = useFetchAllServicesQuery();
+    const [createService, {isLoading: isCreationLoading}] = useCreateServiceMutation();
+    const [updateService, {isLoading: isUpdationLoading}] = useUpdateServiceMutation();
+    const [deleteService, {isLoading: isDeletionLoading}] = useDeleteServiceMutation();
 
     const handleOpenDialog = (service: Service | null = null) => {
         setEditService(service || {
@@ -54,37 +39,43 @@ const AdminServicePage: React.FC = () => {
 
         try {
             if (editService.id) {
-                const updatedServiceResponse: any= await updateService(editService.id, editService);
-               if(updatedServiceResponse?.statusCode === 200){
-                    loadServices()
+                const updatedServiceResponse: any = await updateService({ id: editService.id, serviceData: editService });
+                if (!updatedServiceResponse?.error) {
+                    refetch();
                     setOpenDialog(false);
                     setEditService(null);
-                    toast.success(updatedServiceResponse?.message)
-               }
+                    toast.success('Service updated successfully!');
+                } else {
+                    toast.error('Failed to update service');
+                }
             } else {
                 const newServiceResponse: any = await createService(editService);
-                if(newServiceResponse?.statusCode === 200){
-                    loadServices()
+                if (!newServiceResponse?.error) {
+                    refetch();
                     setOpenDialog(false);
                     setEditService(null);
-                    toast.success(newServiceResponse?.message)
-               }
+                    toast.success('Service created successfully!');
+                } else {
+                    toast.error('Failed to create service');
+                }
             }            
         } catch (error) {
-            setError('Failed to save service');
+            toast.error('Failed to save service');
         }
     };
 
     const handleDeleteService = async (serviceToDelete: Service) => {
         try {
             const response = await deleteService(serviceToDelete.id!);
-            if(response?.statusCode === 200){
-                loadServices()
+            if (!response?.error) {
+                refetch();
                 handleCloseConfirmDialog();
-                toast.success(response?.message)
+                toast.success('Service deleted successfully!');
+            } else {
+                toast.error('Failed to delete service');
             }
         } catch (error) {
-            setError('Failed to delete service');
+            toast.error('Failed to delete service');
         }
     };
 
@@ -140,24 +131,41 @@ const AdminServicePage: React.FC = () => {
                 </AccountSettingsLayout.Header>
 
                 <motion.div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4'>
-                    {services?.map((service, index) => (
-                        <motion.div
-                            key={service.title}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.4 }}
-                        >
-                            <AdminServiceCard
-                                service={service}
-                                onEdit={handleOpenDialog}
-                                onDelete={(service) => {
-                                    setServiceToDelete(service);
-                                    setOpenConfirmDialog(true);
-                                }}
-                            />
-                        </motion.div>
-                    ))}
+                    {isLoading ? (
+                        Array.from(new Array(3)).map((_, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                transition={{ duration: 0.4 }}
+                            >
+                                <Skeleton variant="rectangular" width="100%" height={200} animation="wave" />
+                                <Skeleton variant="text" width="80%" height={100} animation="wave" />
+                                <Skeleton variant="text" width="60%" height={20} animation="wave" />
+                                <Skeleton variant="text" width="90%" height={20} animation="wave" />
+                            </motion.div>
+                        ))
+                    ) : (
+                        services?.map((service, index) => (
+                            <motion.div
+                                key={service.title}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                transition={{ duration: 0.4 }}
+                            >
+                                <AdminServiceCard
+                                    service={service}
+                                    onEdit={handleOpenDialog}
+                                    onDelete={(service) => {
+                                        setServiceToDelete(service);
+                                        setOpenConfirmDialog(true);
+                                    }}
+                                />
+                            </motion.div>
+                        ))
+                    )}
                 </motion.div>
             </AccountSettingsLayout>
 
@@ -203,67 +211,68 @@ const AdminServicePage: React.FC = () => {
                             </IconButton>
                         </div>
                     ))}
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleAddDescriptionKey}
-                        className="!my-4"
-                    >
-                        Add New Description List
-                        <AddIcon className="ml-2" />
-                    </Button>
-                    <TextField
-                        margin="dense"
-                        label="Button Name"
-                        type="text"
-                        fullWidth
-                        value={editService?.buttonLabel || ''}
-                        onChange={(e) => setEditService(prev => ({ ...prev!, buttonLabel: e.target.value }))}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Image URL"
-                        type="text"
-                        fullWidth
-                        value={editService?.imagePath || ''}
-                        onChange={(e) => setEditService(prev => ({ ...prev!, imagePath: e.target.value }))}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Button Redirection URL"
-                        type="text"
-                        fullWidth
-                        value={editService?.buttonUrl || ''}
-                        onChange={(e) => setEditService(prev => ({ ...prev!, buttonUrl: e.target.value }))}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseDialog} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleAddEditService} color="primary">
-                        {editService?.title ? 'Update' : 'Add'}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog open={openConfirmDialog} onClose={handleCloseConfirmDialog}>
-                <DialogTitle>Confirm Delete</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to delete the service "{serviceToDelete?.title}"?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseConfirmDialog} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={() => handleDeleteService(serviceToDelete!)} color="secondary">
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </>
-    );
-};
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleAddDescriptionKey}
+                            className="!my-4"
+                        >
+                            Add New Description List
+                            <AddIcon className="ml-2" />
+                        </Button>
+                        <TextField
+                            margin="dense"
+                            label="Button Name"
+                            type="text"
+                            fullWidth
+                            value={editService?.buttonLabel || ''}
+                            onChange={(e) => setEditService(prev => ({ ...prev!, buttonLabel: e.target.value }))}
+                        />
+                        <TextField
+                            margin="dense"
+                            label="Image URL"
+                            type="text"
+                            fullWidth
+                            value={editService?.imagePath || ''}
+                            onChange={(e) => setEditService(prev => ({ ...prev!, imagePath: e.target.value }))}
+                        />
+                        <TextField
+                            margin="dense"
+                            label="Button Redirection URL"
+                            type="text"
+                            fullWidth
+                            value={editService?.buttonUrl || ''}
+                            onChange={(e) => setEditService(prev => ({ ...prev!, buttonUrl: e.target.value }))}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDialog} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleAddEditService} color="primary">
+                            {(isUpdationLoading || isCreationLoading) ? <CircularProgress size={20} /> : editService?.id ? 'Update' : 'Add'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
-export default AdminServicePage;
+                <Dialog open={openConfirmDialog} onClose={handleCloseConfirmDialog}>
+                    <DialogTitle>Confirm Delete</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Are you sure you want to delete the service "{serviceToDelete?.title}"?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseConfirmDialog} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={() => handleDeleteService(serviceToDelete!)} color="secondary">
+                            {isDeletionLoading ? <CircularProgress size={20} />: 'Delete'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </>
+        );
+    };
+    
+    export default AdminServicePage;

@@ -4,13 +4,13 @@ import { RootState } from "../redux/store";
 
 const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
   const baseQuery = fetchBaseQuery({
-    baseUrl: "/api",
+    baseUrl: process.env.REACT_APP_NEW_SERVICE_API,
     prepareHeaders: (headers, { getState }) => {
-      //   const token = (getState() as RootState).auth?.token; // Fix: Type the getState properly
-
-      //   if (token) {
-      //     headers.set('Authorization', `Bearer ${token}`);
-      //   }
+      // Example to add Authorization token from Redux state
+      // const token = (getState() as RootState).auth?.token;
+      // if (token) {
+      //   headers.set('Authorization', `Bearer ${token}`);
+      // }
       return headers;
     },
   });
@@ -30,8 +30,8 @@ const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, Fetch
 
 export const apiSlice = createApi({
   baseQuery: baseQueryWithErrorHandling,
-  endpoints: () => ({}),
-  tagTypes: ["SomeTag"],
+  endpoints: () => ({}), 
+  tagTypes: ["FAQ", "Service"], 
 });
 
 export default apiSlice;
