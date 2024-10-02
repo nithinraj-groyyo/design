@@ -21,6 +21,7 @@ const Header: React.FC = () => {
     const [opacity, setOpacity] = useState(1);
     const [lastScrollTop, setLastScrollTop] = useState(0);
 
+
     useFetchCategories();
 
     const { activeCategoryTab } = useSelector((state: RootState) => state.categories);

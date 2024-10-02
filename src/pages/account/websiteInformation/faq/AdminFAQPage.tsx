@@ -3,31 +3,22 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/
 import FAQForm from './FAQForm';
 import FAQList from './FAQList';
 import { FAQ } from '../../../../types/faq';
-import { fetchFaqs, createFaq, deleteFaq, updateFaq } from '../../../../api/faqApi';
 import AccountSettingsLayout from '../../../../layouts/AccountSettingsLayout';
 import { toast } from 'react-toastify';
-import { ResponseFormat } from '../../../../types/responseFormat';
-import { ApiError } from '../../../../api';
 import FAQListSkeleton from './FAQListSkeleton';
+import { useFetchFaqsQuery, useCreateFaqMutation, useUpdateFaqMutation, useDeleteFaqMutation } from '../../../../rtk-query/faqApiSlice';
 
 const AdminFAQPage: React.FC = () => {
-    const [faqs, setFaqs] = useState<FAQ[]>([]);
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const [editFAQ, setEditFAQ] = useState<FAQ | null>(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
     const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
-    const [faqsLoading, setfaqsLoading] = useState(false);
 
-    const loadFaqs = async () => {
-        setfaqsLoading(true)
-        const loadedFaqs = await fetchFaqs();
-        setFaqs(loadedFaqs);
-        setfaqsLoading(false)
-    };
 
-    useEffect(() => {
-        loadFaqs();
-    }, []);
+    const { data: faqs = [], isLoading: faqsLoading } = useFetchFaqsQuery();
+    const [createFaq] = useCreateFaqMutation();
+    const [updateFaq] = useUpdateFaqMutation();
+    const [deleteFaq] = useDeleteFaqMutation();
 
     const handleOpenDialog = (faq: FAQ | null = null) => {
         setEditFAQ(faq);
@@ -36,31 +27,23 @@ const AdminFAQPage: React.FC = () => {
 
     const handleAddEditFAQ = async (faq: Partial<FAQ>) => {
         try {
-            let response: ResponseFormat<FAQ> | undefined;
+            let response;
 
             if (faq?.id) {
-                response = await updateFaq(faq?.id as number, faq);
-
+            
+                response = await updateFaq({ id: faq.id as number, faq });
+                toast.success('FAQ updated successfully!');
             } else {
+            
                 response = await createFaq(faq);
+                toast.success('FAQ added successfully!');
             }
 
-            if (response?.statusCode === 200 || response?.statusCode === 201) {
-                
-                if (faq?.id) {
-                    toast.success('FAQ updated successfully!');
-                }
-                toast.success('FAQ added successfully!');
-                loadFaqs()
-            } else {
+            if (response?.error) {
                 toast.error('An unexpected error occurred while processing your request.');
             }
         } catch (error) {
-            if (error instanceof ApiError) {
-                console.error(`Error ${error.statusCode}: ${error.message}`);
-            } else {
-                toast.error('An unexpected error occurred while processing your request.');
-            }
+            toast.error('An unexpected error occurred while processing your request.');
         } finally {
             setOpenDialog(false);
         }
@@ -74,21 +57,19 @@ const AdminFAQPage: React.FC = () => {
     const confirmDelete = async () => {
         if (confirmDeleteId) {
             try {
-                const response: ResponseFormat<void> = await deleteFaq(confirmDeleteId as number);
-                if (response?.statusCode === 200) {
-                    toast.success(response?.message || 'FAQ deleted successfully!');
-                    loadFaqs()
+                const response = await deleteFaq(confirmDeleteId as number);
+                if (!response?.error) {
+                    toast.success('FAQ deleted successfully!');
                 } else {
-                    toast.error(response?.message || 'Failed to delete FAQ?.');
+                    toast.error('Failed to delete FAQ.');
                 }
             } catch (error) {
-                toast.error('An error occurred while deleting the FAQ?.');
+                toast.error('An error occurred while deleting the FAQ.');
             }
         }
         setConfirmDeleteId(null);
         setOpenConfirmDialog(false);
     };
-
 
     return (
         <AccountSettingsLayout>
