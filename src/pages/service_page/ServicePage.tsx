@@ -15,16 +15,19 @@ const carouselDetails = [
     title: "Exclusive Apparel Designs",
     description: "Discover ready-made, trend-driven apparel for your brand.",
     buttonName: "Explore our Designs",
+    backgroundImage: "/images/services/exclusive_apparel_design_desktop.webp"
   },
   {
     title: "Customization Services",
-    description: "Create apparel tailored to your brand’s unique vision.",
+    description: "Create apparel tailored to your brand's unique vision.",
     buttonName: "Book an appointment",
+    backgroundImage: "/images/services/customization_service_desktop.webp"
   },
   {
     title: "Design Consultation",
     description: "Expert guidance to perfect your design ideas.",
     buttonName: "Contact us",
+    backgroundImage: "/images/services/design_consultation_desktop.webp"
   },
 ];
 
@@ -123,7 +126,7 @@ useEffect(() => {
       <motion.div
         className="w-screen min-h-[70vh] mt-[10rem]"
         style={{
-          backgroundImage: "url(/images/landingPages/floralPattern4.png)",
+          backgroundImage: `url(${carouselDetails[currentService]?.backgroundImage})`,
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
           backgroundSize: "cover",
@@ -155,11 +158,11 @@ useEffect(() => {
           </div>
 
           <motion.div
-            className="flex flex-col gap-8 bg-white p-8 rounded w-full min-w-[30vw] text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
+  className="flex flex-col gap-8 bg-[#e0e0e0] p-8 rounded-lg w-full min-w-[30vw] text-center shadow-neomorph"
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ delay: 0.5, duration: 0.8 }}
+>
             <div
               className="text-4xl font-bold whitespace-nowrap"
             >

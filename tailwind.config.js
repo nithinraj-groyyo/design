@@ -34,6 +34,9 @@ module.exports = {
         fadeOut: 'fadeOut 300ms ease-out',
         slide: 'slide 35s linear infinite',
       },
+      boxShadow: {
+        'neomorph': '8px 8px 16px #bebebe, -8px -8px 16px #ffffff',
+      }
     },
   },
   plugins: [],
