@@ -42,14 +42,14 @@ const adminMenuItems = [
       { title: "FAQ", route: "/account/web-info/faq" },
     ],
   },
-  // {
-  //   title: "Product",
-  //   subItems: [
-  //     { title: "Add Product", route: "/account/add-product" },
-  //     { title: "Bulk Upload", route: "/account/bulk-upload" },
-  //     { title: "Product List", route: "/account/product-list" },
-  //   ],
-  // },
+  {
+    title: "Product",
+    subItems: [
+      { title: "Add Product", route: "/account/add-product" },
+      { title: "Bulk Upload", route: "/account/bulk-upload" },
+      { title: "Product List", route: "/account/product-list" },
+    ],
+  },
   // {
   //   title: "Blog",
   //   subItems: [
@@ -134,7 +134,8 @@ const AccountPage = () => {
               </React.Fragment>
             ))}
 
-            {user && user.role === "Admin" &&
+            {/* {user && user.role === "Admin" && */}
+            {
               adminMenuItems.map((menuItem, index) => (
                 <React.Fragment key={index}>
                   <ListItem>
