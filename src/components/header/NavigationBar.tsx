@@ -140,7 +140,7 @@ const NavigationBar = () => {
             {isLoading || isFetching ? (
               <CategoriesLoader />
             ) : (
-              categories && (
+              categories ? (
                 <Grid container spacing={2}>
                   <Grid item>
                     <div>
@@ -184,6 +184,10 @@ const NavigationBar = () => {
                     </Grid>
                   )}
                 </Grid>
+              ) : (
+                <div>
+                  No Data available
+                </div>
               )
             )}
           </Menu>
