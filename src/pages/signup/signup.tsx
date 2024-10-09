@@ -1,17 +1,18 @@
-import { Button, CircularProgress, TextField } from '@mui/material'
+import { Button, CircularProgress, IconButton, InputAdornment, TextField } from '@mui/material'
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link, useNavigate } from 'react-router-dom'
-import { createUser } from '../../api/userApi';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
 import GoogleIcon from '../../assets/svg/auth/GoogleIcon';
 import BasicLayout from '../../layouts/BasicLayout';
+import { useSignUpMutation } from '../../rtk-query/userApiSlice';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const Signup = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
 
-  const [isSignUpFormLoading, setIsSignUpFormLoading] = useState(false)
+  const [signUp, {isLoading}] = useSignUpMutation()
 
   const navigate = useNavigate();
 
@@ -31,23 +32,20 @@ const Signup = () => {
       .matches(/[@$!%*?&#]/, "Password must contain at least one special character.")
     }),
     onSubmit: async (values, { resetForm }) => {
-      setIsSignUpFormLoading(true);
-
       const newData = {
-        email: values.email,
-        password: values.password,
+        email: values?.email,
+        password: values?.password,
       };
       try {
-        const response = await createUser(newData);
-        if(response?.status){
-          toast.success("User Created Successfully!")
-          resetForm(); 
-          navigate("/login")
+        const response = await signUp(newData).unwrap();
+        if(response?.status && response?.httpStatusCode === 201){
+          toast.success(response?.message);
+          resetForm();
+          navigate("/login");
         }
       } catch (error: any) {
-        toast.error("Login failed: "+error?.response?.data?.message);
-      }finally {
-        setIsSignUpFormLoading(false)
+        console.log("Error Response: ", error);
+        toast.error("Signup failed: " + error?.data?.message || "Unexpected error occurred");
       }
     }
   });
@@ -55,6 +53,17 @@ const Signup = () => {
     setIsGoogleAuthLoading(true);
     // window.location.href = url + "/users/auth/google?state=SIGN_UP";
   };
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
   return (
     <BasicLayout  showFooter={false}>
       <div className="flex relative min-h-screen opacity-65 bg-white">
@@ -94,13 +103,27 @@ const Signup = () => {
                 name="password"
                 label="Password"
                 variant="outlined"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 fullWidth
                 value={formik.values.password}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </div>
             <div className="flex flex-col gap-3">
@@ -110,7 +133,7 @@ const Signup = () => {
                   variant="contained"
                   className="w-[100%] h-[3.5rem] !bg-black !text-white rounded"
                 >
-                  {isSignUpFormLoading ? (
+                  {isLoading ? (
                     <CircularProgress size={24} color="inherit" />
                   ) : (
                     "Sign Up"
