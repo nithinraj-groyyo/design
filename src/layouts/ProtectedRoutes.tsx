@@ -14,14 +14,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   redirectTo,
 }) => {
-  if (!isAuthenticated) {    
+  if (isAuthenticated) {    
     return <Navigate to={redirectTo} replace />;
   }
 
   
-  if (isAdmin !== undefined && !isAdmin) {    
-    return <Navigate to="/unauthorized" replace />;
-  }
+  // if (isAdmin !== undefined && !isAdmin) {    
+  //   return <Navigate to="/unauthorized" replace />;
+  // }
 
   
   return children;

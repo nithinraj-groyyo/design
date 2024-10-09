@@ -48,9 +48,11 @@ const Login = () => {
         };
 
         const response = await signIn(newData).unwrap();
-        if(response?.status && response?.httpStatusCode === 201){
+        console.log(response)
+        if(response?.status && response?.httpStatusCode === 200){
           toast.success(response?.message);
-          localStorage.setItem("authToken", response?.data?.access_token);
+          localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
+          localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin))
           resetForm(); 
           navigate("/")
         }

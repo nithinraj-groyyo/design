@@ -40,8 +40,10 @@ const Signup = () => {
         const response = await signUp(newData).unwrap();
         if(response?.status && response?.httpStatusCode === 201){
           toast.success(response?.message);
-          resetForm();
-          navigate("/login");
+          localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
+          localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin))
+          resetForm(); 
+          navigate("/")
         }
       } catch (error: any) {
         console.log("Error Response: ", error);
