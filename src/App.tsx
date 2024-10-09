@@ -28,6 +28,7 @@ import AboutUsInfo from './pages/account/websiteInformation/about/AboutUsInfo';
 import AdminTeamPage from './pages/account/websiteInformation/teams/AdminTeamPage';
 import AdminServicePage from './pages/account/websiteInformation/services/AdminServicePage';
 import AdminFAQPage from './pages/account/websiteInformation/faq/AdminFAQPage';
+import ForgotPassword from './pages/forgotPassword';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
@@ -94,6 +95,7 @@ const App = () => {
 
         <Route path="orders-returns" element={<OrderReturns />} />
       </Route>
+      <Route path="forgot-password" element={<ForgotPassword />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
