@@ -1,4 +1,4 @@
-import { Button, CircularProgress, TextField } from "@mui/material";
+import { Button, CircularProgress, IconButton, InputAdornment, TextField } from "@mui/material";
 import { Link, useNavigate} from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -7,13 +7,24 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import GoogleIcon from "../../assets/svg/auth/GoogleIcon";
 import BasicLayout from "../../layouts/BasicLayout";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useSignInMutation } from "../../rtk-query/userApiSlice";
 
 const Login = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
 
   const navigate = useNavigate();
 
-  const [isLoginFormLoading, setIsLoginFormLoading] = useState(false)
+  const [signIn, {isLoading}] = useSignInMutation();
 
   const formik = useFormik({
     initialValues: {
@@ -30,34 +41,28 @@ const Login = () => {
       .matches(/[@$!%*?&#]/, "Password must contain at least one special character.")
     }),
     onSubmit: async (values, { resetForm }) => {
-      setIsLoginFormLoading(true)
       try {
         let newData = {
           email: values.email,
           password: values.password,
         };
-        const response = await loginUser({email: newData?.email, password: newData?.password});
 
-        if(response?.token){
-          toast.success('Logged In successfully!');
-          localStorage.setItem("authToken", response?.token)
-          localStorage.setItem("user",JSON.stringify(response?.user))
-          localStorage.setItem("roles",JSON.stringify(response?.roles))
-          localStorage.setItem("userId",JSON.stringify(response?.user?.id))
+        const response = await signIn(newData).unwrap();
+        if(response?.status && response?.httpStatusCode === 201){
+          toast.success(response?.message);
+          localStorage.setItem("authToken", response?.data?.access_token);
           resetForm(); 
           navigate("/")
         }
       } catch (error: any) {
         toast.error('Login failed: ' + error?.response?.data?.message);
-      }finally{
-        setIsLoginFormLoading(false)
       }
     }
   });
 
   const handleGoogleAuth = () => {
     setIsGoogleAuthLoading(true);
-    // window.location.href = url + "/users/auth/google?state=SIGN_IN";
+  
   };
 
   return (
@@ -99,13 +104,27 @@ const Login = () => {
                 name="password"
                 label="Password"
                 variant="outlined"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 fullWidth
                 value={formik.values.password}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </div>
             <div className="flex flex-col gap-3">
@@ -114,9 +133,9 @@ const Login = () => {
                   type="submit"
                   variant="contained"
                   className="w-[100%] h-[3.5rem] !bg-black !text-white rounded"
-                  disabled={isLoginFormLoading}
+                  disabled={isLoading}
                 >
-                  {isLoginFormLoading ? (
+                  {isLoading ? (
                     <CircularProgress size={24} color="inherit" />
                   ) : (
                     "Log in"

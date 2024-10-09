@@ -13,11 +13,22 @@ const userApiSlice = apiSlice.injectEndpoints({
 				method: 'POST',
                 body: {email, password}
             })
+        }),
+        signIn: builder.mutation({
+            query: ({email, password}: {email:string, password: string}) => ({
+                url: `${userUrl}/login`,
+                headers: {
+					'Content-type': 'application/json',
+				},
+				method: 'POST',
+                body: {email, password}
+            })
         })
     })
 });
 
 
 export const {
-    useSignUpMutation
+    useSignUpMutation,
+    useSignInMutation
 } = userApiSlice;
