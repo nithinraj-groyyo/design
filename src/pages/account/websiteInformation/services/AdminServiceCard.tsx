@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@mui/material';
 import { Service } from '../../../../types/service';
+import DOMPurify from "dompurify";
+
 
 interface AdminServiceCardProps {
   service: Service;
@@ -20,6 +22,9 @@ const AdminServiceCard: React.FC<AdminServiceCardProps> = ({ service, onEdit, on
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
+  const sanitizedDescription = DOMPurify.sanitize(
+    service?.description
+  );
 
   return (
     <motion.div
@@ -31,9 +36,10 @@ const AdminServiceCard: React.FC<AdminServiceCardProps> = ({ service, onEdit, on
         )}
         <h3 className="text-lg font-bold">{service.title}</h3>
                 
-        <p className="text-gray-600">
+        {/* <p className="text-gray-600">
           {isExpanded ? service.description : limitWords(service.description)}
-        </p>
+        </p> */}
+        <div className="text-gray-600"  dangerouslySetInnerHTML={{ __html: sanitizedDescription }}/>
         
         {isExpanded && (
           <ul className="list-disc list-inside mt-2">

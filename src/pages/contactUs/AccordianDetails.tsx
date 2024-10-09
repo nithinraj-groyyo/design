@@ -4,7 +4,8 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
-import ContactUsForm from "./ContactUsForm";
+import { ContactUsForm } from "./ContactUsForm";
+// import ContactUsForm from "./ContactUsForm";
 // import FAQ from "./FAQ";
 
 const CustomAccordion = styled(Accordion)(({ theme }) => ({
@@ -34,7 +35,7 @@ const AccordionComponent: React.FC = () => {
     // },
     {
       title: "Email our Customer Service Team",
-      content: <ContactUsForm />,
+      content: <ContactUsForm/>,
     },
   ];
 

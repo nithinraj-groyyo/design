@@ -7,8 +7,7 @@ import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import { fetchAllServices } from "../../api/servicesApi";
 import { setError, setLoading } from "../../redux/shoppingBagSlice";
 import { Service } from "../../types/service";
-
-
+import DOMPurify from "dompurify";
 
 const carouselDetails = [
   {
@@ -96,17 +95,17 @@ const ServicePage = () => {
   const loadServices = async () => {
     setLoading(true);
     try {
-        const data: any = await fetchAllServices();
-        setServices(data?.data);
+      const data: any = await fetchAllServices();
+      setServices(data?.data);
     } catch (error) {
-        setError('Failed to fetch services');
+      setError("Failed to fetch services");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-useEffect(() => {
-  loadServices();
-}, []);
+  };
+  useEffect(() => {
+    loadServices();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -160,9 +159,7 @@ useEffect(() => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
           >
-            <div
-              className="text-4xl font-bold whitespace-nowrap"
-            >
+            <div className="text-4xl font-bold whitespace-nowrap">
               {carouselDetails[currentService]?.title}
             </div>
             <div style={{ fontFamily: "Poppins" }}>
@@ -223,6 +220,9 @@ useEffect(() => {
 
         <div className="flex flex-row gap-16 flex-wrap justify-center">
           {services.map((serviceDetail, index) => {
+            const sanitizedDescription = DOMPurify.sanitize(
+              serviceDetail?.description
+            );
             return (
               <motion.div
                 key={index}
@@ -244,21 +244,29 @@ useEffect(() => {
                     <div className="font-bold text-lg text-center">
                       {serviceDetail?.title}
                     </div>
-                    <div className="whitespace-normal text-justify my-4 text-xs min-h-20">
-                      {serviceDetail?.description}
-                    </div>
-
-                    {expandedCard===index && serviceDetail?.featuresList?.map((feature,featureIndex)=>{
-                      return <>
-                        <div className="flex flex-col gap-2">
-                          <li className="text-xs">
-                            <span className="font-semibold">{feature?.featureName}</span>
-                            <span className="ml-2">{feature?.featureDetail}</span>
-                          </li>
-                            </div>
-                      </>
-                    })}
-
+                    <div
+                      className="whitespace-normal text-justify my-4 text-xs min-h-20"
+                      dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+                    />
+                    {expandedCard === index &&
+                      serviceDetail?.featuresList?.map(
+                        (feature, featureIndex) => {
+                          return (
+                            <>
+                              <div className="flex flex-col gap-2">
+                                <li className="text-xs">
+                                  <span className="font-semibold">
+                                    {feature?.featureName}
+                                  </span>
+                                  <span className="ml-2">
+                                    {feature?.featureDetail}
+                                  </span>
+                                </li>
+                              </div>
+                            </>
+                          );
+                        }
+                      )}
                     {/* {expandedCard === index &&
                       serviceDetail?.featuresList?.map(
                         (featureList, i) => (
@@ -274,7 +282,6 @@ useEffect(() => {
                           </div>
                         )
                       )} */}
-
                     <Button
                       onClick={() => handleToggleDetails(index)}
                       className="cursor-pointer"
@@ -310,6 +317,76 @@ useEffect(() => {
           })}
         </div>
       </motion.div>
+
+      <section className="w-screen h-[100vh] flex">
+        {/* Left Part */}
+        <div className="bg-[#B7A99A] min-w-[40%] flex flex-col justify-center items-center">
+          <div className="flex flex-col items-center">
+            <img
+              src="/images/DummyImages/contact.png"
+              alt="Illustration"
+              className="object-cover w-[24rem] h-[24rem] mb-4"
+            />
+            <h2 className="text-[#F3EDE5] text-4xl font-bold">Subscription</h2>
+          </div>
+        </div>
+
+        {/* Right Part with layered boxes */}
+        <div className="flex justify-center items-center flex-1 relative">
+          {/* First Background Layer */}
+          <div className="bg-gradient-to-br from-[#CEC1B2] to-[#D8C9BB] w-[26rem] h-[15rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">
+            {/* Second Layer */}
+            <div className="bg-gradient-to-br from-[#B9A99A] to-[#CAB7A9] w-[23rem] h-[20rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">
+              {/* Main Card */}
+              <div className="bg-gradient-to-br from-[#978776] to-[#B19C89] w-[20rem] h-[25rem] rounded-3xl shadow-2xl relative z-20 transform hover:scale-105 transition-transform duration-300 ease-out">
+                {/* Bear Icon */}
+                <div className="absolute -top-8 left-[50%] transform -translate-x-[50%]">
+                  <div className="w-16 h-16 bg-[#B9A99A] rounded-full flex justify-center items-center shadow-md">
+                    <span className="text-4xl">💎</span>
+                  </div>
+                </div>
+
+                {/* Design + Label */}
+                <div className="text-center mt-12">
+                  <span className="inline-block bg-[#60594D] text-white text-xs px-4 py-1 rounded-full shadow-lg">
+                    Design +
+                  </span>
+                </div>
+
+                {/* Price */}
+                <div className="text-center mt-4 flex justify-center items-baseline">
+                  <h3 className="text-[#F3EDE5] text-6xl font-bold drop-shadow-lg">
+                    $10
+                  </h3>
+                  <span className="text-[#F3EDE5] text-lg ml-1 drop-shadow-md">
+                    /MO
+                  </span>
+                </div>
+
+                {/* Features List */}
+                <div className="text-[#F3EDE5] text-center mt-8 text-opacity-90 space-y-2">
+                  <p className="flex items-center justify-center">
+                    <span className="mr-2">🔥</span> Best Price ever
+                  </p>
+                  <p className="flex items-center justify-center">
+                    <span className="mr-2">✨</span> Best Design ever
+                  </p>
+                  <p className="flex items-center justify-center">
+                    <span className="mr-2">🌟</span> 11:11 lorem ipsum
+                  </p>
+                </div>
+
+                {/* Get Started Button */}
+                <div className="flex justify-center mt-8">
+                  <button className="bg-[#60594D] text-white px-8 py-3 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 ease-out">
+                    Get Started
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </BasicLayout>
   );
 };

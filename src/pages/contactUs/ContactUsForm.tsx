@@ -51,7 +51,7 @@ export const ContactUsForm = () => {
   };
 
   return (
-    <div className="md:w-[65%] bg-white shadow-lg px-10 py-16 rounded-r-xl">
+    <div className="md:w-[65%] bg-white shadow-lg px-10 py-16 rounded-r-xl transition duration-300 hover:shadow-2xl">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
           <TextField
@@ -61,6 +61,7 @@ export const ContactUsForm = () => {
             onChange={handleInputChange}
             required
             fullWidth
+            className="transition duration-300 focus:!border-black"
           />
           <TextField
             label="Email"
@@ -69,6 +70,7 @@ export const ContactUsForm = () => {
             onChange={handleInputChange}
             required
             fullWidth
+            className="transition duration-300 focus:!border-black"
           />
         </div>
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
@@ -83,6 +85,7 @@ export const ContactUsForm = () => {
               onChange={handleInputChange}
               label="Contact Preference"
               fullWidth
+              className="transition duration-300 focus:!border-black"
             >
               <MenuItem value="">Select Preference</MenuItem>
               <MenuItem value="email">Email</MenuItem>
@@ -96,15 +99,8 @@ export const ContactUsForm = () => {
             onChange={handleInputChange}
             required
             fullWidth
+            className="transition duration-300 focus:!border-black"
           />
-
-          {/* <FormControl fullWidth>
-                        <InputLabel>Country ID</InputLabel>
-                        <Select name="countryId" value={formValues.countryId} onChange={handleInputChange} fullWidth>
-                            <MenuItem value="">Select Country</MenuItem>
-                            <MenuItem value="IN">India</MenuItem>
-                        </Select>
-                    </FormControl> */}
         </div>
         <TextField
           label="Subject"
@@ -113,6 +109,7 @@ export const ContactUsForm = () => {
           onChange={handleInputChange}
           required
           fullWidth
+          className="transition duration-300 focus:!border-black"
         />
         <TextField
           label="Message"
@@ -123,11 +120,12 @@ export const ContactUsForm = () => {
           fullWidth
           multiline
           rows={4}
+          className="transition duration-300 focus:!border-black"
         />
         <Button
           component="label"
           variant="outlined"
-          className="!border !border-black !text-black h-12"
+          className="!border !border-black !text-black h-12 transition duration-300 hover:!border-gray-500"
           fullWidth
           startIcon={<CloudUploadIcon />}
         >
@@ -138,7 +136,7 @@ export const ContactUsForm = () => {
           type="submit"
           variant="contained"
           fullWidth
-          className="!bg-black text-white h-12"
+          className="!bg-black text-white h-12 transition duration-300 hover:!bg-gray-900"
         >
           Send
         </Button>
@@ -146,5 +144,3 @@ export const ContactUsForm = () => {
     </div>
   );
 };
-
-export default ContactUsForm;
