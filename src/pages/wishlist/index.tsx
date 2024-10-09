@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import BasicLayout from '../../layouts/BasicLayout';
-import ProductCard from '../product_list/ProductCard';
+import ProductCard from '../productList/ProductCard';
 import { fetchWishlistResponse } from '../../api/userApi';
 import { RootState } from '../../redux/store';
 import { setWishlistItems, removeWishlistItem, setLoading, setError, removeFromLocalWishlist } from '../../redux/wishlistSlice';

@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import Home from './pages/home';
-import ProductList from './pages/product_list';
+import ProductList from './pages/productList';
 import ProductDetails from './pages/productDetails';
 import ShoppingBag from './pages/shoppingBag';
 import WishList from './pages/wishlist';
@@ -21,13 +21,14 @@ import OrderReturns from './pages/account/product/OrderReturns';
 import AdminRoutes from './layouts/AdminRoutes';
 import Unauthorized from './components/Unauthorized';
 import EditProduct from './pages/account/product/EditProduct';
-import ServicePage from './pages/service_page/ServicePage';
+import ServicePage from './pages/servicePage/ServicePage';
 import AboutPage from './pages/aboutPage/AboutPage';
 import TeamsPage from './pages/teamPage/TeamsPage';
 import AboutUsInfo from './pages/account/websiteInformation/about/AboutUsInfo';
 import AdminTeamPage from './pages/account/websiteInformation/teams/AdminTeamPage';
 import AdminServicePage from './pages/account/websiteInformation/services/AdminServicePage';
 import AdminFAQPage from './pages/account/websiteInformation/faq/AdminFAQPage';
+import ForgetPassword from './pages/forgetPassword/ForgetPassword';
 
 const App = () => {
   const userId = JSON.parse(localStorage.getItem('userId') as string);
@@ -94,6 +95,8 @@ const App = () => {
 
         <Route path="orders-returns" element={<OrderReturns />} />
       </Route>
+
+      <Route path='/forgetPassword' element={<ForgetPassword/>}></Route>
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

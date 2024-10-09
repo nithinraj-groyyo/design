@@ -12,7 +12,7 @@ import useFetchProductById from '../../hooks/useFetchProductById';
 import { useParams } from 'react-router-dom';
 import { getImagesFromUrl } from '../../utilities/helper';
 import AddToBagButton from './AddToBagButton';
-import ProductCard from '../product_list/ProductCard';
+import ProductCard from '../productList/ProductCard';
 import useFetchProducts from '../../hooks/useFetchProducts';
 import Footer from '../../components/footer/Footer';
 import { setLocalWishlistItems } from '../../redux/wishlistSlice';

@@ -7,7 +7,7 @@ import ProductSizeSelector from './ProductSizeSelector';
 import AddToBagButton from './AddToBagButton';
 import ImageSlider from './ImageSlider';
 import { Typography } from '@mui/material';
-import ProductCard from '../product_list/ProductCard';
+import ProductCard from '../productList/ProductCard';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { useParams } from 'react-router-dom';
