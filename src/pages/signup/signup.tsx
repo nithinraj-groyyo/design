@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useState } from 'react';
 import GoogleIcon from '../../assets/svg/auth/GoogleIcon';
 import BasicLayout from '../../layouts/BasicLayout';
-import { useSignUpMutation } from '../../rtk-query/userApiSlice';
+import { useSignUpMutation } from '../../rtk-query/authApiSlice';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const Signup = () => {
@@ -40,8 +40,10 @@ const Signup = () => {
         const response = await signUp(newData).unwrap();
         if(response?.status && response?.httpStatusCode === 201){
           toast.success(response?.message);
-          resetForm();
-          navigate("/login");
+          localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
+          localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin))
+          resetForm(); 
+          navigate("/")
         }
       } catch (error: any) {
         console.log("Error Response: ", error);

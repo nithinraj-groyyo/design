@@ -13,7 +13,8 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import BasicLayout from "../../layouts/BasicLayout";
-import { useForgotPasswordMutation, useSignInMutation } from "../../rtk-query/userApiSlice";
+import { useForgotPasswordMutation } from "../../rtk-query/userApiSlice";
+import { useSignInMutation } from "../../rtk-query/authApiSlice";
 
 const Login = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
@@ -59,11 +60,13 @@ const Login = () => {
         };
 
         const response = await signIn(newData).unwrap();
-        if (response?.status && response?.httpStatusCode === 201) {
+
+        if(response?.status && response?.httpStatusCode === 200){
           toast.success(response?.message);
-          localStorage.setItem("authToken", response?.data?.access_token);
-          resetForm();
-          navigate("/");
+          localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
+          localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin))
+          resetForm(); 
+          navigate("/")
         }
       } catch (error: any) {
         toast.error("Login failed: " + error?.response?.data?.message);

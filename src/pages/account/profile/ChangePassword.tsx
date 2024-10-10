@@ -1,41 +1,49 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Button, TextField } from "@mui/material";
+import { Button } from "@mui/material";
 import { toast } from "react-toastify";
+import PasswordField from "../../../components/PasswordField";
+import { useChangePasswordMutation } from "../../../rtk-query/userApiSlice";
+
+interface ChangePasswordValues {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
 
 const validationSchema = Yup.object({
-  currentPassword: Yup.string()
-    .required("Current password is required"),
+  currentPassword: Yup.string().required("Current password is required"),
   newPassword: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("New password is required"),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref('newPassword'), undefined], 'Passwords must match')
+    .oneOf([Yup.ref('newPassword')], 'Passwords must match')
     .required("Re-entering the new password is required"),
 });
 
-const ChangePassword = () => {
-  const formik = useFormik({
+const ChangePassword: React.FC = () => {
+  const [changePassword] = useChangePasswordMutation();
+
+  const formik = useFormik<ChangePasswordValues>({
     initialValues: {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     },
     validationSchema: validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, {resetForm}) => {
       try {
-      
-        const response = await fetch('/api/change-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(values),
-        });
+        const response = await changePassword({
+          currentPassword: values?.currentPassword,
+          newPassword: values?.newPassword
+        }).unwrap()
 
-        if (response) {
+        if (response?.status && response?.httpStatusCode === 200) {
           toast.success('Password changed successfully');
+          resetForm();
+        } else {
+          throw new Error('Failed to change password');
         }
       } catch (error) {
         console.error('Error changing password:', error);
@@ -49,13 +57,11 @@ const ChangePassword = () => {
       <div className="flex flex-col bg-white p-4 m-6 rounded-xl gap-8">
         <div className="font-semibold">Change Password</div>
         <div className="flex justify-evenly w-full flex-col gap-4">
-          <div className="w-full gap-8">
-            <TextField
+          <div className="w-1/2 pr-2">
+            <PasswordField
               id="currentPassword"
               name="currentPassword"
               label="Current Password"
-              variant="outlined"
-              className="w-1/2"
               value={formik.values.currentPassword}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -64,24 +70,20 @@ const ChangePassword = () => {
             />
           </div>
           <div className="w-full flex flex-row gap-4">
-            <TextField
+            <PasswordField
               id="newPassword"
               name="newPassword"
               label="New Password"
-              variant="outlined"
-              className="w-full"
               value={formik.values.newPassword}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
               helperText={formik.touched.newPassword && formik.errors.newPassword}
             />
-            <TextField
+            <PasswordField
               id="confirmPassword"
               name="confirmPassword"
               label="Re-Enter New Password"
-              variant="outlined"
-              className="w-full"
               value={formik.values.confirmPassword}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -92,8 +94,8 @@ const ChangePassword = () => {
         </div>
         <div>
           <Button
-            variant="outlined"
-            className="w-[10rem] h-[3rem] !rounded-lg !bg-[#A2865B] !text-white"
+            variant="contained"
+            className="w-[10rem] h-[3rem]"
             type="submit"
           >
             <b>Reset</b>

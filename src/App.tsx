@@ -29,30 +29,30 @@ import AdminTeamPage from './pages/account/websiteInformation/teams/AdminTeamPag
 import AdminServicePage from './pages/account/websiteInformation/services/AdminServicePage';
 import AdminFAQPage from './pages/account/websiteInformation/faq/AdminFAQPage';
 import ForgotPassword from './pages/forgotPassword';
+import useAuth from './hooks/useAuth';
 
 const App = () => {
-  const userId = JSON.parse(localStorage.getItem('userId') as string);
-  const isAuthenticated = Boolean(userId);
+  const isAuthenticated = useAuth()
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
       <Route
         path="/login"
         element={
-          // <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
+          <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
             <Login />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/signup"
         element={
           // <ProtectedRoute isAuthenticated={isAuthenticated} redirectTo="/">
-            <Signup />
+          <Signup />
           // </ProtectedRoute>
         }
       />
+      <Route path="/" element={<Home />} />
       <Route path="/designs/:categoryKey/:categoryId" element={<ProductList />} />
       <Route path="/product-details/:categoryKey/:productId" element={<ProductDetails />} />
       <Route path="/bag" element={<ShoppingBag />} />
