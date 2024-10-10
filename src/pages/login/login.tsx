@@ -2,13 +2,12 @@ import { Button, CircularProgress, IconButton, InputAdornment, TextField } from 
 import { Link, useNavigate} from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { loginUser } from "../../api/userApi";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import GoogleIcon from "../../assets/svg/auth/GoogleIcon";
 import BasicLayout from "../../layouts/BasicLayout";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useSignInMutation } from "../../rtk-query/userApiSlice";
+import { useSignInMutation } from "../../rtk-query/authApiSlice";
 
 const Login = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);

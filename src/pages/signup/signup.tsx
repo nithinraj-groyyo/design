@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useState } from 'react';
 import GoogleIcon from '../../assets/svg/auth/GoogleIcon';
 import BasicLayout from '../../layouts/BasicLayout';
-import { useSignUpMutation } from '../../rtk-query/userApiSlice';
+import { useSignUpMutation } from '../../rtk-query/authApiSlice';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const Signup = () => {

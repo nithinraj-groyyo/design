@@ -1,27 +1,24 @@
 export interface IUserProfile {
     id: number;
-    firstName: string;
-    lastName: string;
-    emailId: string;
-    mobileNo: string;
-    profileImage: string | null;
+    contactName: string | null;
+    contactNumber: string | null;
     gender: string | null;
-    isActive: boolean;
-    roleId: number;
-    lastLoggedIn: string | null;
-    createdDate: string;
-    createdBy: string;
-    modifiedDate: string;
-    modifiedBy: string;
+    email: string;
+    role: Role;
+    isAdmin: boolean;
 }
 
+export interface Role {
+    id: number;
+    name: string;
+  }
+
 export interface IUserDetailsRequest {
-    userId: string | null;
-    firstName: string;
-    lastName: string;
-    gender: string;
-    emailId: string;
-    mobileNo: string;
+    id: number;
+    contactName: string | null;
+    contactNumber: string | null;
+    gender: string | null;
+    email: string;
     fileName: File | string | null;
 }
 

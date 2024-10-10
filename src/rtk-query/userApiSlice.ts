@@ -1,34 +1,49 @@
 import apiSlice from "./apiSlice";
 
-const userUrl = "auth";
+const userUrl = "user";
+const token = JSON.parse(localStorage.getItem('authToken') as string);
 
 const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        signUp: builder.mutation({
-            query: ({email, password}: {email:string, password: string}) => ({
-                url: `${userUrl}/signup`,
+        changePassword: builder.mutation({
+            query: ({currentPassword, newPassword}: {currentPassword: string, newPassword: string}) => ({
+                url: `${userUrl}/change-password`,
                 headers: {
 					'Content-type': 'application/json',
+                    'Authorization': `Bearer ${token}`
 				},
-				method: 'POST',
-                body: {email, password}
+                method: 'POST',
+                body: {currentPassword, newPassword}
             })
         }),
-        signIn: builder.mutation({
-            query: ({email, password}: {email:string, password: string}) => ({
-                url: `${userUrl}/login`,
+        getUserProfile: builder.query({
+            query: () => ({
+                url: `${userUrl}/profile`,
                 headers: {
 					'Content-type': 'application/json',
+                    'Authorization': `Bearer ${token}`
 				},
-				method: 'POST',
-                body: {email, password}
-            })
+            }),
+            providesTags: ["UserProfile"],
+        }),
+        updateUserProfile: builder.mutation({
+            query: (payload) => ({
+                url: `${userUrl}/update-profile`,
+                method: "PUT",
+                headers: {
+					'Content-type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+				},
+                body: payload
+            }),
+            invalidatesTags: ["UserProfile"]
         })
     })
 });
 
 
 export const {
-    useSignUpMutation,
-    useSignInMutation
+    useChangePasswordMutation,
+    useLazyGetUserProfileQuery,
+    useUpdateUserProfileMutation
 } = userApiSlice;
