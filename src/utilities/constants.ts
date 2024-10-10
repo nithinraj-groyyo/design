@@ -5,6 +5,11 @@ export const CONSTANT = {
     PAGE_LIMIT: 10,
 }
 
+export enum PRODUCT_STATUS {
+    ALL = "all",
+    ACTIVE = "active",
+    INACTIVE = "inactive"
+}
 
 export const clientData = [
     { url: '/images/ClientsLogos/DeFacto.png', name: 'DeFacto' },

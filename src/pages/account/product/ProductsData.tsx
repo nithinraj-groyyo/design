@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, MenuItem, Select, FormControl, InputLabel, IconButton, Switch, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
-import { useLazyFetchProductsQuery } from '../../../rtk-query/productApiSlice';
+import { useLazyFetchProductsQuery, useUpdateProductStatusMutation } from '../../../rtk-query/productApiSlice';
 import NoDataAvailable from '../../../components/NoDataAvailable';
-import { CONSTANT } from '../../../utilities/constants';
+import { CONSTANT, PRODUCT_STATUS } from '../../../utilities/constants';
+import { toast } from 'react-toastify';
 
 const ProductTable: React.FC = () => {
   const [products, setProducts] = useState([]);
-  const [filter, setFilter] = useState<{ status?: string }>({});
+  const [filter, setFilter] = useState<{ status?: string }>({status: PRODUCT_STATUS.ALL});
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
   const [itemCount, setItemCount] = useState<number>(CONSTANT.PAGE_LIMIT);
@@ -17,11 +18,24 @@ const ProductTable: React.FC = () => {
 
   const [fetchProducts, { data, isLoading: isProductLoading }] = useLazyFetchProductsQuery();
 
+  function getStatus(val: string) {
+    switch (val){
+      case PRODUCT_STATUS.ALL:
+        return undefined
+      case PRODUCT_STATUS.ACTIVE:
+        return true
+      case PRODUCT_STATUS.INACTIVE:
+        return false
+      default:
+        return undefined;
+    }
+  }
 
   const loadProducts = async () => {
     const response = await fetchProducts({
       page: currentPage,
       limit: itemCount,
+      isProductActive: getStatus(filter.status ?? PRODUCT_STATUS.ALL)
     });
 
     if (response?.data) {
@@ -39,8 +53,28 @@ const ProductTable: React.FC = () => {
     console.log(`Edit product with ID: ${id}`);
   };
 
-  const handleToggle = async (id: number, currentStatus: boolean, productName: string) => {
+  const [updateProductStatus] = useUpdateProductStatusMutation(); 
 
+
+  const handleToggle = async (id: number, currentStatus: boolean, productName: string) => {
+    const newStatus = !currentStatus; 
+
+    try {
+      await updateProductStatus({ id, isProductActive: newStatus }).unwrap();
+      setProducts((prevProducts:any) =>
+        prevProducts.map((product:any) =>
+          product.id === id ? { ...product, isProductActive: newStatus } : product
+        )
+      );
+      toast.success(`${productName} is now ${newStatus ? 'enabled' : 'disabled'}`);
+    } catch (error) {
+      console.error(`Error updating product status for ${productName}:`, error);
+      setProducts((prevProducts:any) =>
+        prevProducts.map((product:any) =>
+          product.id === id ? { ...product, isProductActive: currentStatus } : product
+        )
+      );
+    }
   };
 
   const goToEditPage = (product: any) => {
@@ -79,9 +113,9 @@ const ProductTable: React.FC = () => {
             onChange={handleStatusFilter}
             label="Status"
           >
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="active">Active</MenuItem>
-            <MenuItem value="inactive">Inactive</MenuItem>
+            <MenuItem value={PRODUCT_STATUS.ALL}>All</MenuItem>
+            <MenuItem value={PRODUCT_STATUS.ACTIVE}>Active</MenuItem>
+            <MenuItem value={PRODUCT_STATUS.INACTIVE}>Inactive</MenuItem>
           </Select>
         </FormControl>
       </div>
@@ -121,9 +155,9 @@ const ProductTable: React.FC = () => {
                           <EditIcon />
                         </IconButton>
                         <Switch
-                          title={`${item.status ? 'Disable' : 'Enable'} product`}
-                          checked={item.status}
-                          onChange={() => handleToggle(item.id, item.status, item?.name)}
+                          title={`${item.isProductActive ? 'Disable' : 'Enable'} product`}
+                          checked={item.isProductActive}
+                          onChange={() => handleToggle(item.id, item.isProductActive, item?.name)}
                         />
                       </TableCell>
                     </TableRow>
