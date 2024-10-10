@@ -37,13 +37,25 @@ const userApiSlice = apiSlice.injectEndpoints({
                 body: payload
             }),
             invalidatesTags: ["UserProfile"]
-        })
-    })
+        }),
+        updatePassword: builder.mutation({
+            query: ({ token, password }: {token: string, password: string }) => ({
+              url: `/auth/updatePassword`,
+              headers: {
+                "Content-type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              method: "PATCH",
+              body: { password },
+            }),
+          }),
+    }),
 });
 
 
 export const {
     useChangePasswordMutation,
     useLazyGetUserProfileQuery,
-    useUpdateUserProfileMutation
+    useUpdateUserProfileMutation,
+    useUpdatePasswordMutation
 } = userApiSlice;
