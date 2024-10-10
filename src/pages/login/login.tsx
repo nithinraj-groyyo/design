@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import BasicLayout from "../../layouts/BasicLayout";
-import { useForgotPasswordMutation } from "../../rtk-query/userApiSlice";
+import { useForgotPasswordMutation } from "../../rtk-query/authApiSlice";
 import { useSignInMutation } from "../../rtk-query/authApiSlice";
 
 const Login = () => {
@@ -67,24 +67,28 @@ const Login = () => {
           localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin))
           resetForm(); 
           navigate("/")
+        }else if(response?.statusCode === 400){
+          toast.error(response?.message)
         }
       } catch (error: any) {
+        console.log(error)
         toast.error("Login failed: " + error?.response?.data?.message);
       }
     },
   });
 
-  // Handle email submission for password reset
   const handleSendEmail = async (email: string) => {
     try {
       const response = await forgotPassword({ email }).unwrap();
       setApiData(response);
       toast.success("Reset link sent to your email!");
+  
+      modalToggleHandler();
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to send reset link");
     }
-    console.log(apiData, "keshav")
   };
+  
 
   const resetFormik = useFormik({
     initialValues: { resetEmail: "" },
@@ -93,7 +97,6 @@ const Login = () => {
     }),
     onSubmit: (values) => {
       handleSendEmail(values.resetEmail);
-      modalToggleHandler();
     },
   });
 

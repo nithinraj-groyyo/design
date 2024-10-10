@@ -106,39 +106,43 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
                 </Link>
             ))}
 
-            <div className='flex flex-col items-center justify-between my-auto whitespace-nowrap'>
-                <IconButton
-                    className='!w-9 !h-9'
-                    onClick={handleMenuClick}
-                >
-                    <PersonIcon fontSize="large" />
-                </IconButton>
-                <Typography>accounts</Typography>
-                <Menu
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={handleMenuClose}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center',
-                    }}
-                >
-                    <MenuItem onClick={() => handleMenuNavigation("profile")}>Account Settings</MenuItem>
-                    <MenuItem onClick={() => handleMenuNavigation("orders")}>Orders</MenuItem>
-                    <MenuItem onClick={() => handleMenuNavigation("address")}>Address</MenuItem>
-                    {isAuthenticated && <MenuItem onClick={handleSignOutClick}>Sign Out</MenuItem>}
+            {
+                isAuthenticated && (
+                    <div className='flex flex-col items-center justify-between my-auto whitespace-nowrap'>
+                        <IconButton
+                            className='!w-9 !h-9'
+                            onClick={handleMenuClick}
+                        >
+                            <PersonIcon fontSize="large" />
+                        </IconButton>
+                        <Typography>accounts</Typography>
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleMenuClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'center',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'center',
+                            }}
+                        >
+                            <MenuItem onClick={() => handleMenuNavigation("profile")}>Account Settings</MenuItem>
+                            <MenuItem onClick={() => handleMenuNavigation("orders")}>Orders</MenuItem>
+                            <MenuItem onClick={() => handleMenuNavigation("address")}>Address</MenuItem>
+                            {isAuthenticated && <MenuItem onClick={handleSignOutClick}>Sign Out</MenuItem>}
 
-                    <SignOutModal
-                        open={isModalOpen}
-                        onClose={handleCloseModal}
-                        onConfirm={handleConfirmSignOut}
-                    />
-                </Menu>
-            </div>
+                            <SignOutModal
+                                open={isModalOpen}
+                                onClose={handleCloseModal}
+                                onConfirm={handleConfirmSignOut}
+                            />
+                        </Menu>
+                    </div>
+                )
+            }
         </div>
     );
 };

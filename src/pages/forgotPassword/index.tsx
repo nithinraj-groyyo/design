@@ -2,41 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { TextField } from '@mui/material';
+import { Button } from '@mui/material';
 import { useUpdatePasswordMutation } from '../../rtk-query/userApiSlice';
+import PasswordField from '../../components/PasswordField';
+import { toast } from 'react-toastify';
 
-// const validationSchema = Yup.object().shape({
-//   newPassword: Yup.string()
-//     .required('New password is required')
-//     .min(8, 'Password must be at least 8 characters')
-//     .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-//     .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-//     .matches(/\d/, 'Password must contain at least one number')
-//     .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
-//   confirmPassword: Yup.string()
-//     .oneOf([Yup.ref('newPassword')], 'Passwords must match')
-//     .required('Confirm password is required'),
-// });
+const validationSchema = Yup.object().shape({
+  newPassword: Yup.string()
+    .required('New password is required')
+    .min(8, "Password must be at least 8 characters")
+    .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
+    .matches(/[a-z]/, "Password must contain at least one lowercase letter.")
+    .matches(/[0-9]/, "Password must contain at least one number.")
+    .matches(/[@$!%*?&#]/, "Password must contain at least one special character."),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('newPassword')], 'Passwords must match')
+    .required('Confirm password is required'),
+});
 
 const ForgotPassword = () => {
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token'); 
+  const token = searchParams.get('token');
   const navigate = useNavigate();
-  console.log(token,"token")
 
-  const [updatePassword, { isLoading, isError, isSuccess }] = useUpdatePasswordMutation();
-
-  const togglePasswordVisibility = (setShowPassword: React.Dispatch<React.SetStateAction<boolean>>, showPassword: boolean) => {
-    setShowPassword(!showPassword);
-  };
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate('/login'); 
-    }
-  }, [isSuccess, navigate]);
+  const [updatePassword, { isLoading }] = useUpdatePasswordMutation();
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-300">
@@ -47,11 +36,15 @@ const ForgotPassword = () => {
 
         <Formik
           initialValues={{ newPassword: '', confirmPassword: '' }}
-          // validationSchema={validationSchema}
+          validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
             if (token) {
               try {
-                await updatePassword({ password: values.newPassword }).unwrap();
+                const response = await updatePassword({ token, password: values.newPassword }).unwrap();
+                if(response?.status && response?.httpStatusCode === 200){
+                  toast.success(response?.message);
+                  navigate("/login")
+                }
               } catch (error) {
                 console.error("Password update failed", error);
               } finally {
@@ -59,159 +52,51 @@ const ForgotPassword = () => {
               }
             } else {
               console.error("Token not found in URL");
+              toast.error("Token not found in URL");
               setSubmitting(false);
             }
           }}
         >
-          {({ isSubmitting, isValid }) => (
+          {({ isSubmitting, handleChange, handleBlur, values, touched, errors }) => (
             <Form>
               <div className="mb-4 relative">
-                <label
-                  htmlFor="newPassword"
-                  className="block text-lg font-medium text-gray-800"
-                >
-                  New Password
-                </label>
-                <div className="relative mt-2">
-                  <TextField
-                    type={showNewPassword ? 'text' : 'password'}
-                    name="newPassword"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base"
-                    placeholder="Enter your new password"
-                  />
-                  <span
-                    onClick={() => togglePasswordVisibility(setShowNewPassword, showNewPassword)}
-                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-                  >
-                    {showNewPassword ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="w-6 h-6 text-gray-600"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.543 7-1.275 4.057-5.065 7-9.543 7-4.478 0-8.268-2.943-9.543-7z"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="w-6 h-6 text-gray-600"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 3l18 18m-2.2-2.2A9.97 9.97 0 0012 15c-3.866 0-7.1-2.239-8.8-5.6A9.966 9.966 0 0112 5c2.489 0 4.749.906 6.533 2.4m3.034 3.4c.2.486.367.986.499 1.5"
-                        />
-                      </svg>
-                    )}
-                  </span>
-                </div>
-                <ErrorMessage
+                <PasswordField
+                  id="newPassword"
                   name="newPassword"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
+                  label="New Password"
+                  value={values.newPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.newPassword && Boolean(errors.newPassword)}
+                  helperText={touched.newPassword && errors.newPassword}
                 />
+                <ErrorMessage name="newPassword" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               <div className="mb-4 relative">
-                <label
-                  htmlFor="confirmPassword"
-                  className="block text-lg font-medium text-gray-800"
-                >
-                  Confirm Password
-                </label>
-                <div className="relative mt-2">
-                  <TextField
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base"
-                    placeholder="Confirm your new password"
-                  />
-                  <span
-                    onClick={() => togglePasswordVisibility(setShowConfirmPassword, showConfirmPassword)}
-                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-                  >
-                    {showConfirmPassword ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="w-6 h-6 text-gray-600"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.543 7-1.275 4.057-5.065 7-9.543 7-4.478 0-8.268-2.943-9.543-7z"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="w-6 h-6 text-gray-600"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 3l18 18m-2.2-2.2A9.97 9.97 0 0012 15c-3.866 0-7.1-2.239-8.8-5.6A9.966 9.966 0 0112 5c2.489 0 4.749.906 6.533 2.4m3.034 3.4c.2.486.367.986.499 1.5"
-                        />
-                      </svg>
-                    )}
-                  </span>
-                </div>
-                <ErrorMessage
+                <PasswordField
+                  id="confirmPassword"
                   name="confirmPassword"
-                  component="div"
-                  className="text-red-500 text-sm mt-1"
+                  label="Confirm Password"
+                  value={values.confirmPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.confirmPassword && Boolean(errors.confirmPassword)}
+                  helperText={touched.confirmPassword && errors.confirmPassword}
                 />
+                <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
               <div className="flex space-x-4 items-center">
-                <button
+                <Button
                   type="submit"
-                  className={`${
-                    isSubmitting || !isValid
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-blue-500 hover:bg-blue-600'
-                  } text-white font-bold py-3 px-6 rounded-md shadow-sm focus:outline-none transition duration-300 w-full`}
-                  disabled={isSubmitting || !isValid}
+                  variant="contained"
+                  className="w-full !bg-black"
+                  disabled={isSubmitting || isLoading}
                 >
                   {isLoading ? 'Updating...' : 'Reset Password'}
-                </button>
+                </Button>
               </div>
-
-              {isError && (
-                <div className="mt-4 text-center text-red-500">
-                  Failed to update password. Please try again.
-                </div>
-              )}
             </Form>
           )}
         </Formik>

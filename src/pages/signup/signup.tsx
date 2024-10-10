@@ -6,8 +6,8 @@ import { toast } from 'react-toastify';
 import { useState } from 'react';
 import GoogleIcon from '../../assets/svg/auth/GoogleIcon';
 import BasicLayout from '../../layouts/BasicLayout';
-import { useSignUpMutation } from '../../rtk-query/authApiSlice';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useSignUpMutation } from '../../rtk-query/authApiSlice';
 
 const Signup = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);

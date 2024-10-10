@@ -38,22 +38,12 @@ const userApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ["UserProfile"]
         }),
-        forgotPassword: builder.mutation({
-            query: ({ email }: { email: string }) => ({
-                url: `/auth/forgotPassword`,
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                method: 'POST',
-                body: { email },
-            }),
-        }),
         updatePassword: builder.mutation({
-            query: ({ password }: { password: string }) => ({
+            query: ({ token, password }: {token: string, password: string }) => ({
               url: `/auth/updatePassword`,
               headers: {
                 "Content-type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                Authorization: `Bearer ${token}`,
               },
               method: "PATCH",
               body: { password },
@@ -64,7 +54,6 @@ const userApiSlice = apiSlice.injectEndpoints({
 
 
 export const {
-    useForgotPasswordMutation,
     useChangePasswordMutation,
     useLazyGetUserProfileQuery,
     useUpdateUserProfileMutation,
