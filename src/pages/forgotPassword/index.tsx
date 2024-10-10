@@ -1,31 +1,42 @@
-import React, { useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import React, { useState, useEffect } from 'react';
+import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
-import { Button, TextField } from '@mui/material';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { TextField } from '@mui/material';
+import { useUpdatePasswordMutation } from '../../rtk-query/userApiSlice';
 
-const validationSchema = Yup.object().shape({
-  newPassword: Yup.string()
-    .required('New password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .matches(/\d/, 'Password must contain at least one number')
-    .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
-  
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('newPassword')], 'Passwords must match')
-    .required('Confirm password is required'),
-});
+// const validationSchema = Yup.object().shape({
+//   newPassword: Yup.string()
+//     .required('New password is required')
+//     .min(8, 'Password must be at least 8 characters')
+//     .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+//     .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+//     .matches(/\d/, 'Password must contain at least one number')
+//     .matches(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character'),
+//   confirmPassword: Yup.string()
+//     .oneOf([Yup.ref('newPassword')], 'Passwords must match')
+//     .required('Confirm password is required'),
+// });
 
 const ForgotPassword = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token'); 
   const navigate = useNavigate();
+  console.log(token,"token")
+
+  const [updatePassword, { isLoading, isError, isSuccess }] = useUpdatePasswordMutation();
 
   const togglePasswordVisibility = (setShowPassword: React.Dispatch<React.SetStateAction<boolean>>, showPassword: boolean) => {
     setShowPassword(!showPassword);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate('/login'); 
+    }
+  }, [isSuccess, navigate]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-300">
@@ -36,12 +47,20 @@ const ForgotPassword = () => {
 
         <Formik
           initialValues={{ newPassword: '', confirmPassword: '' }}
-          validationSchema={validationSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            setTimeout(() => {
-              navigate('/login');
+          // validationSchema={validationSchema}
+          onSubmit={async (values, { setSubmitting }) => {
+            if (token) {
+              try {
+                await updatePassword({ password: values.newPassword }).unwrap();
+              } catch (error) {
+                console.error("Password update failed", error);
+              } finally {
+                setSubmitting(false);
+              }
+            } else {
+              console.error("Token not found in URL");
               setSubmitting(false);
-            }, 500);
+            }
           }}
         >
           {({ isSubmitting, isValid }) => (
@@ -174,17 +193,25 @@ const ForgotPassword = () => {
                 />
               </div>
 
-              <div className="flex space-x-4 mt-6">
+              <div className="flex space-x-4 items-center">
                 <button
                   type="submit"
+                  className={`${
+                    isSubmitting || !isValid
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-blue-500 hover:bg-blue-600'
+                  } text-white font-bold py-3 px-6 rounded-md shadow-sm focus:outline-none transition duration-300 w-full`}
                   disabled={isSubmitting || !isValid}
-                  className={`w-full py-3 px-5 bg-black text-white font-medium text-base rounded-md hover:bg-transparent hover:text-black hover:border transition duration-300 ${
-                    isSubmitting || !isValid ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
                 >
-                  Confirm
+                  {isLoading ? 'Updating...' : 'Reset Password'}
                 </button>
               </div>
+
+              {isError && (
+                <div className="mt-4 text-center text-red-500">
+                  Failed to update password. Please try again.
+                </div>
+              )}
             </Form>
           )}
         </Formik>
