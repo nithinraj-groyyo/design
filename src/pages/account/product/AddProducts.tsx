@@ -38,14 +38,16 @@ import { useFetchSubCategories } from "../../../hooks/useFetchSubCategories";
 import { ICategory } from "../../../types/categories";
 import { toast } from "react-toastify";
 import { addUpdateProductResponse } from "../../../api/productsApi";
+import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 
 interface ImageData {
     id: string;
     side: string;
     file: File | null;
-    isCover: boolean;
+    isThumbnail: boolean;
     fileName: string;
     isDeleted: boolean;
+    imageUrl: string
 }
 
 
@@ -87,30 +89,32 @@ const AddProducts = () => {
 
     const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
 
-  const handleCategoryChange = (e: any) => {
-    const selectedCategoryId = e.target.value as number;
-    const selectedCat = categories.find((cat) => cat.id === selectedCategoryId) || null;
+    const [uploadSingleFile, { isLoading: isFileLoading }] = useUploadSingleFileMutation()
 
-    formik.setFieldValue('category', selectedCat?.key); 
-    setSelectedCategory(selectedCat); 
-  };
+    const handleCategoryChange = (e: any) => {
+        const selectedCategoryId = e.target.value as number;
+        const selectedCat = categories.find((cat) => cat.id === selectedCategoryId) || null;
+
+        formik.setFieldValue('category', selectedCat?.key);
+        setSelectedCategory(selectedCat);
+    };
 
 
     const [imgList, setImgList] = useState<ImageData[]>([
-        { id: uuidv1(), side: "", file: null, isCover: true, fileName: "", isDeleted: false },
+        { id: uuidv1(), side: "", file: null, isThumbnail: true, fileName: "", isDeleted: false, imageUrl: "" },
     ]);
 
-    const {categories, subCategories} = useSelector((state: RootState) => state.categories);
-    const {fetchSubCategories} = useFetchSubCategories();
+    const { categories, subCategories } = useSelector((state: RootState) => state.categories);
+    const { fetchSubCategories } = useFetchSubCategories();
 
     useEffect(() => {
-        if(selectedCategory?.id){
+        if (selectedCategory?.id) {
             fetchSubCategories(selectedCategory?.id as number)
         }
     }, [selectedCategory])
-    
-    
-    const handleFileUpload = (id: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+
+
+    const handleFileUpload = (id: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event?.target?.files;
         if (files && files?.length > 0) {
             const file: any = files[0];
@@ -122,30 +126,54 @@ const AddProducts = () => {
                 return;
             }
 
-            setImgList(prev =>
-                prev.map(img =>
-                    img?.id === id ? { ...img, file, fileName: `${img?.side}-${uuidv1()}.${fileExtension}` } : img
-                )
-            );
+            try {
+
+                const response = await uploadSingleFile(file).unwrap();
+                const responseData = response?.data
+                console.log(response, "response file");
+
+                const fileUrl = responseData?.imageUrl; // signedUrl(confirm from ashish)
+                const fileId = responseData?.id;
+
+
+                setImgList(prev =>
+                    prev.map(img =>
+                        img.id === id
+                            ? {
+                                ...img,
+                                file: file,
+                                fileName: responseData.fileName,
+                                isDeleted: false,
+                                id: fileId,
+                                imageUrl: fileUrl,
+                            }
+                            : img
+                    )
+                );
+            } catch (error) {
+                toast.error("Error uploading file");
+            }
         }
     };
+
     const handleCheckboxIsCover = (selectedId: string) => {
         setImgList((prevItems) =>
-          prevItems.map((item) => ({
-            ...item,
-            isCover: item.id === selectedId,
-          }))
+            prevItems.map((item) => ({
+                ...item,
+                isThumbnail: item.id === selectedId,
+            }))
         );
-      };
+    };
 
 
     const handleAddImage = () => {
         setImgList(prev => [
             ...prev,
-            { id: uuidv1(), side: "", file: null, isCover: false, fileName: "", isDeleted: false }
+            { id: uuidv1(), side: "", file: null, isThumbnail: false, fileName: "", isDeleted: false, imageUrl: "" }
         ]);
     };
 
+    console.log(imgList, "imgList")
     const handleRemoveImage = (id: string) => () => {
         setImgList(prev => prev.filter(img => img?.id !== id));
     };
@@ -209,7 +237,7 @@ const AddProducts = () => {
             } else {
                 if (priceList?.filter(x => +x.price == 0).length > 0) {
                     toast.error("Please enter quantity range and price!");
-                }else{
+                } else {
                     const payload = {
                         productName: values?.productName,
                         styleName: values?.styleName,
@@ -222,29 +250,29 @@ const AddProducts = () => {
                         leftHeading1: values?.leftHeading1,
                         leftHeading1Content: values?.leftHeading1Content,
                         leftHeading2: values?.leftHeading2,
-                        leftHeading2Content: values?.leftHeading2Content                
+                        leftHeading2Content: values?.leftHeading2Content
                     };
-        
+
                     const convertPriceList = priceList?.map((price) => {
-                        return{
+                        return {
                             qtyFrom: +price?.qtyFrom,
                             qtyTo: +price?.qtyTo,
                             price: +price?.price,
                         }
                     })
-        
+
                     const formData = new FormData();
-        
+
                     imgList.forEach(item => {
                         formData.append("upload_file", item?.file ?? "");
                     })
-                    
+
                     formData.append("content", JSON.stringify(payload));
                     formData.append("imgList", JSON.stringify(imgList));
                     formData.append("priceList", JSON.stringify(convertPriceList));
                     formData.append("userId", userId);
-console.log({convertPriceList, imgList, payload})
-console.log(formData)
+                    console.log({ convertPriceList, imgList, payload })
+                    console.log(formData)
                     // try {
                     //     const response = await addUpdateProductResponse(formData, "create");
                     //     if(response?.message === "success"){
@@ -292,7 +320,7 @@ console.log(formData)
                                     error={formik.touched.styleName && Boolean(formik.errors.styleName)}
                                     helperText={formik.touched.styleName && formik.errors.styleName}
                                 />
-                                 <FormControl fullWidth>
+                                <FormControl fullWidth>
                                     <InputLabel>Category</InputLabel>
                                     <Select
                                         name="category"
@@ -304,15 +332,15 @@ console.log(formData)
                                     >
                                         <MenuItem value="">--Select--</MenuItem>
                                         {categories.map((cat) => (
-                                        <MenuItem key={cat.id} value={cat.id}>
-                                            {cat.label}
-                                        </MenuItem>
+                                            <MenuItem key={cat.id} value={cat.id}>
+                                                {cat.label}
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                     {formik.touched.category && formik.errors.category && (
                                         <div className="text-red-600 text-xs">{formik.errors.category}</div>
                                     )}
-                                    </FormControl>
+                                </FormControl>
 
                                 <FormControl fullWidth>
                                     <InputLabel>Other Category</InputLabel>
@@ -350,40 +378,41 @@ console.log(formData)
                         <Card className="p-4 flex flex-col gap-4">
                             <div className="font-bold">Upload Images</div>
                             {imgList.map(img => (
-                                <div key={img?.id} className="flex flex-wrap gap-4 items-center">
+                                <div key={img.id} className="flex flex-wrap gap-4 items-center">
                                     <div className="flex flex-1 gap-4">
                                         <TextField
-                                            id={`sideName-${img?.id}`}
-                                            name={`sideName-${img?.id}`}
+                                            id={`sideName-${img.id}`}
+                                            name={`sideName-${img.id}`}
                                             label="Side Name"
-                                            value={img?.side}
+                                            value={img.side}
                                             onChange={(e) =>
                                                 setImgList(prev =>
-                                                    prev.map(i =>
-                                                        i.id === img?.id ? { ...i, side: e.target.value } : i
+                                                    prev?.map(i =>
+                                                        i.id === img.id ? { ...i, side: e.target.value } : i
                                                     )
                                                 )
                                             }
                                             fullWidth
                                             sx={{ flex: '1 1 300px' }}
                                         />
+
                                         <TextField
                                             fullWidth
-                                            label="Upload File (Preffered size: 512 × 768 px)"
-                                            value={img?.fileName || ""}
+                                            label="Upload File (Preferred size: 512 × 768 px)"
+                                            value={img.fileName || ""}
                                             className="cursor-pointer"
                                             InputProps={{
-                                                readOnly: true, 
+                                                readOnly: true,
                                                 endAdornment: (
                                                     <InputAdornment position="end">
                                                         <input
                                                             accept=".png,.jpeg,.jpg,.webp"
                                                             style={{ display: 'none' }}
-                                                            id={`upload-file-${img?.id}`}
+                                                            id={`upload-file-${img.id}`}
                                                             type="file"
-                                                            onChange={handleFileUpload(img?.id)}
+                                                            onChange={handleFileUpload(img.id)}
                                                         />
-                                                        <label htmlFor={`upload-file-${img?.id}`}>
+                                                        <label htmlFor={`upload-file-${img.id}`}>
                                                             <IconButton color="primary" component="span">
                                                                 <UploadIcon />
                                                             </IconButton>
@@ -391,30 +420,39 @@ console.log(formData)
                                                     </InputAdornment>
                                                 ),
                                                 sx: {
-                                                    pointerEvents: 'none', 
+                                                    pointerEvents: 'none',
                                                 },
                                             }}
                                             sx={{ flex: '1 1 300px' }}
-                                            onClick={() => document.getElementById(`upload-file-${img?.id}`)?.click()}
+                                            onClick={() => document.getElementById(`upload-file-${img.id}`)?.click()}
                                         />
                                     </div>
+
+                                    {/* Preview of the uploaded image */}
+                                    {img.imageUrl && (
+                                        <img src={img?.imageUrl} alt={img?.fileName} style={{ width: '100px', height: 'auto' }} />
+                                    )}
+
                                     <FormGroup>
                                         <StyledFormControlLabel
                                             control={
                                                 <Checkbox
-                                                    checked={img?.isCover}
-                                                    onChange={() => handleCheckboxIsCover(img?.id)}
+                                                    checked={img.isThumbnail}
+                                                    onChange={() => handleCheckboxIsCover(img.id)}
                                                     color="primary"
                                                 />
                                             }
-                                            label=""
+                                            label="Is Cover"
                                         />
                                     </FormGroup>
-                                    {imgList?.length > 1 && <div className="flex gap-2">
-                                        <IconButton color="error" onClick={handleRemoveImage(img?.id)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </div>}
+
+                                    {imgList.length > 1 && (
+                                        <div className="flex gap-2">
+                                            <IconButton color="error" onClick={handleRemoveImage(img.id)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                             <div className="flex justify-end mt-2">
@@ -423,6 +461,7 @@ console.log(formData)
                                 </IconButton>
                             </div>
                         </Card>
+
                         <Card className="p-4 flex flex-col gap-4">
                             <div className="font-bold">Attribute</div>
                             <div className="flex ">
@@ -460,7 +499,7 @@ console.log(formData)
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {priceList.map((row, index) => (
+                                                {priceList?.map((row, index) => (
                                                     <TableRow key={row?.id} sx={{ borderBottom: "none" }}>
                                                         <TableCell>
                                                             <TextField
@@ -478,7 +517,7 @@ console.log(formData)
                                                                 type="number"
                                                                 fullWidth
                                                                 variant="outlined"
-                                                                 placeholder="0"
+                                                                placeholder="0"
                                                                 value={row?.qtyTo}
                                                                 onChange={(e) => handleInputChange(row?.id, 'qtyTo', e.target.value)}
                                                                 inputProps={{ min: 0 }}
@@ -489,7 +528,7 @@ console.log(formData)
                                                                 type="number"
                                                                 fullWidth
                                                                 variant="outlined"
-                                                                 placeholder="0"
+                                                                placeholder="0"
                                                                 value={row?.price}
                                                                 onChange={(e) => handleInputChange(row?.id, 'price', e.target.value)}
                                                                 inputProps={{ min: 0 }}
@@ -503,7 +542,7 @@ console.log(formData)
                                                                     </IconButton>
                                                                 )}
                                                                 {index === priceList?.length - 1 && (
-                                                                    <IconButton color="primary"  onClick={handleAddRow}>
+                                                                    <IconButton color="primary" onClick={handleAddRow}>
                                                                         <AddBoxIcon />
                                                                     </IconButton>
                                                                 )}
@@ -535,7 +574,7 @@ console.log(formData)
                     <div className="flex-[1]">
                         <Card className="p-4 flex flex-col gap-4">
                             <div className="font-bold">Product Status</div>
-                            
+
                             <FormControl component="fieldset">
                                 <FormLabel component="legend">
                                     <p className="font-bold text-sm">Status</p>

@@ -87,7 +87,7 @@ const App = () => {
           <Route path="" element={<AddProducts />} />
         </Route>
 
-        <Route path="edit-product" element={<AdminRoutes />}>
+        <Route path="edit-product/:productId" element={<AdminRoutes />}>
           <Route path="" element={<EditProduct />} />
         </Route>
 

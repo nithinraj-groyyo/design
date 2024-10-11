@@ -29,11 +29,18 @@ const productApiSlice = apiSlice.injectEndpoints({
                 method: 'PATCH',
                 body: { isProductActive },
             }),
+            invalidatesTags: ["Products"]
         }),
+        getProductById: builder.query({
+            query: ({productId}: {productId: number}) => ({
+                url: `${productUrl}/${productId}`
+            })
+        })
     })
 });
 
 export const {
     useLazyFetchProductsQuery,
-    useUpdateProductStatusMutation
+    useUpdateProductStatusMutation,
+    useGetProductByIdQuery
 } = productApiSlice;
