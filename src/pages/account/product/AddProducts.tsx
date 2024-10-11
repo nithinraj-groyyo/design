@@ -30,19 +30,15 @@ import {
   DialogTitle,
   DialogActions,
 } from "@mui/material";
-import React, { useEffect, useState, ChangeEvent } from "react";
+import React, { useEffect, useState } from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import UploadIcon from "@mui/icons-material/Upload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useFormik } from "formik";
 import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
-import { useFetchSubCategories } from "../../../hooks/useFetchSubCategories";
 import { toast } from "react-toastify";
-import { addUpdateProductResponse } from "../../../api/productsApi";
-import { useLazyLoadCategoriesWithPaginationQuery } from "../../../rtk-query/categoriesApiSlice";
+import { useLazyLoadCategoriesWithPaginationQuery, useLazyLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
 import { setError } from "../../../redux/shoppingBagSlice";
 interface ImageData {
   id: string;
@@ -133,30 +129,11 @@ const AddProducts = () => {
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
   const [categoriesList, setCategoriesList] = useState<any>();
+  const [subCategoriesList, setSubCategoriesList] = useState<any>();
   const [triggerLoadCategoriesWithPagination, { data, isLoading, isError }] = useLazyLoadCategoriesWithPaginationQuery();
+  const [triggerLoadSubCategoriesWithId] = useLazyLoadSubCategoriesWithIdQuery();
 
-
-  // const [sizeOptions,setSizeOptions] = useState();
-
-  //   const [sizeOptions, setSizeOptions] = React.useState<{id: number, name: string}[]>([]);
-
-  //   const [fetchSizes] = useLazyFetchSizesQuery({});
-
-  //   const getSizesList = () => {
-  //     void fetchSizes({})?.then((res) => {
-  //         const responseBody = res?.data;
-
-  //         const modifedSizeOptions = responseBody?.data?.map((size: any) => {
-  //             return {
-  //                 id: size?.id,
-  //                 name: size?.name
-  //             }
-  //         })
-
-  //         setSizeOptions(modifedSizeOptions)
-  //     })
-  //   }
-
+  // Load Categories API
   const loadCategories = async () => {
     setLoading(true);
     try {
@@ -181,28 +158,50 @@ const AddProducts = () => {
     loadCategories();
   }, []);
 
+  // Load SubCategories API
+  const loadSubCategories = async () => {
+    if (!selectedCategory?.id) return;
+  
+    setLoading(true);
+    try {
+      const responseData = await triggerLoadSubCategoriesWithId({
+        categoryId: selectedCategory?.id,
+        pageIndex: 0,
+        pageSize: 10
+      }).unwrap();
+      
+      console.log(responseData, "subsubsub");
+  
+      const formattedCategories = responseData?.map((res: any) => ({
+        id: res.id,
+        name: res.name
+      }));
+  
+      console.log(formattedCategories, "Formatted Categories");
+      setSubCategoriesList(formattedCategories);
+    } catch (error) {
+      console.error("Failed to fetch subcategories:", error);
+      setError("Failed to fetch categories");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
+    if (selectedCategory) {
+      loadSubCategories();
+    }
+  }, [selectedCategory]);
+
   const userId = JSON.stringify(localStorage.getItem("userId") as string);
 
   const handleCategoryChange = (e: any) => {
     const selectedCategoryId = e.target.value as number;
     const selectedCat =
     categoriesList.find((cat:any) => cat.id === selectedCategoryId) || null;
-    console.log(selectedCat,"sssss")
     formik.setFieldValue("category", selectedCat?.id); 
     setSelectedCategory(selectedCat);
 };
-
-
-//   const { categories, subCategories } = useSelector(
-//     (state: RootState) => state.categories
-//   );
-  const { fetchSubCategories } = useFetchSubCategories();
-
-  useEffect(() => {
-    if (selectedCategory?.id) {
-      fetchSubCategories(selectedCategory?.id as number);
-    }
-  }, [selectedCategory]);
 
   const handleFileUpload =
     (id: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,14 +269,12 @@ const AddProducts = () => {
 
   const handleAddSize = () => {
     if (newSize) {
-      //   setSizeOptionsState([...sizeOptionsState, newSize]);
       setNewSize("");
       setIsSizeModalOpen(false);
     }
   };
   const handleAddColor = () => {
     if (newSize) {
-      //   setSizeOptionsState([...sizeOptionsState, newSize]);
       setNewColor("");
       setIsColorModalOpen(false);
     }
@@ -501,7 +498,7 @@ const AddProducts = () => {
                     }
                   >
                     <MenuItem value="">--Select--</MenuItem>
-                    {categoriesList?.map((cat:any) => (
+                    {subCategoriesList?.map((cat:any) => (
                       <MenuItem key={cat.id} value={cat.id}>
                         {cat.name}
                       </MenuItem>

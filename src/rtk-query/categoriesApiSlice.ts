@@ -58,9 +58,11 @@ const categoriesApiSlice = apiSlice.injectEndpoints({
 
     loadSubCategoriesWithId: builder.query<
       { id: number; name: string }[],
-      number
+      { categoryId: number; pageIndex: number; pageSize: number }
     >({
-      query: (categoryId) => `${categoryUrl}/${categoryId}/subcategories`,
+      query: ({ categoryId, pageIndex, pageSize }) =>
+        `${categoryUrl}/${categoryId}/list/subcategories?pageIndex=${pageIndex}&pageSize=${pageSize}`,
+
       transformResponse: (
         response: ResponseDTO<{ id: number; name: string }[]>
       ) => {
@@ -82,5 +84,5 @@ const categoriesApiSlice = apiSlice.injectEndpoints({
 export const {
   useLazyLoadAllCategoriesWithSubCategoriesQuery,
   useLazyLoadCategoriesWithPaginationQuery,
-  useLazyLoadSubCategoriesWithIdQuery, 
+  useLazyLoadSubCategoriesWithIdQuery,
 } = categoriesApiSlice;
