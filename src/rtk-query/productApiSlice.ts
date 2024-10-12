@@ -1,7 +1,9 @@
 import { ResponseDTO } from "../types/responseFormat";
 import apiSlice from "./apiSlice";
 
-const productUrl = "product"
+const productUrl = "product";
+const sizeUrl = "size";
+const colorUrl = "color";
 
 const productApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
@@ -30,10 +32,24 @@ const productApiSlice = apiSlice.injectEndpoints({
                 body: { isProductActive },
             }),
         }),
+        getAllSizes: builder.query({
+            query: () => ({
+                url: `${sizeUrl}/list`,
+            }),
+            providesTags: ["Sizes"],
+        }),
+        getAllColors: builder.query({
+            query: () => ({
+                url: `${colorUrl}/list`,
+            }),
+            providesTags: ["Sizes"],
+        })
     })
 });
 
 export const {
     useLazyFetchProductsQuery,
-    useUpdateProductStatusMutation
+    useUpdateProductStatusMutation,
+    useGetAllSizesQuery,
+    useGetAllColorsQuery
 } = productApiSlice;
