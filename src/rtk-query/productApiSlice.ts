@@ -31,6 +31,7 @@ const productApiSlice = apiSlice.injectEndpoints({
                 method: 'PATCH',
                 body: { isProductActive },
             }),
+            invalidatesTags: ["Products"]
         }),
         getAllSizes: builder.query({
             query: () => ({
@@ -42,7 +43,12 @@ const productApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: `${colorUrl}/list`,
             }),
-            providesTags: ["Sizes"],
+            providesTags: ["Colors"],
+        }),
+        getProductById: builder.query({
+            query: ({productId}: {productId: number}) => ({
+                url: `${productUrl}/${productId}`
+            })
         })
     })
 });
@@ -51,5 +57,6 @@ export const {
     useLazyFetchProductsQuery,
     useUpdateProductStatusMutation,
     useGetAllSizesQuery,
-    useGetAllColorsQuery
+    useGetAllColorsQuery,
+    useGetProductByIdQuery
 } = productApiSlice;

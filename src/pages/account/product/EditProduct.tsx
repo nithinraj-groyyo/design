@@ -23,6 +23,7 @@ import {
     RadioGroup,
     Radio,
     Divider,
+    CircularProgress,
 } from "@mui/material";
 import { useEffect, useState, ChangeEvent } from "react";
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -32,13 +33,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useFormik } from "formik";
 import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useSelector } from "react-redux";
 import { useFetchSubCategories } from "../../../hooks/useFetchSubCategories";
 import { ICategory } from "../../../types/categories";
 import { RootState } from "../../../redux/store";
 import { toast } from "react-toastify";
 import { addUpdateProductResponse } from "../../../api/productsApi";
+import { useGetProductByIdQuery } from "../../../rtk-query/productApiSlice";
 
 const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
     display: 'flex',
@@ -83,77 +85,90 @@ interface FormData {
 }
 
 const EditProduct = () => {
-    const location = useLocation();
+    const { productId } = useParams();
+    
     const userId = JSON.stringify(localStorage.getItem("userId") as string);
 
-    const { product } = location?.state;
+    // const { product } = location?.state;
 
     const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
     const { categories, subCategories } = useSelector((state: RootState) => state.categories);
     const { fetchSubCategories } = useFetchSubCategories();
 
+    const {data: productByIdResponse} = useGetProductByIdQuery({productId: +productId!});
+    const productData = productByIdResponse?.data;
+    const isLoading = false;
+    
     useEffect(() => {
-        if (product) {
-            if (product?.OtherCategoryId && !subCategories.length) {
-                fetchSubCategories(product?.OtherCategoryId);
-            }
-
-
-            if (formik.values.productId !== product.id) {
-                formik.setFieldValue('productId', product?.id);
-                formik.setFieldValue('productName', product?.name);
-                formik.setFieldValue('styleName', product?.StyleName);
-                formik.setFieldValue('description', product?.description);
-                formik.setFieldValue('status', product?.status);
-                formik.setFieldValue('leftHeading1', product?.leftHeading1);
-                formik.setFieldValue('leftHeading1Content', product?.leftHeading1Content);
-                formik.setFieldValue('leftHeading2', product?.leftHeading2);
-                formik.setFieldValue('leftHeading2Content', product?.leftHeading2Content);
-            }
-
-            const initialCategory = categories?.find(cat => cat.id === product?.categoryId) || null;
-            const initialOtherCategory = subCategories?.find((cat) => {
-                return cat.id === product?.OtherCategoryId
-            });
-
-            setSelectedCategory(initialCategory);
-
-            formik.setFieldValue('category', initialCategory?.key);
-            formik.setFieldValue('otherCategory', initialOtherCategory?.id);
-
-            const previousSizes = product?.productSizes?.map((size: any) => size?.sizeName)?.join(", ");
-            formik.setFieldValue('sizes', previousSizes);
-
-            const previousColors = product?.ProductColours?.length > 0 ? product?.ProductColours?.map((size: any) => size?.Color)?.join(", ") : "";
-            formik.setFieldValue('colors', previousColors);
-
-            const imageList = product?.ProductImages?.map((image: any, index: number) => {
-                const { fileName, filePath, id, side } = image;
-                return {
-                    id,
-                    fileName,
-                    file: filePath,
-                    side,
-                    isDeleted: false,
-                    isCover: index === 0 ? true : false
-                }
-                // { id: uuidv1(), side: "", file: null, isCover: true, fileName: "", isDeleted: false }
-
-            })
-            setImgList(imageList);
-
-            const pricingList = product?.ProductPricings?.map((pricing: any) => {
-                const { MinQuantity, MaxQuantity, id, Price } = pricing;
-                return {
-                    id,
-                    qtyFrom: MinQuantity?.toString() ?? "",
-                    qtyTo: MaxQuantity?.toString() ?? "",
-                    price: Price?.toString() ?? ""
-                }
-            })
-            setPriceList(pricingList)
+        if(productData){
+            formik.setFieldValue('productId', productData?.id);
+            formik.setFieldValue('productName', productData?.name);
+            formik.setFieldValue('styleName', productData?.styleName);
         }
-    }, [product, categories, subCategories]);
+    }, [productData])
+
+    // useEffect(() => {
+    //     if (product) {
+    //         if (product?.OtherCategoryId && !subCategories.length) {
+    //             fetchSubCategories(product?.OtherCategoryId);
+    //         }
+
+
+    //         if (formik.values.productId !== product.id) {
+    //             formik.setFieldValue('productId', product?.id);
+    //             formik.setFieldValue('productName', product?.name);
+    //             formik.setFieldValue('styleName', product?.StyleName);
+    //             formik.setFieldValue('description', product?.description);
+    //             formik.setFieldValue('status', product?.status);
+    //             formik.setFieldValue('leftHeading1', product?.leftHeading1);
+    //             formik.setFieldValue('leftHeading1Content', product?.leftHeading1Content);
+    //             formik.setFieldValue('leftHeading2', product?.leftHeading2);
+    //             formik.setFieldValue('leftHeading2Content', product?.leftHeading2Content);
+    //         }
+
+    //         const initialCategory = categories?.find(cat => cat.id === product?.categoryId) || null;
+    //         const initialOtherCategory = subCategories?.find((cat) => {
+    //             return cat.id === product?.OtherCategoryId
+    //         });
+
+    //         setSelectedCategory(initialCategory);
+
+    //         formik.setFieldValue('category', initialCategory?.key);
+    //         formik.setFieldValue('otherCategory', initialOtherCategory?.id);
+
+    //         const previousSizes = product?.productSizes?.map((size: any) => size?.sizeName)?.join(", ");
+    //         formik.setFieldValue('sizes', previousSizes);
+
+    //         const previousColors = product?.ProductColours?.length > 0 ? product?.ProductColours?.map((size: any) => size?.Color)?.join(", ") : "";
+    //         formik.setFieldValue('colors', previousColors);
+
+    //         const imageList = product?.ProductImages?.map((image: any, index: number) => {
+    //             const { fileName, filePath, id, side } = image;
+    //             return {
+    //                 id,
+    //                 fileName,
+    //                 file: filePath,
+    //                 side,
+    //                 isDeleted: false,
+    //                 isCover: index === 0 ? true : false
+    //             }
+    //             // { id: uuidv1(), side: "", file: null, isCover: true, fileName: "", isDeleted: false }
+
+    //         })
+    //         setImgList(imageList);
+
+    //         const pricingList = product?.ProductPricings?.map((pricing: any) => {
+    //             const { MinQuantity, MaxQuantity, id, Price } = pricing;
+    //             return {
+    //                 id,
+    //                 qtyFrom: MinQuantity?.toString() ?? "",
+    //                 qtyTo: MaxQuantity?.toString() ?? "",
+    //                 price: Price?.toString() ?? ""
+    //             }
+    //         })
+    //         setPriceList(pricingList)
+    //     }
+    // }, [product, categories, subCategories]);
 
     useEffect(() => {
         if (selectedCategory?.id) {
@@ -369,21 +384,25 @@ const EditProduct = () => {
                                 />
                                 <FormControl fullWidth>
                                     <InputLabel>Category</InputLabel>
+                                    {isLoading ? (
+                                        <CircularProgress size={24} />
+                                    ) : (
                                     <Select
                                         name="category"
                                         label="Category"
-                                        value={selectedCategory?.id || ''}
+                                        value={selectedCategory?.id || ""}
                                         onChange={handleCategoryChange}
                                         onBlur={formik.handleBlur}
                                         error={formik.touched.category && Boolean(formik.errors.category)}
                                     >
                                         <MenuItem value="">--Select--</MenuItem>
                                         {categories.map((cat) => (
-                                            <MenuItem key={cat.id} value={cat.id}>
-                                                {cat.label}
-                                            </MenuItem>
+                                        <MenuItem key={cat.id} value={cat.id}>
+                                            {cat.label}
+                                        </MenuItem>
                                         ))}
                                     </Select>
+                                    )}
                                     {formik.touched.category && formik.errors.category && (
                                         <div className="text-red-600 text-xs">{formik.errors.category}</div>
                                     )}
