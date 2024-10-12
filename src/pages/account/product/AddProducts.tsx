@@ -38,8 +38,9 @@ import { useFormik } from "formik";
 import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { useLazyLoadCategoriesWithPaginationQuery, useLazyLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
+import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
 import { setError } from "../../../redux/shoppingBagSlice";
+import { useGetAllColorsQuery, useGetAllSizesQuery } from "../../../rtk-query/productApiSlice";
 interface ImageData {
   id: string;
   side: string;
@@ -81,16 +82,6 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
   },
 }));
 
-const sizeOptions = ["XS", "S", "M", "XL", "XXL", "XXXL"];
-const colorOptions = ["Red", "Blue", "Green", "Black", "White"];
-
-function sleep(duration: number): Promise<void> {
-  return new Promise<void>((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, duration);
-  });
-}
 
 interface ICategory {
     id: number;
@@ -102,11 +93,11 @@ const AddProducts = () => {
     
   const [sizeOpen, setSizeOpen] = React.useState(false);
   const [colorOpen, setColorOpen] = React.useState(false);
-  const [colorOptionsState, setColorOptionsState] = React.useState<string[]>(
+  const [colorOptionsState, setColorOptionsState] = React.useState<Array<{id: number; name: string}>>(
     []
   );
-  const [sizeOptionsState, setSizeOptionsState] = React.useState<string[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [sizeOptionsState, setSizeOptionsState] = React.useState<Array<{id: number; name: string}>>([]);
+
   const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
     null
   );
@@ -128,68 +119,23 @@ const AddProducts = () => {
   ]);
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
-  const [categoriesList, setCategoriesList] = useState<any>();
-  const [subCategoriesList, setSubCategoriesList] = useState<any>();
-  const [triggerLoadCategoriesWithPagination, { data, isLoading, isError }] = useLazyLoadCategoriesWithPaginationQuery();
-  const [triggerLoadSubCategoriesWithId] = useLazyLoadSubCategoriesWithIdQuery();
 
-  // Load Categories API
-  const loadCategories = async () => {
-    setLoading(true);
-    try {
-        const responseData:any = await triggerLoadCategoriesWithPagination({ pageIndex: 0, pageSize: 10 }).unwrap();
-        console.log(responseData,"fdfef");
-        const formattedCategories = responseData?.map((res: any) => ({
-            id: res.id,
-            name: res.name
-          }));
-  
-      console.log(formattedCategories, "Formatted Categories");
-      setCategoriesList(formattedCategories);
-      console.log(categoriesList,"kkkkkk")
-  
-    } catch (error) {
-      setError("Failed to fetch categories");
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    loadCategories();
-  }, []);
+  const { data: categories, isLoading: isCategoriesLoading, isError }= useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
+  const {data: subCategories, refetch, isLoading:isSubCatLoading} = useLoadSubCategoriesWithIdQuery({
+    categoryId: selectedCategory?.id!,
+    pageIndex: 0,
+    pageSize: 10
+  });
 
-  // Load SubCategories API
-  const loadSubCategories = async () => {
-    if (!selectedCategory?.id) return;
-  
-    setLoading(true);
-    try {
-      const responseData = await triggerLoadSubCategoriesWithId({
-        categoryId: selectedCategory?.id,
-        pageIndex: 0,
-        pageSize: 10
-      }).unwrap();
-      
-      console.log(responseData, "subsubsub");
-  
-      const formattedCategories = responseData?.map((res: any) => ({
-        id: res.id,
-        name: res.name
-      }));
-  
-      console.log(formattedCategories, "Formatted Categories");
-      setSubCategoriesList(formattedCategories);
-    } catch (error) {
-      console.error("Failed to fetch subcategories:", error);
-      setError("Failed to fetch categories");
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+  const {data: sizes, isLoading: isSizesLoading} = useGetAllSizesQuery({});
+  const sizeOptions = sizes?.data;
+
+  const {data: colors, isLoading: isColorsLoading} = useGetAllColorsQuery({});
+  const colorOptions = colors?.data;
+
   useEffect(() => {
     if (selectedCategory) {
-      loadSubCategories();
+      refetch();
     }
   }, [selectedCategory]);
 
@@ -197,11 +143,15 @@ const AddProducts = () => {
 
   const handleCategoryChange = (e: any) => {
     const selectedCategoryId = e.target.value as number;
-    const selectedCat =
-    categoriesList.find((cat:any) => cat.id === selectedCategoryId) || null;
+    const selectedCat = categories && categories?.find((cat:any) => cat.id === selectedCategoryId) || null;
     formik.setFieldValue("category", selectedCat?.id); 
     setSelectedCategory(selectedCat);
 };
+  const handleSubCategoryChange = (e: any) => {
+    const selectedSubCategoryId = e.target.value; 
+    formik.setFieldValue("otherCategory", selectedSubCategoryId);
+  };
+
 
   const handleFileUpload =
     (id: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -314,9 +264,16 @@ const AddProducts = () => {
       productName: Yup.string().required("Product Name is required"),
       styleName: Yup.string().required("Style Name is required"),
       category: Yup.string().required("Category is required"),
+      otherCategory: Yup.string().required("Sub Category is required"),
       description: Yup.string().required("Description is required"),
-      sizes: Yup.string().required("Sizes are required"),
-      colors: Yup.string().required("Colors are required"),
+      sizes: Yup.array()
+        .of(Yup.string().required("Each size must be a string"))
+        .min(1, "At least one size is required")
+        .required("Sizes are required"),
+        colors: Yup.array()
+        .of(Yup.string().required("Each color must be a string"))
+        .min(1, "At least one color is required")
+        .required("Colors are required"),
     }),
     onSubmit: async (values) => {
       if (
@@ -378,17 +335,7 @@ const AddProducts = () => {
 
   const handleSizeOpen = () => {
     setSizeOpen(true);
-    (async () => {
-      setLoading(true);
-      await sleep(1000);
-      setLoading(false);
-
-      setSizeOptionsState(sizeOptions);
-      setSizeOptionsState({
-        ...sizeOptions,
-        [Object.keys(sizeOptions).length + 1]: "Add new Size",
-      });
-    })();
+    setSizeOptionsState(sizeOptions);
   };
 
   const sizeOptionsArray = Object.values(sizeOptionsState);
@@ -400,17 +347,7 @@ const AddProducts = () => {
 
   const handleColorOpen = () => {
     setColorOpen(true);
-    (async () => {
-      setLoading(true);
-      await sleep(1000);
-      setLoading(false);
-
-      setColorOptionsState(colorOptions);
-      setColorOptionsState({
-        ...colorOptions,
-        [Object.keys(colorOptions).length + 1]: "Add new Color",
-      });
-    })();
+    setColorOptionsState(colorOptions);
   };
 
   const colorOptionsArray = Object.values(colorOptionsState);
@@ -466,16 +403,28 @@ const AddProducts = () => {
                     value={formik.values.category || ""} 
                     onChange={handleCategoryChange}
                     onBlur={formik.handleBlur}
+                    disabled={isCategoriesLoading}
                     error={
                       formik.touched.category && Boolean(formik.errors.category)
                     }
                   >
-                    <MenuItem value="">--Select--</MenuItem>
-                    {categoriesList?.map((cat:any) => (
-                      <MenuItem key={cat.id} value={cat.id}>
-                        {cat.name}
+                    {isCategoriesLoading ? (
+                      <MenuItem disabled>
+                        <CircularProgress size={24} />
+                        &nbsp; Loading Categories...
                       </MenuItem>
-                    ))}
+                    ) : (
+                      [
+                        <MenuItem key="default" value="">
+                          --Select--
+                        </MenuItem>,
+                        ...(categories?.map((cat: any) => (
+                          <MenuItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </MenuItem>
+                        )) || [])
+                      ]
+                    )}
                   </Select>
                   {formik.touched.category && formik.errors.category && (
                     <div className="text-red-600 text-xs">
@@ -490,27 +439,40 @@ const AddProducts = () => {
                     name="otherCategory"
                     label="Other Category"
                     value={formik.values.otherCategory}
-                    onChange={formik.handleChange}
+                    onChange={handleSubCategoryChange}
                     onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.otherCategory &&
-                      Boolean(formik.errors.otherCategory)
-                    }
+                    error={formik.touched.otherCategory && Boolean(formik.errors.otherCategory)}
+                    disabled={isSubCatLoading && Boolean(!selectedCategory)}
+                    renderValue={(selected) => {
+                      if (isSubCatLoading) return "Loading...";
+                      const selectedCategory = subCategories?.find(cat => +cat.id === +selected);
+                      return selectedCategory ? selectedCategory.name : "--Select--";
+                    }}
                   >
-                    <MenuItem value="">--Select--</MenuItem>
-                    {subCategoriesList?.map((cat:any) => (
-                      <MenuItem key={cat.id} value={cat.id}>
-                        {cat.name}
+                    {isSubCatLoading ? (
+                      <MenuItem disabled>
+                        <CircularProgress size={24} />
+                        &nbsp; Loading Sub-categories...
                       </MenuItem>
-                    ))}
-                  </Select>
-                  {formik.touched.otherCategory &&
-                    formik.errors.otherCategory && (
-                      <div className="text-red-600 text-xs">
-                        {formik.errors.otherCategory}
-                      </div>
+                    ) : (
+                      [
+                        <MenuItem key="default" value="">
+                          --Select--
+                        </MenuItem>,
+                        ...(subCategories?.map((cat) => (
+                          <MenuItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </MenuItem>
+                        )) || [])
+                      ]
                     )}
+                  </Select>
+                  {formik.touched.otherCategory && formik.errors.otherCategory && (
+                    <div className="text-red-600 text-xs">{formik.errors.otherCategory}</div>
+                  )}
                 </FormControl>
+
+
               </div>
               <TextField
                 label="Description"
@@ -626,110 +588,105 @@ const AddProducts = () => {
               </div>
             </Card>
             <Card className="p-4 flex flex-col gap-4">
-              <div className="font-bold">Attribute</div>
+              <div className="font-bold">Attributes</div>
               <div className="flex ">
                 <div className="flex-[2] flex flex-col gap-8 ">
-                  <Autocomplete
-                    multiple
-                    open={sizeOpen}
-                    onOpen={handleSizeOpen}
-                    onClose={handleSizeClose}
-                    options={sizeOptionsArray}
-                    loading={loading}
-                    onChange={(event, newValue) => {
-                      //   formik.setFieldValue("sizes", newValue);
-                      if (newValue.includes("Add new Size")) {
-                        setIsSizeModalOpen(true);
-                      } else {
-                        formik.setFieldValue("sizes", newValue);
-                      }
-                    }}
-                    isOptionEqualToValue={(option, value) => option === value}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Sizes"
-                        fullWidth
-                        onBlur={formik.handleBlur}
-                        error={
-                          formik.touched.sizes && Boolean(formik.errors.sizes)
-                        }
-                        helperText={formik.touched.sizes && formik.errors.sizes}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <React.Fragment>
-                              {loading ? (
-                                <CircularProgress color="inherit" size={20} />
-                              ) : null}
-                              {params.InputProps.endAdornment}
-                            </React.Fragment>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
+                <Autocomplete
+                  multiple
+                  open={sizeOpen}
+                  onOpen={handleSizeOpen}
+                  onClose={handleSizeClose}
+                  options={sizeOptionsArray}
+                  loading={isSizesLoading}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  onChange={(event, newValue) => {
+                    const selectedSizeIds = newValue.map((size) => size.id);
+                    formik.setFieldValue("sizes", selectedSizeIds);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Sizes"
+                      fullWidth
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.sizes && Boolean(formik.errors.sizes)}
+                      helperText={formik.touched.sizes && formik.errors.sizes}
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {isSizesLoading ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
 
-                  {/* Color Autocomplete */}
-                  <Autocomplete
-                    multiple
-                    open={colorOpen}
-                    onOpen={handleColorOpen}
-                    onClose={handleColorClose}
-                    options={colorOptionsArray}
-                    loading={loading}
-                    onChange={(event, newValue) => {
-                      if (newValue.includes("Add new Color")) {
-                        setIsColorModalOpen(true);
-                      } else {
-                        formik.setFieldValue("colors", newValue);
+                <Autocomplete
+                  multiple
+                  open={colorOpen}
+                  onOpen={handleColorOpen}
+                  onClose={handleColorClose}
+                  options={colorOptionsArray}
+                  loading={isColorsLoading}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  onChange={(event, newValue) => {
+                    const selectedColorIds = newValue.map((size) => size.id);
+                    formik.setFieldValue("colors", selectedColorIds);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Colors"
+                      fullWidth
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched.colors && Boolean(formik.errors.colors)
                       }
-                    }}
-                    isOptionEqualToValue={(option, value) => option === value}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Colors"
-                        fullWidth
-                        onBlur={formik.handleBlur}
-                        error={
-                          formik.touched.colors && Boolean(formik.errors.colors)
-                        }
-                        helperText={
-                          formik.touched.colors && formik.errors.colors
-                        }
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <React.Fragment>
-                              {loading ? (
-                                <CircularProgress color="inherit" size={20} />
-                              ) : null}
-                              {params.InputProps.endAdornment}
-                            </React.Fragment>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
+                      helperText={
+                        formik.touched.colors && formik.errors.colors
+                      }
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <React.Fragment>
+                            {isColorsLoading ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {params.InputProps.endAdornment}
+                          </React.Fragment>
+                        ),
+                      }}
+                    />
+                  )}
+                />
 
                   <div className="flex-[5] px-2">
+                    <div className="font-bold">
+                      Product Pricing : 
+                    </div>
                     <TableContainer>
                       <Table sx={{ border: "none" }}>
                         <TableHead>
                           <TableRow>
                             <TableCell>
-                              <Typography className="!font-bold text-[1rem]">
+                              <Typography className="!font-bold !text-sm">
                                 Min Quantity
                               </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography className="!font-bold text-[1rem]">
+                              <Typography className="!font-bold !text-sm">
                                 Max Quantity
                               </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography className="!font-bold text-[1rem]">
+                              <Typography className="!font-bold !text-sm">
                                 Price
                               </Typography>
                             </TableCell>
@@ -833,7 +790,7 @@ const AddProducts = () => {
                 type="submit"
                 variant="outlined"
                 color="primary"
-                className="!text-black !border-black !rounded-lg w-32"
+                className=" !rounded-lg w-32"
                 disabled={formik.isSubmitting}
               >
                 Submit

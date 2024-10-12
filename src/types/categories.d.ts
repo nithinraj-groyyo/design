@@ -12,3 +12,8 @@ export interface ISubcategory {
 export interface ICategoryWithSubcategories extends ICategory {
     subcategories: ISubcategory[];
 }
+
+export interface IApiCategory {
+    id: number;
+    name: string;
+}
