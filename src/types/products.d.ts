@@ -84,3 +84,24 @@ export interface IWishlistItem {
 export interface IWishlistResponse {
     wishlist: IWishlistItem[];
 }
+
+export interface UpdateProductDTO {
+    name?: string;
+    description?: string;
+    styleName?: string;
+    categoryId?: number;
+    subCategoryId?: number;
+    productColorIds?: number[];
+    productSizeIds?: number[];
+    productPrices?: Array<{
+      minQty: number;
+      maxQty: number | null;
+      pricePerPiece: number;
+    }>;
+    productImages?: Array<{
+      fileId: number;
+      sideName: string;
+      isThumbnail: boolean;
+    }> | undefined;
+  }
+  

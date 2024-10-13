@@ -49,6 +49,29 @@ const productApiSlice = apiSlice.injectEndpoints({
             query: ({productId}: {productId: number}) => ({
                 url: `${productUrl}/${productId}`
             })
+        }),
+        addNewSize: builder.mutation({
+            query: ({size}:{size: string}) => ({
+                url: `${sizeUrl}/add`,
+                body: {name: size},
+                method: "POST", 
+            }),
+            invalidatesTags: ["Sizes"]
+        }),
+        addNewColor: builder.mutation({
+            query: ({color}:{color: string}) => ({
+                url: `${colorUrl}/add`,
+                body: {name: color},
+                method: "POST", 
+            }),
+            invalidatesTags: ["Colors"]
+        }),
+        updateProduct: builder.mutation({
+            query: ({productId, payload}: {productId: number, payload: any}) => ({
+               url: `${productUrl}/${productId}`,
+               method: "PUT",
+               body: payload
+            })
         })
     })
 });
@@ -58,5 +81,8 @@ export const {
     useUpdateProductStatusMutation,
     useGetAllSizesQuery,
     useGetAllColorsQuery,
-    useGetProductByIdQuery
+    useGetProductByIdQuery,
+    useAddNewSizeMutation,
+    useAddNewColorMutation,
+    useUpdateProductMutation
 } = productApiSlice;
