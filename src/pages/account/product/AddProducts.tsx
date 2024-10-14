@@ -161,8 +161,8 @@ const AddProducts = () => {
       }
 
       const fileSizeInKB = file.size / 1024;
-      if (fileSizeInKB > 100) {
-        toast.error("File size must be between 50 KB and 100 KB.");
+      if (fileSizeInKB > 1024) {
+        toast.error("File size must be between 50 KB and 1MB.");
         return;
       }
 

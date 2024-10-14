@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Menu, MenuItem, Button, Grid } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { motion } from "framer-motion";
@@ -15,6 +15,7 @@ const NavigationBar = () => {
   const [categories, setCategories] = useState<Record<string, ICategoryWithSubcategories> | undefined>(undefined);
   const open = Boolean(anchorEl);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [loadAllCategoriesWithSubCategories, { isLoading, isFetching }] = useLazyLoadAllCategoriesWithSubCategoriesQuery();
 
@@ -27,6 +28,14 @@ const NavigationBar = () => {
 
   const handleMainMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+  };
+
+  const handleProductByCategory = () => {
+    handleMainMenuClose();
+  };
+
+  const handleProductBySubCategory = () => {
+    handleMainMenuClose();
   };
 
   const handleMainMenuClose = () => {
@@ -139,56 +148,62 @@ const NavigationBar = () => {
           >
             {isLoading || isFetching ? (
               <CategoriesLoader />
-            ) : (
-              categories ? (
-                <Grid container spacing={2}>
+            ) : categories ? (
+              <Grid container spacing={2}>
+                <Grid item>
+                  <div>
+                    {Object.keys(categories).map((category) => (
+                      <MenuItem
+                        key={category}
+                        onMouseEnter={() => handleCategoryHover(category)}
+                        onClick={() =>
+                          navigate(`/designs/${categories[category].id}`, {
+                            state: { categoryId: categories[category].id },
+                          })
+                        }
+                        sx={{
+                          display: "flex",
+                          gap: 3,
+                          justifyContent: "space-between",
+                          backgroundColor: hoveredCategory === category ? "rgba(0, 0, 0, 0.1)" : "transparent",
+                        }}
+                      >
+                        <span className="opacity-70 arrow-icon">{category}</span>
+                        <span className={`${hoveredCategory === category ? "opacity-100" : "opacity-0"}`}>
+                          <KeyboardArrowRightIcon />
+                        </span>
+                      </MenuItem>
+                    ))}
+                  </div>
+                </Grid>
+                {hoveredCategory && (
                   <Grid item>
                     <div>
-                      {Object.keys(categories).map((category) => (
+                      {categories[hoveredCategory]?.subcategories.map((subcat) => (
                         <MenuItem
-                          key={category}
-                          onMouseEnter={() => handleCategoryHover(category)}
+                          key={subcat.id}
+                          onClick={() =>
+                            navigate(`/designs/${categories[hoveredCategory].id}`, {
+                              state: {
+                                categoryId: categories[hoveredCategory].id,
+                                subCategoryId: subcat.id,
+                              },
+                            })
+                          }
+                          onMouseEnter={() => handleSubCategoryHover(subcat.name)}
                           sx={{
-                            display: "flex",
-                            gap: 3,
-                            justifyContent: "space-between",
-                            backgroundColor: hoveredCategory === category ? "rgba(0, 0, 0, 0.1)" : "transparent",
+                            backgroundColor: hoveredSubCategory === subcat.name ? "rgba(0, 0, 0, 0.05)" : "transparent",
                           }}
                         >
-                          <span className="opacity-70 arrow-icon">{category}</span>
-                          <span className={`${hoveredCategory === category ? "opacity-100" : "opacity-0"}`}>
-                            <KeyboardArrowRightIcon />
-                          </span>
+                          <span className="opacity-70 sub-cat">{subcat.name}</span>
                         </MenuItem>
                       ))}
                     </div>
                   </Grid>
-                  {hoveredCategory && (
-                    <Grid item>
-                      <div>
-                        {categories[hoveredCategory]?.subcategories.map((subcat) => (
-                          <MenuItem
-                            key={subcat.id}
-                            component={Link}
-                            to={`/categories/${categories[hoveredCategory].id}/${subcat.id}`}
-                            onClick={handleMainMenuClose}
-                            onMouseEnter={() => handleSubCategoryHover(subcat.name)}
-                            sx={{
-                              backgroundColor: hoveredSubCategory === subcat.name ? "rgba(0, 0, 0, 0.05)" : "transparent",
-                            }}
-                          >
-                            <span className="opacity-70 sub-cat">{subcat.name}</span>
-                          </MenuItem>
-                        ))}
-                      </div>
-                    </Grid>
-                  )}
-                </Grid>
-              ) : (
-                <div>
-                  No Data available
-                </div>
-              )
+                )}
+              </Grid>
+            ) : (
+              <div>No Data available</div>
             )}
           </Menu>
         </li>

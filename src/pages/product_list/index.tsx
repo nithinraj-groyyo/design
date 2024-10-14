@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import BasicLayout from '../../layouts/BasicLayout';
-import ProductFilter from './ProductFilter';
-import ProductGrid from './ProductGrid';
-import { ProductViewEnum } from '../../utilities/enum';
-import { IProductView } from '../../types/products';
-import ProductLargeView from './ProductLargeView';
-import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
-import useFetchProducts from '../../hooks/useFetchProducts';
+import React, { useEffect, useState } from "react";
+import BasicLayout from "../../layouts/BasicLayout";
+import ProductFilter from "./ProductFilter";
+import ProductGrid from "./ProductGrid";
+import { ProductViewEnum } from "../../utilities/enum";
+import { IProductView } from "../../types/products";
+import ProductLargeView from "./ProductLargeView";
+import { useLocation, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import useFetchProducts from "../../hooks/useFetchProducts";
+import { useLazyFetchProductsQuery } from "../../rtk-query/productApiSlice";
 
 const ProductList: React.FC = () => {
   const { categoryKey } = useParams<{ categoryKey: string }>();
@@ -16,8 +17,31 @@ const ProductList: React.FC = () => {
   const [opacity, setOpacity] = useState(1);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const { productData } = useSelector((state: RootState) => state.products);
+  const location = useLocation();
+  const { categoryId, subCategoryId } = location?.state;
 
-  useFetchProducts({categoryKey});
+  const [fetchProducts, { data, isLoading }] = useLazyFetchProductsQuery();
+
+  useEffect(() => {
+    if (subCategoryId) {
+      fetchProducts({
+        page: 1,
+        limit: 20,
+        isProductActive: true,
+        categoryId,
+        subCategoryId,
+      });
+    } else if (categoryId) {
+      fetchProducts({
+        page: 1,
+        limit: 20,
+        isProductActive: true,
+        categoryId,
+      });
+    }
+  }, [categoryId, subCategoryId]);
+
+  console.log(data, "datat");
 
   const handleFilterChange = (size: IProductView) => {
     setCurrentView(size);
@@ -50,28 +74,21 @@ const ProductList: React.FC = () => {
       setLastScrollTop(scrollTop <= 0 ? 0 : scrollTop);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [lastScrollTop, opacity]);
 
   return (
     <BasicLayout>
-      <div className='mt-[10rem] fixed w-full' style={{ opacity }}>
+      <div className="mt-[10rem] fixed w-full" style={{ opacity }}>
         <ProductFilter currentView={currentView} onFilterChange={handleFilterChange} />
       </div>
 
-      <div className='mt-[12rem]'>
-        {currentView === ProductViewEnum.LARGE ? (
-          <ProductLargeView />
-        ) : (
-          <ProductGrid
-            products={productData?.products}
-            currentView={currentView}
-          />
-        )}
+      <div className="mt-[12rem]">
+        {currentView === ProductViewEnum.LARGE ? <ProductLargeView /> : <ProductGrid products={productData?.products} currentView={currentView} />}
       </div>
     </BasicLayout>
   );
