@@ -57,10 +57,10 @@ export interface IProductResponse {
     price: string;
     isDelete: boolean;
     status: boolean;
-    leftHeading1: string;
-    leftHeading1Content: string;
-    leftHeading2: string;
-    leftHeading2Content: string;
+    leftTopHeader: string;
+    leftTopContent: string;
+    leftBottomHeader: string;
+    leftBottomContent: string;
     createdDate: string;
     createdBy: string;
     modifiedDate: string;
@@ -84,3 +84,24 @@ export interface IWishlistItem {
 export interface IWishlistResponse {
     wishlist: IWishlistItem[];
 }
+
+export interface UpdateProductDTO {
+    name?: string;
+    description?: string;
+    styleName?: string;
+    categoryId?: number;
+    subCategoryId?: number;
+    productColorIds?: number[];
+    productSizeIds?: number[];
+    productPrices?: Array<{
+      minQty: number;
+      maxQty: number | null;
+      pricePerPiece: number;
+    }>;
+    productImages?: Array<{
+      fileId: number;
+      sideName: string;
+      isThumbnail: boolean;
+    }> | undefined;
+  }
+  

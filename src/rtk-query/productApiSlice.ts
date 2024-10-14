@@ -31,6 +31,7 @@ const productApiSlice = apiSlice.injectEndpoints({
                 method: 'PATCH',
                 body: { isProductActive },
             }),
+            invalidatesTags: ["Products"]
         }),
         getAllSizes: builder.query({
             query: () => ({
@@ -42,7 +43,35 @@ const productApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: `${colorUrl}/list`,
             }),
-            providesTags: ["Sizes"],
+            providesTags: ["Colors"],
+        }),
+        getProductById: builder.query({
+            query: ({productId}: {productId: number}) => ({
+                url: `${productUrl}/${productId}`
+            })
+        }),
+        addNewSize: builder.mutation({
+            query: ({size}:{size: string}) => ({
+                url: `${sizeUrl}/add`,
+                body: {name: size},
+                method: "POST", 
+            }),
+            invalidatesTags: ["Sizes"]
+        }),
+        addNewColor: builder.mutation({
+            query: ({color}:{color: string}) => ({
+                url: `${colorUrl}/add`,
+                body: {name: color},
+                method: "POST", 
+            }),
+            invalidatesTags: ["Colors"]
+        }),
+        updateProduct: builder.mutation({
+            query: ({productId, payload}: {productId: number, payload: any}) => ({
+               url: `${productUrl}/${productId}`,
+               method: "PUT",
+               body: payload
+            })
         })
     })
 });
@@ -51,5 +80,9 @@ export const {
     useLazyFetchProductsQuery,
     useUpdateProductStatusMutation,
     useGetAllSizesQuery,
-    useGetAllColorsQuery
+    useGetAllColorsQuery,
+    useGetProductByIdQuery,
+    useAddNewSizeMutation,
+    useAddNewColorMutation,
+    useUpdateProductMutation
 } = productApiSlice;

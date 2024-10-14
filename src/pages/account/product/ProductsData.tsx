@@ -77,10 +77,10 @@ const ProductTable: React.FC = () => {
     }
   };
 
-  const goToEditPage = (product: any) => {
-    navigate('/account/edit-product', {
-      state: { product },
-    });
+  const goToEditPage = (productId: number) => {
+
+    navigate(`/account/edit-product/${productId}`)
+    
   };
 
   const handleStatusFilter = (e: any) => {
@@ -147,7 +147,7 @@ const ProductTable: React.FC = () => {
                       </TableCell>
                       <TableCell sx={{ display: "flex", alignItems: "center", justifyContent: "center" }} className='!h-32'>
                         <IconButton
-                          onClick={() => goToEditPage(item)}
+                          onClick={() => goToEditPage(item?.id)}
                           color="primary"
                           title="Edit product"
                           className='!text-black'

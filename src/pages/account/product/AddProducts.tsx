@@ -41,13 +41,16 @@ import { toast } from "react-toastify";
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
 import { setError } from "../../../redux/shoppingBagSlice";
 import { useGetAllColorsQuery, useGetAllSizesQuery } from "../../../rtk-query/productApiSlice";
+import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
+
 interface ImageData {
   id: string;
   side: string;
   file: File | null;
-  isCover: boolean;
+  isThumbnail: boolean;
   fileName: string;
   isDeleted: boolean;
+  imageUrl: string
 }
 
 interface PriceListData {
@@ -67,10 +70,10 @@ interface FormData {
   colors: string;
   sizes: string;
   status: boolean;
-  leftHeading1: string;
-  leftHeading1Content: string;
-  leftHeading2: string;
-  leftHeading2Content: string;
+  leftTopHeader: string;
+  leftTopContent: string;
+  leftBottomHeader: string;
+  leftBottomContent: string;
 }
 
 const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
@@ -84,19 +87,19 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
 
 
 interface ICategory {
-    id: number;
-    name: string;
-  }
-  
+  id: number;
+  name: string;
+}
+
 
 const AddProducts = () => {
-    
+
   const [sizeOpen, setSizeOpen] = React.useState(false);
   const [colorOpen, setColorOpen] = React.useState(false);
-  const [colorOptionsState, setColorOptionsState] = React.useState<Array<{id: number; name: string}>>(
+  const [colorOptionsState, setColorOptionsState] = React.useState<Array<{ id: number; name: string }>>(
     []
   );
-  const [sizeOptionsState, setSizeOptionsState] = React.useState<Array<{id: number; name: string}>>([]);
+  const [sizeOptionsState, setSizeOptionsState] = React.useState<Array<{ id: number; name: string }>>([]);
 
   const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
     null
@@ -105,32 +108,28 @@ const AddProducts = () => {
   const [newColor, setNewColor] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("enabled");
   const [imgList, setImgList] = useState<ImageData[]>([
-    {
-      id: uuidv1(),
-      side: "",
-      file: null,
-      isCover: true,
-      fileName: "",
-      isDeleted: false,
-    },
+    { id: uuidv1(), side: "", file: null, isThumbnail: true, fileName: "", isDeleted: false, imageUrl: "" },
   ]);
+
   const [priceList, setPriceList] = useState<PriceListData[]>([
     { id: 1, qtyFrom: "", qtyTo: "", price: "" },
   ]);
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
 
-  const { data: categories, isLoading: isCategoriesLoading, isError }= useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
-  const {data: subCategories, refetch, isLoading:isSubCatLoading} = useLoadSubCategoriesWithIdQuery({
+  const [uploadSingleFile, { isLoading: isFileLoading }] = useUploadSingleFileMutation()
+
+  const { data: categories, isLoading: isCategoriesLoading, isError } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
+  const { data: subCategories, refetch, isLoading: isSubCatLoading } = useLoadSubCategoriesWithIdQuery({
     categoryId: selectedCategory?.id!,
     pageIndex: 0,
     pageSize: 10
   });
 
-  const {data: sizes, isLoading: isSizesLoading} = useGetAllSizesQuery({});
+  const { data: sizes, isLoading: isSizesLoading } = useGetAllSizesQuery({});
   const sizeOptions = sizes?.data;
 
-  const {data: colors, isLoading: isColorsLoading} = useGetAllColorsQuery({});
+  const { data: colors, isLoading: isColorsLoading } = useGetAllColorsQuery({});
   const colorOptions = colors?.data;
 
   useEffect(() => {
@@ -143,62 +142,102 @@ const AddProducts = () => {
 
   const handleCategoryChange = (e: any) => {
     const selectedCategoryId = e.target.value as number;
-    const selectedCat = categories && categories?.find((cat:any) => cat.id === selectedCategoryId) || null;
-    formik.setFieldValue("category", selectedCat?.id); 
+    const selectedCat = categories && categories?.find((cat: any) => cat.id === selectedCategoryId) || null;
+    formik.setFieldValue("category", selectedCat?.id);
     setSelectedCategory(selectedCat);
-};
+  };
+
   const handleSubCategoryChange = (e: any) => {
-    const selectedSubCategoryId = e.target.value; 
+    const selectedSubCategoryId = e.target.value;
     formik.setFieldValue("otherCategory", selectedSubCategoryId);
   };
 
 
-  const handleFileUpload =
-    (id: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = event?.target?.files;
-      if (files && files?.length > 0) {
-        const file: any = files[0];
+  const handleFileUpload = (id: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event?.target?.files;
+    if (files && files?.length > 0) {
+      const file: any = files[0];
 
-        const fileExtension = file?.name?.split(".").pop().toLowerCase();
-        const acceptedFormats = ["png", "jpeg", "jpg", "webp"];
-        if (!acceptedFormats.includes(fileExtension)) {
-          toast.error("Invalid file format!");
+      const fileExtension = file?.name?.split('.').pop().toLowerCase();
+      const acceptedFormats = ["png", "jpeg", "jpg", "webp"];
+      if (!acceptedFormats.includes(fileExtension)) {
+        toast.error("Invalid file format! Please upload .jpeg, .jpg, .png, or .webp files.");
+        return;
+      }
+
+      const fileSizeInKB = file.size / 1024;
+      if (fileSizeInKB > 100) {
+        toast.error("File size must be between 50 KB and 100 KB.");
+        return;
+      }
+
+      const image = new Image();
+      image.src = URL.createObjectURL(file);
+
+      image.onload = async () => {
+        const width = image.width;
+        const height = image.height;
+
+
+        const aspectRatio = width / height;
+        if (Math.abs(aspectRatio - 1) > 0.01) {
+          toast.error("Image must have a square aspect ratio (1:1).");
           return;
         }
 
-        setImgList((prev) =>
-          prev.map((img) =>
-            img?.id === id
-              ? {
+        try {
+          const reader = new FileReader();
+
+          reader.onloadend = () => {
+            const previewUrl = reader.result as string;
+
+            setImgList((prev) =>
+              prev.map((img) =>
+                img.id === id ? { ...img, file: file, imageUrl: previewUrl, fileName: file.name } : img
+              )
+            );
+          };
+
+          reader.readAsDataURL(file);
+
+
+          const response = await uploadSingleFile(file).unwrap();
+          const responseData = response?.data;
+          const fileId = responseData?.id;
+
+          setImgList(prev =>
+            prev.map(img =>
+              img.id === id
+                ? {
                   ...img,
-                  file,
-                  fileName: `${img?.side}-${uuidv1()}.${fileExtension}`,
+                  file: file,
+                  fileName: responseData.fileName,
+                  isDeleted: false,
+                  id: fileId,
                 }
-              : img
-          )
-        );
-      }
-    };
-  const handleCheckboxIsCover = (selectedId: string) => {
+                : img
+            )
+          );
+        } catch (error) {
+          toast.error("Error uploading file");
+        }
+      };
+    }
+  };
+
+  const handleCheckboxIsThumbnail = (selectedId: string) => {
     setImgList((prevItems) =>
       prevItems.map((item) => ({
         ...item,
-        isCover: item.id === selectedId,
+        isThumbnail: item.id === selectedId,
       }))
     );
   };
 
   const handleAddImage = () => {
-    setImgList((prev) => [
+    setImgList(prev => [
       ...prev,
-      {
-        id: uuidv1(),
-        side: "",
-        file: null,
-        isCover: false,
-        fileName: "",
-        isDeleted: false,
-      },
+      { id: uuidv1(), side: "", file: null, isThumbnail: false, fileName: "", isDeleted: false, imageUrl: "" }
     ]);
   };
 
@@ -255,10 +294,10 @@ const AddProducts = () => {
       colors: "",
       sizes: "",
       status: true,
-      leftHeading1: "",
-      leftHeading1Content: "",
-      leftHeading2: "",
-      leftHeading2Content: "",
+      leftTopHeader: "",
+      leftTopContent: "",
+      leftBottomHeader: "",
+      leftBottomContent: "",
     },
     validationSchema: Yup.object({
       productName: Yup.string().required("Product Name is required"),
@@ -270,7 +309,7 @@ const AddProducts = () => {
         .of(Yup.string().required("Each size must be a string"))
         .min(1, "At least one size is required")
         .required("Sizes are required"),
-        colors: Yup.array()
+      colors: Yup.array()
         .of(Yup.string().required("Each color must be a string"))
         .min(1, "At least one color is required")
         .required("Colors are required"),
@@ -297,10 +336,10 @@ const AddProducts = () => {
             colors: values?.colors,
             sizes: values?.sizes,
             status: values?.status,
-            leftHeading1: values?.leftHeading1,
-            leftHeading1Content: values?.leftHeading1Content,
-            leftHeading2: values?.leftHeading2,
-            leftHeading2Content: values?.leftHeading2Content,
+            leftTopHeader: values?.leftTopHeader,
+            leftTopContent: values?.leftTopContent,
+            leftBottomHeader: values?.leftBottomHeader,
+            leftBottomContent: values?.leftBottomContent,
           };
 
           const convertPriceList = priceList?.map((price) => {
@@ -400,7 +439,7 @@ const AddProducts = () => {
                   <Select
                     name="category"
                     label="Category"
-                    value={formik.values.category || ""} 
+                    value={formik.values.category || ""}
                     onChange={handleCategoryChange}
                     onBlur={formik.handleBlur}
                     disabled={isCategoriesLoading}
@@ -494,38 +533,29 @@ const AddProducts = () => {
             </Card>
             <Card className="p-4 flex flex-col gap-4">
               <div className="font-bold">Upload Images</div>
-              {imgList.map((img) => (
-                <div
-                  key={img?.id}
-                  className="flex flex-wrap gap-4 items-center"
-                >
+              {imgList.map(img => (
+                <div key={img.id} className="flex flex-wrap gap-8 items-center">
                   <div className="flex flex-1 gap-4">
                     <TextField
-                      id={`sideName-${img?.id}`}
-                      name={`sideName-${img?.id}`}
+                      id={`sideName-${img.id}`}
+                      name={`sideName-${img.id}`}
                       label="Side Name"
-                      value={img?.side}
+                      value={img.side}
                       onChange={(e) =>
-                        setImgList((prev) =>
-                          prev.map((i) =>
-                            i.id === img?.id
-                              ? { ...i, side: e.target.value }
-                              : i
+                        setImgList(prev =>
+                          prev?.map(i =>
+                            i.id === img.id ? { ...i, side: e.target.value } : i
                           )
                         )
                       }
                       fullWidth
-                      sx={{ flex: "1 1 300px" }}
+                      sx={{ flex: '1 1 300px' }}
                     />
+
                     <TextField
                       fullWidth
-                      label="Upload File (Preffered size: 512 × 768 px)"
-                      InputLabelProps={{
-                        sx: {
-                          fontSize: "0.8rem",
-                        },
-                      }}
-                      value={img?.fileName || ""}
+                      label="Upload File (Preferred size: 1:1 aspect-ratio, Ex: 300*300)"
+                      value={img.fileName || ""}
                       className="cursor-pointer"
                       InputProps={{
                         readOnly: true,
@@ -533,12 +563,12 @@ const AddProducts = () => {
                           <InputAdornment position="end">
                             <input
                               accept=".png,.jpeg,.jpg,.webp"
-                              style={{ display: "none" }}
-                              id={`upload-file-${img?.id}`}
+                              style={{ display: 'none' }}
+                              id={`upload-file-${img.id}`}
                               type="file"
-                              onChange={handleFileUpload(img?.id)}
+                              onChange={handleFileUpload(img.id)}
                             />
-                            <label htmlFor={`upload-file-${img?.id}`}>
+                            <label htmlFor={`upload-file-${img.id}`}>
                               <IconButton color="primary" component="span">
                                 <UploadIcon />
                               </IconButton>
@@ -546,35 +576,34 @@ const AddProducts = () => {
                           </InputAdornment>
                         ),
                         sx: {
-                          pointerEvents: "none",
+                          pointerEvents: 'none',
                         },
                       }}
-                      sx={{ flex: "1 1 300px" }}
-                      onClick={() =>
-                        document
-                          .getElementById(`upload-file-${img?.id}`)
-                          ?.click()
-                      }
+                      sx={{ flex: '6 1 300px' }}
+                      onClick={() => document.getElementById(`upload-file-${img.id}`)?.click()}
                     />
                   </div>
+
+                  {img.imageUrl && (
+                    <img src={img?.imageUrl} alt={img?.fileName} style={{ width: '100px', height: 'auto' }} />
+                  )}
+
                   <FormGroup>
                     <StyledFormControlLabel
                       control={
                         <Checkbox
-                          checked={img?.isCover}
-                          onChange={() => handleCheckboxIsCover(img?.id)}
+                          checked={img.isThumbnail}
+                          onChange={() => handleCheckboxIsThumbnail(img.id)}
                           color="primary"
                         />
                       }
-                      label=""
+                      label="Is Cover"
                     />
                   </FormGroup>
-                  {imgList?.length > 1 && (
+
+                  {imgList.length > 1 && (
                     <div className="flex gap-2">
-                      <IconButton
-                        color="error"
-                        onClick={handleRemoveImage(img?.id)}
-                      >
+                      <IconButton color="error" onClick={handleRemoveImage(img.id)}>
                         <DeleteIcon />
                       </IconButton>
                     </div>
@@ -591,85 +620,130 @@ const AddProducts = () => {
               <div className="font-bold">Attributes</div>
               <div className="flex ">
                 <div className="flex-[2] flex flex-col gap-8 ">
-                <Autocomplete
-                  multiple
-                  open={sizeOpen}
-                  onOpen={handleSizeOpen}
-                  onClose={handleSizeClose}
-                  options={sizeOptionsArray}
-                  loading={isSizesLoading}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  onChange={(event, newValue) => {
-                    const selectedSizeIds = newValue.map((size) => size.id);
-                    formik.setFieldValue("sizes", selectedSizeIds);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Sizes"
-                      fullWidth
-                      onBlur={formik.handleBlur}
-                      error={formik.touched.sizes && Boolean(formik.errors.sizes)}
-                      helperText={formik.touched.sizes && formik.errors.sizes}
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <React.Fragment>
-                            {isSizesLoading ? (
-                              <CircularProgress color="inherit" size={20} />
-                            ) : null}
-                            {params.InputProps.endAdornment}
-                          </React.Fragment>
-                        ),
-                      }}
-                    />
-                  )}
-                />
+                  <Autocomplete
+                    multiple
+                    open={sizeOpen}
+                    onOpen={handleSizeOpen}
+                    onClose={handleSizeClose}
+                    options={sizeOptionsArray}
+                    loading={isSizesLoading}
+                    getOptionLabel={(option) => option.name}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    onChange={(event, newValue) => {
+                      const selectedSizeIds = newValue.map((size) => size.id);
+                      formik.setFieldValue("sizes", selectedSizeIds);
+                    }}
+                    renderOption={(props, option) => {
+                      const index = sizeOptionsArray.findIndex((opt) => opt.id === option.id);
 
-                <Autocomplete
-                  multiple
-                  open={colorOpen}
-                  onOpen={handleColorOpen}
-                  onClose={handleColorClose}
-                  options={colorOptionsArray}
-                  loading={isColorsLoading}
-                  getOptionLabel={(option) => option.name}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  onChange={(event, newValue) => {
-                    const selectedColorIds = newValue.map((size) => size.id);
-                    formik.setFieldValue("colors", selectedColorIds);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Colors"
-                      fullWidth
-                      onBlur={formik.handleBlur}
-                      error={
-                        formik.touched.colors && Boolean(formik.errors.colors)
-                      }
-                      helperText={
-                        formik.touched.colors && formik.errors.colors
-                      }
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <React.Fragment>
-                            {isColorsLoading ? (
-                              <CircularProgress color="inherit" size={20} />
-                            ) : null}
-                            {params.InputProps.endAdornment}
-                          </React.Fragment>
-                        ),
-                      }}
-                    />
-                  )}
-                />
+                      return (
+                        <React.Fragment key={option.id || index}>
+                          <li {...props} key={`option-${option.id || index}`}>
+                            {option.name}
+                          </li>
+                          {index === sizeOptionsArray?.length - 1 && (
+                            <div key="add-new-size-button" className="w-full flex justify-center items-center">
+                              <Button
+                                onClick={() => {
+                                  setIsSizeModalOpen(true);
+                                }}
+                              >
+                                Add New Size
+                              </Button>
+                            </div>
+                          )}
+                        </React.Fragment>
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Sizes"
+                        fullWidth
+                        onBlur={formik.handleBlur}
+                        error={formik.touched.sizes && Boolean(formik.errors.sizes)}
+                        helperText={formik.touched.sizes && formik.errors.sizes}
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                            <React.Fragment>
+                              {isSizesLoading ? <CircularProgress color="inherit" size={20} /> : null}
+                              {params.InputProps.endAdornment}
+                            </React.Fragment>
+                          ),
+                        }}
+                      />
+                    )}
+                  />
+
+                  <Autocomplete
+                    multiple
+                    open={colorOpen}
+                    onOpen={handleColorOpen}
+                    onClose={handleColorClose}
+                    options={colorOptionsArray}
+                    loading={isColorsLoading}
+                    value={colorOptions?.filter((color: any) => formik.values.colors.includes(color?.id as never)) || []}
+                    getOptionLabel={(option) => option.name}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    onChange={(event, newValue) => {
+                      const selectedColorIds = newValue.map((size) => size.id);
+                      formik.setFieldValue("colors", selectedColorIds);
+                    }}
+                    renderOption={(props, option) => {
+                      const index = colorOptionsArray.findIndex((opt) => opt.id === option.id);
+
+                      return (
+                        <React.Fragment key={option.id || index}>
+                          <div>
+                            <li {...props} key={`option-${option.id || index}`}>
+                              {option.name || option}
+                            </li>
+                          </div>
+                          {index === colorOptionsArray?.length - 1 && (
+                            <div key="add-new-color-button" className="w-full flex justify-center items-center">
+                              <Button
+                                onClick={() => {
+                                  setIsColorModalOpen(true);
+                                }}
+                              >
+                                Add New Color
+                              </Button>
+                            </div>
+                          )}
+                        </React.Fragment>
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Colors"
+                        fullWidth
+                        onBlur={formik.handleBlur}
+                        error={
+                          formik.touched.colors && Boolean(formik.errors.colors)
+                        }
+                        helperText={
+                          formik.touched.colors && formik.errors.colors
+                        }
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                            <React.Fragment>
+                              {isColorsLoading ? (
+                                <CircularProgress color="inherit" size={20} />
+                              ) : null}
+                              {params.InputProps.endAdornment}
+                            </React.Fragment>
+                          ),
+                        }}
+                      />
+                    )}
+                  />
 
                   <div className="flex-[5] px-2">
                     <div className="font-bold">
-                      Product Pricing : 
+                      Product Pricing :
                     </div>
                     <TableContainer>
                       <Table sx={{ border: "none" }}>
@@ -827,15 +901,15 @@ const AddProducts = () => {
               <div className="font-bold">Left Top Section</div>
               <TextField
                 label="Heading"
-                name="leftHeading1"
-                value={formik.values.leftHeading1}
+                name="leftTopHeader"
+                value={formik.values.leftTopHeader}
                 onChange={formik.handleChange}
                 fullWidth
               />
               <TextField
                 label="Content"
-                name="leftHeading1Content"
-                value={formik.values.leftHeading1Content}
+                name="leftTopContent"
+                value={formik.values.leftTopContent}
                 onChange={formik.handleChange}
                 fullWidth
                 multiline
@@ -845,15 +919,15 @@ const AddProducts = () => {
               <div className="font-bold">Left Bottom Section</div>
               <TextField
                 label="Heading"
-                name="leftHeading2"
-                value={formik.values.leftHeading2}
+                name="leftBottomHeader"
+                value={formik.values.leftBottomHeader}
                 onChange={formik.handleChange}
                 fullWidth
               />
               <TextField
                 label="Content"
-                name="leftHeading2Content"
-                value={formik.values.leftHeading2Content}
+                name="leftBottomContent"
+                value={formik.values.leftBottomContent}
                 onChange={formik.handleChange}
                 fullWidth
                 multiline
