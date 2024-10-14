@@ -60,6 +60,7 @@ import {
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
 import { UpdateProductDTO } from "../../../types/products";
+import MagnifyProductImage from "./MagnifyProductImage";
 
 const CustomPaper = styled("div")(({ theme }) => ({
   position: "relative",
@@ -269,7 +270,7 @@ const EditProduct = () => {
           isThumbnail: price?.isThumbnail,
           fileName: price?.fileName,
           isDeleted: false,
-          imageUrl: price?.imageUrl,
+          imageUrl: price?.signedUrl,
         };
       });
       setImgList(initialImageList);
@@ -683,7 +684,7 @@ const EditProduct = () => {
                       value={img.side}
                       onChange={(e) => setImgList((prev) => prev?.map((i) => (i.id === img.id ? { ...i, side: e.target.value } : i)))}
                       fullWidth
-                      sx={{ flex: "1 1 300px" }}
+                      sx={{ maxWidth: "12rem", flex: "1 1 300px" }}
                     />
 
                     <TextField
@@ -718,11 +719,7 @@ const EditProduct = () => {
                     />
                   </div>
 
-                  {isFileLoading ? (
-                    <CircularProgress />
-                  ) : (
-                    img?.imageUrl && <img src={img?.imageUrl} alt={img?.fileName} style={{ width: "100px", height: "auto" }} />
-                  )}
+                  {isFileLoading ? <CircularProgress /> : img?.imageUrl && <MagnifyProductImage img={img} />}
 
                   <FormGroup>
                     <StyledFormControlLabel

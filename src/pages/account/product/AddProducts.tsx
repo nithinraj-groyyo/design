@@ -42,6 +42,7 @@ import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery }
 import { setError } from "../../../redux/shoppingBagSlice";
 import { useGetAllColorsQuery, useGetAllSizesQuery } from "../../../rtk-query/productApiSlice";
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
+import MagnifyProductImage from "./MagnifyProductImage";
 
 interface ImageData {
   id: string;
@@ -50,7 +51,7 @@ interface ImageData {
   isThumbnail: boolean;
   fileName: string;
   isDeleted: boolean;
-  imageUrl: string
+  imageUrl: string;
 }
 
 interface PriceListData {
@@ -85,25 +86,18 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
   },
 }));
 
-
 interface ICategory {
   id: number;
   name: string;
 }
 
-
 const AddProducts = () => {
-
   const [sizeOpen, setSizeOpen] = React.useState(false);
   const [colorOpen, setColorOpen] = React.useState(false);
-  const [colorOptionsState, setColorOptionsState] = React.useState<Array<{ id: number; name: string }>>(
-    []
-  );
+  const [colorOptionsState, setColorOptionsState] = React.useState<Array<{ id: number; name: string }>>([]);
   const [sizeOptionsState, setSizeOptionsState] = React.useState<Array<{ id: number; name: string }>>([]);
 
-  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
-    null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
   const [newSize, setNewSize] = useState("");
   const [newColor, setNewColor] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("enabled");
@@ -111,19 +105,21 @@ const AddProducts = () => {
     { id: uuidv1(), side: "", file: null, isThumbnail: true, fileName: "", isDeleted: false, imageUrl: "" },
   ]);
 
-  const [priceList, setPriceList] = useState<PriceListData[]>([
-    { id: 1, qtyFrom: "", qtyTo: "", price: "" },
-  ]);
+  const [priceList, setPriceList] = useState<PriceListData[]>([{ id: 1, qtyFrom: "", qtyTo: "", price: "" }]);
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
 
-  const [uploadSingleFile, { isLoading: isFileLoading }] = useUploadSingleFileMutation()
+  const [uploadSingleFile, { isLoading: isFileLoading }] = useUploadSingleFileMutation();
 
   const { data: categories, isLoading: isCategoriesLoading, isError } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
-  const { data: subCategories, refetch, isLoading: isSubCatLoading } = useLoadSubCategoriesWithIdQuery({
+  const {
+    data: subCategories,
+    refetch,
+    isLoading: isSubCatLoading,
+  } = useLoadSubCategoriesWithIdQuery({
     categoryId: selectedCategory?.id!,
     pageIndex: 0,
-    pageSize: 10
+    pageSize: 10,
   });
 
   const { data: sizes, isLoading: isSizesLoading } = useGetAllSizesQuery({});
@@ -142,7 +138,7 @@ const AddProducts = () => {
 
   const handleCategoryChange = (e: any) => {
     const selectedCategoryId = e.target.value as number;
-    const selectedCat = categories && categories?.find((cat: any) => cat.id === selectedCategoryId) || null;
+    const selectedCat = (categories && categories?.find((cat: any) => cat.id === selectedCategoryId)) || null;
     formik.setFieldValue("category", selectedCat?.id);
     setSelectedCategory(selectedCat);
   };
@@ -152,13 +148,12 @@ const AddProducts = () => {
     formik.setFieldValue("otherCategory", selectedSubCategoryId);
   };
 
-
   const handleFileUpload = (id: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event?.target?.files;
     if (files && files?.length > 0) {
       const file: any = files[0];
 
-      const fileExtension = file?.name?.split('.').pop().toLowerCase();
+      const fileExtension = file?.name?.split(".").pop().toLowerCase();
       const acceptedFormats = ["png", "jpeg", "jpg", "webp"];
       if (!acceptedFormats.includes(fileExtension)) {
         toast.error("Invalid file format! Please upload .jpeg, .jpg, .png, or .webp files.");
@@ -178,7 +173,6 @@ const AddProducts = () => {
         const width = image.width;
         const height = image.height;
 
-
         const aspectRatio = width / height;
         if (Math.abs(aspectRatio - 1) > 0.01) {
           toast.error("Image must have a square aspect ratio (1:1).");
@@ -191,30 +185,25 @@ const AddProducts = () => {
           reader.onloadend = () => {
             const previewUrl = reader.result as string;
 
-            setImgList((prev) =>
-              prev.map((img) =>
-                img.id === id ? { ...img, file: file, imageUrl: previewUrl, fileName: file.name } : img
-              )
-            );
+            setImgList((prev) => prev.map((img) => (img.id === id ? { ...img, file: file, imageUrl: previewUrl, fileName: file.name } : img)));
           };
 
           reader.readAsDataURL(file);
-
 
           const response = await uploadSingleFile(file).unwrap();
           const responseData = response?.data;
           const fileId = responseData?.id;
 
-          setImgList(prev =>
-            prev.map(img =>
+          setImgList((prev) =>
+            prev.map((img) =>
               img.id === id
                 ? {
-                  ...img,
-                  file: file,
-                  fileName: responseData.fileName,
-                  isDeleted: false,
-                  id: fileId,
-                }
+                    ...img,
+                    file: file,
+                    fileName: responseData.fileName,
+                    isDeleted: false,
+                    id: fileId,
+                  }
                 : img
             )
           );
@@ -235,10 +224,7 @@ const AddProducts = () => {
   };
 
   const handleAddImage = () => {
-    setImgList(prev => [
-      ...prev,
-      { id: uuidv1(), side: "", file: null, isThumbnail: false, fileName: "", isDeleted: false, imageUrl: "" }
-    ]);
+    setImgList((prev) => [...prev, { id: uuidv1(), side: "", file: null, isThumbnail: false, fileName: "", isDeleted: false, imageUrl: "" }]);
   };
 
   const handleRemoveImage = (id: string) => () => {
@@ -246,10 +232,7 @@ const AddProducts = () => {
   };
 
   const handleAddRow = () => {
-    setPriceList((prevRows) => [
-      ...prevRows,
-      { id: prevRows.length + 1, qtyFrom: "", qtyTo: "", price: "" },
-    ]);
+    setPriceList((prevRows) => [...prevRows, { id: prevRows.length + 1, qtyFrom: "", qtyTo: "", price: "" }]);
   };
 
   const handleDeleteRow = (id: number) => {
@@ -269,14 +252,8 @@ const AddProducts = () => {
     }
   };
 
-  const handleInputChange = (
-    id: number,
-    field: keyof PriceListData,
-    value: string
-  ) => {
-    setPriceList((prevRows) =>
-      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
-    );
+  const handleInputChange = (id: number, field: keyof PriceListData, value: string) => {
+    setPriceList((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   };
 
   const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -315,13 +292,7 @@ const AddProducts = () => {
         .required("Colors are required"),
     }),
     onSubmit: async (values) => {
-      if (
-        imgList?.filter(
-          (x) =>
-            x.side.trim() === "" ||
-            (x.file == null && x.fileName === "" && x.isDeleted === false)
-        ).length > 0
-      ) {
+      if (imgList?.filter((x) => x.side.trim() === "" || (x.file == null && x.fileName === "" && x.isDeleted === false)).length > 0) {
         toast.error("Please enter product image and it's side!");
       } else {
         if (priceList?.filter((x) => +x.price === 0).length > 0) {
@@ -392,10 +363,7 @@ const AddProducts = () => {
   const colorOptionsArray = Object.values(colorOptionsState);
 
   return (
-    <form
-      onSubmit={formik.handleSubmit}
-      className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg"
-    >
+    <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg">
       <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
         <div className="flex justify-between">
           <div className="font-bold">Add Product</div>
@@ -411,13 +379,8 @@ const AddProducts = () => {
                 onChange={formik.handleChange}
                 fullWidth
                 onBlur={formik.handleBlur}
-                error={
-                  formik.touched.productName &&
-                  Boolean(formik.errors.productName)
-                }
-                helperText={
-                  formik.touched.productName && formik.errors.productName
-                }
+                error={formik.touched.productName && Boolean(formik.errors.productName)}
+                helperText={formik.touched.productName && formik.errors.productName}
               />
               <div className="flex gap-4">
                 <TextField
@@ -427,12 +390,8 @@ const AddProducts = () => {
                   onChange={formik.handleChange}
                   fullWidth
                   onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.styleName && Boolean(formik.errors.styleName)
-                  }
-                  helperText={
-                    formik.touched.styleName && formik.errors.styleName
-                  }
+                  error={formik.touched.styleName && Boolean(formik.errors.styleName)}
+                  helperText={formik.touched.styleName && formik.errors.styleName}
                 />
                 <FormControl fullWidth>
                   <InputLabel>Category</InputLabel>
@@ -443,9 +402,7 @@ const AddProducts = () => {
                     onChange={handleCategoryChange}
                     onBlur={formik.handleBlur}
                     disabled={isCategoriesLoading}
-                    error={
-                      formik.touched.category && Boolean(formik.errors.category)
-                    }
+                    error={formik.touched.category && Boolean(formik.errors.category)}
                   >
                     {isCategoriesLoading ? (
                       <MenuItem disabled>
@@ -461,15 +418,11 @@ const AddProducts = () => {
                           <MenuItem key={cat.id} value={cat.id}>
                             {cat.name}
                           </MenuItem>
-                        )) || [])
+                        )) || []),
                       ]
                     )}
                   </Select>
-                  {formik.touched.category && formik.errors.category && (
-                    <div className="text-red-600 text-xs">
-                      {formik.errors.category}
-                    </div>
-                  )}
+                  {formik.touched.category && formik.errors.category && <div className="text-red-600 text-xs">{formik.errors.category}</div>}
                 </FormControl>
 
                 <FormControl fullWidth>
@@ -484,7 +437,7 @@ const AddProducts = () => {
                     disabled={isSubCatLoading && Boolean(!selectedCategory)}
                     renderValue={(selected) => {
                       if (isSubCatLoading) return "Loading...";
-                      const selectedCategory = subCategories?.find(cat => +cat.id === +selected);
+                      const selectedCategory = subCategories?.find((cat) => +cat.id === +selected);
                       return selectedCategory ? selectedCategory.name : "--Select--";
                     }}
                   >
@@ -502,7 +455,7 @@ const AddProducts = () => {
                           <MenuItem key={cat.id} value={cat.id}>
                             {cat.name}
                           </MenuItem>
-                        )) || [])
+                        )) || []),
                       ]
                     )}
                   </Select>
@@ -510,8 +463,6 @@ const AddProducts = () => {
                     <div className="text-red-600 text-xs">{formik.errors.otherCategory}</div>
                   )}
                 </FormControl>
-
-
               </div>
               <TextField
                 label="Description"
@@ -522,18 +473,13 @@ const AddProducts = () => {
                 multiline
                 rows={3}
                 onBlur={formik.handleBlur}
-                error={
-                  formik.touched.description &&
-                  Boolean(formik.errors.description)
-                }
-                helperText={
-                  formik.touched.description && formik.errors.description
-                }
+                error={formik.touched.description && Boolean(formik.errors.description)}
+                helperText={formik.touched.description && formik.errors.description}
               />
             </Card>
             <Card className="p-4 flex flex-col gap-4">
               <div className="font-bold">Upload Images</div>
-              {imgList.map(img => (
+              {imgList.map((img) => (
                 <div key={img.id} className="flex flex-wrap gap-8 items-center">
                   <div className="flex flex-1 gap-4">
                     <TextField
@@ -541,15 +487,9 @@ const AddProducts = () => {
                       name={`sideName-${img.id}`}
                       label="Side Name"
                       value={img.side}
-                      onChange={(e) =>
-                        setImgList(prev =>
-                          prev?.map(i =>
-                            i.id === img.id ? { ...i, side: e.target.value } : i
-                          )
-                        )
-                      }
+                      onChange={(e) => setImgList((prev) => prev?.map((i) => (i.id === img.id ? { ...i, side: e.target.value } : i)))}
                       fullWidth
-                      sx={{ flex: '1 1 300px' }}
+                      sx={{ maxWidth: "12rem", flex: "1 1 300px" }}
                     />
 
                     <TextField
@@ -563,7 +503,7 @@ const AddProducts = () => {
                           <InputAdornment position="end">
                             <input
                               accept=".png,.jpeg,.jpg,.webp"
-                              style={{ display: 'none' }}
+                              style={{ display: "none" }}
                               id={`upload-file-${img.id}`}
                               type="file"
                               onChange={handleFileUpload(img.id)}
@@ -576,27 +516,19 @@ const AddProducts = () => {
                           </InputAdornment>
                         ),
                         sx: {
-                          pointerEvents: 'none',
+                          pointerEvents: "none",
                         },
                       }}
-                      sx={{ flex: '6 1 300px' }}
+                      sx={{ flex: "6 1 300px" }}
                       onClick={() => document.getElementById(`upload-file-${img.id}`)?.click()}
                     />
                   </div>
 
-                  {img.imageUrl && (
-                    <img src={img?.imageUrl} alt={img?.fileName} style={{ width: '100px', height: 'auto' }} />
-                  )}
+                  {isFileLoading ? <CircularProgress /> : img?.imageUrl && <MagnifyProductImage img={img} />}
 
                   <FormGroup>
                     <StyledFormControlLabel
-                      control={
-                        <Checkbox
-                          checked={img.isThumbnail}
-                          onChange={() => handleCheckboxIsThumbnail(img.id)}
-                          color="primary"
-                        />
-                      }
+                      control={<Checkbox checked={img.isThumbnail} onChange={() => handleCheckboxIsThumbnail(img.id)} color="primary" />}
                       label="Is Cover"
                     />
                   </FormGroup>
@@ -720,19 +652,13 @@ const AddProducts = () => {
                         label="Colors"
                         fullWidth
                         onBlur={formik.handleBlur}
-                        error={
-                          formik.touched.colors && Boolean(formik.errors.colors)
-                        }
-                        helperText={
-                          formik.touched.colors && formik.errors.colors
-                        }
+                        error={formik.touched.colors && Boolean(formik.errors.colors)}
+                        helperText={formik.touched.colors && formik.errors.colors}
                         InputProps={{
                           ...params.InputProps,
                           endAdornment: (
                             <React.Fragment>
-                              {isColorsLoading ? (
-                                <CircularProgress color="inherit" size={20} />
-                              ) : null}
+                              {isColorsLoading ? <CircularProgress color="inherit" size={20} /> : null}
                               {params.InputProps.endAdornment}
                             </React.Fragment>
                           ),
@@ -742,37 +668,26 @@ const AddProducts = () => {
                   />
 
                   <div className="flex-[5] px-2">
-                    <div className="font-bold">
-                      Product Pricing :
-                    </div>
+                    <div className="font-bold">Product Pricing :</div>
                     <TableContainer>
                       <Table sx={{ border: "none" }}>
                         <TableHead>
                           <TableRow>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">
-                                Min Quantity
-                              </Typography>
+                              <Typography className="!font-bold !text-sm">Min Quantity</Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">
-                                Max Quantity
-                              </Typography>
+                              <Typography className="!font-bold !text-sm">Max Quantity</Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">
-                                Price
-                              </Typography>
+                              <Typography className="!font-bold !text-sm">Price</Typography>
                             </TableCell>
                             <TableCell></TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {priceList.map((row, index) => (
-                            <TableRow
-                              key={row?.id}
-                              sx={{ borderBottom: "none" }}
-                            >
+                            <TableRow key={row?.id} sx={{ borderBottom: "none" }}>
                               <TableCell>
                                 <TextField
                                   type="number"
@@ -780,13 +695,7 @@ const AddProducts = () => {
                                   variant="outlined"
                                   value={row?.qtyFrom}
                                   placeholder="0"
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      row?.id,
-                                      "qtyFrom",
-                                      e.target.value
-                                    )
-                                  }
+                                  onChange={(e) => handleInputChange(row?.id, "qtyFrom", e.target.value)}
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
@@ -797,13 +706,7 @@ const AddProducts = () => {
                                   variant="outlined"
                                   placeholder="0"
                                   value={row?.qtyTo}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      row?.id,
-                                      "qtyTo",
-                                      e.target.value
-                                    )
-                                  }
+                                  onChange={(e) => handleInputChange(row?.id, "qtyTo", e.target.value)}
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
@@ -814,31 +717,19 @@ const AddProducts = () => {
                                   variant="outlined"
                                   placeholder="0"
                                   value={row?.price}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      row?.id,
-                                      "price",
-                                      e.target.value
-                                    )
-                                  }
+                                  onChange={(e) => handleInputChange(row?.id, "price", e.target.value)}
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-4">
                                   {priceList?.length > 1 && (
-                                    <IconButton
-                                      color="error"
-                                      onClick={() => handleDeleteRow(row?.id)}
-                                    >
+                                    <IconButton color="error" onClick={() => handleDeleteRow(row?.id)}>
                                       <DeleteIcon />
                                     </IconButton>
                                   )}
                                   {index === priceList?.length - 1 && (
-                                    <IconButton
-                                      color="primary"
-                                      onClick={handleAddRow}
-                                    >
+                                    <IconButton color="primary" onClick={handleAddRow}>
                                       <AddBoxIcon />
                                     </IconButton>
                                   )}
@@ -854,19 +745,10 @@ const AddProducts = () => {
               </div>
             </Card>
             <div className="flex justify-between mt-4">
-              <Button
-                variant="outlined"
-                className="!text-red-500 !border-red-500 w-32"
-              >
+              <Button variant="outlined" className="!text-red-500 !border-red-500 w-32">
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                variant="outlined"
-                color="primary"
-                className=" !rounded-lg w-32"
-                disabled={formik.isSubmitting}
-              >
+              <Button type="submit" variant="outlined" color="primary" className=" !rounded-lg w-32" disabled={formik.isSubmitting}>
                 Submit
               </Button>
             </div>
@@ -879,33 +761,14 @@ const AddProducts = () => {
                 <FormLabel component="legend">
                   <p className="font-bold text-sm">Status</p>
                 </FormLabel>
-                <RadioGroup
-                  aria-label="status"
-                  name="status"
-                  value={selectedStatus}
-                  onChange={handleStatusChange}
-                >
-                  <FormControlLabel
-                    value="enabled"
-                    control={<Radio />}
-                    label="Enabled"
-                  />
-                  <FormControlLabel
-                    value="disabled"
-                    control={<Radio />}
-                    label="Disabled"
-                  />
+                <RadioGroup aria-label="status" name="status" value={selectedStatus} onChange={handleStatusChange}>
+                  <FormControlLabel value="enabled" control={<Radio />} label="Enabled" />
+                  <FormControlLabel value="disabled" control={<Radio />} label="Disabled" />
                 </RadioGroup>
               </FormControl>
               <Divider />
               <div className="font-bold">Left Top Section</div>
-              <TextField
-                label="Heading"
-                name="leftTopHeader"
-                value={formik.values.leftTopHeader}
-                onChange={formik.handleChange}
-                fullWidth
-              />
+              <TextField label="Heading" name="leftTopHeader" value={formik.values.leftTopHeader} onChange={formik.handleChange} fullWidth />
               <TextField
                 label="Content"
                 name="leftTopContent"
@@ -917,13 +780,7 @@ const AddProducts = () => {
               />
               <Divider />
               <div className="font-bold">Left Bottom Section</div>
-              <TextField
-                label="Heading"
-                name="leftBottomHeader"
-                value={formik.values.leftBottomHeader}
-                onChange={formik.handleChange}
-                fullWidth
-              />
+              <TextField label="Heading" name="leftBottomHeader" value={formik.values.leftBottomHeader} onChange={formik.handleChange} fullWidth />
               <TextField
                 label="Content"
                 name="leftBottomContent"
@@ -941,15 +798,7 @@ const AddProducts = () => {
       <Dialog open={isSizeModalOpen} onClose={() => setIsSizeModalOpen(false)}>
         <DialogTitle>Add New Size</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="New Size"
-            type="text"
-            fullWidth
-            value={newSize}
-            onChange={(e) => setNewSize(e.target.value)}
-          />
+          <TextField autoFocus margin="dense" label="New Size" type="text" fullWidth value={newSize} onChange={(e) => setNewSize(e.target.value)} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsSizeModalOpen(false)} color="primary">
@@ -961,21 +810,10 @@ const AddProducts = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={isColorModalOpen}
-        onClose={() => setIsColorModalOpen(false)}
-      >
+      <Dialog open={isColorModalOpen} onClose={() => setIsColorModalOpen(false)}>
         <DialogTitle>Add New Color</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="New Color"
-            type="text"
-            fullWidth
-            value={newColor}
-            onChange={(e) => setNewSize(e.target.value)}
-          />
+          <TextField autoFocus margin="dense" label="New Color" type="text" fullWidth value={newColor} onChange={(e) => setNewSize(e.target.value)} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsColorModalOpen(false)} color="primary">
