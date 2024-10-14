@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery, BaseQueryFn } from "@reduxjs/toolkit/query/react";
 import type { FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { RootState } from "../redux/store";
+import { toast } from "react-toastify";
 
 const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
   const baseQuery = fetchBaseQuery({
@@ -16,9 +17,13 @@ const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, Fetch
   });
 
   try {
-    const result = await baseQuery(args, api, extraOptions);
-    if (result.error) {
-      console.error("API Error:", result.error);
+    console.log(args, api, extraOptions, "args, api, extraOptions")
+    const result: any = await baseQuery(args, api, extraOptions);
+    console.log("args, api, extraOptions", result)
+    if (result.data) {
+      if(result?.data?.httpStatusCode === 500){
+        toast.error(result?.data?.errorReason?.message)
+      }
     }
     return result;
   } catch (error) {

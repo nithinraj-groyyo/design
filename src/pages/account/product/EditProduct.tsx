@@ -246,7 +246,12 @@ const EditProduct = () => {
                     pricePerPiece: price.pricePerPiece?.toString(),
                 }
             }) || [];
-            setPriceList(initialPricings)
+            setPriceList(initialPricings);
+
+            const initialImageList = productData?.productImages?.map((price: any) => {
+                return  { id: price?.fileId, side: price?.sideName, file: null, isThumbnail: price?.isThumbnail, fileName: price?.fileName, isDeleted: false, imageUrl: price?.imageUrl }
+            });
+            setImgList(initialImageList)
         }
     }, [productData, categories, subCategories])
 
@@ -539,8 +544,8 @@ const EditProduct = () => {
                     toast.success(response?.message);
                 }
             } catch (error: any) {
-                console.error(error?.message)
-                toast.error("Error while Updatin g product")
+                console.error(error)
+                toast.error(error?.error ?? "Error while Updatin g product")
             }
             // }
 
@@ -675,7 +680,7 @@ const EditProduct = () => {
                         </Card>
                         <Card className="p-4 flex flex-col gap-4">
                             <div className="font-bold">Upload Images</div>
-                            {imgList.map(img => (
+                            {imgList?.map(img => (
                                 <div key={img.id} className="flex flex-wrap gap-8 items-center">
                                     <div className="flex flex-1 gap-4">
                                         <TextField
