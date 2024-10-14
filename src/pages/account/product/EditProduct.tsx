@@ -42,7 +42,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useFormik } from "formik";
 import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useFetchSubCategories } from "../../../hooks/useFetchSubCategories";
 import { ICategory } from "../../../types/categories";
@@ -194,7 +194,7 @@ const EditProduct = () => {
 
   const [selectedStatus, setSelectedStatus] = useState("enabled");
 
-  const [uploadSingleFile, { isLoading: isFileLoading }] = useUploadSingleFileMutation();
+  const [uploadSingleFile] = useUploadSingleFileMutation();
 
   const { data: categories, isLoading: isCategoriesLoading } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
   const {
@@ -206,6 +206,8 @@ const EditProduct = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const navigate = useNavigate();
 
   const [addNewSize] = useAddNewSizeMutation();
   const [addNewColor] = useAddNewColorMutation();
@@ -231,6 +233,8 @@ const EditProduct = () => {
       formik.setFieldValue("leftTopContent", productData?.leftTopContent);
       formik.setFieldValue("leftBottomHeader", productData?.leftBottomHeader);
       formik.setFieldValue("leftBottomContent", productData?.leftBottomContent);
+
+      setSelectedStatus(productData?.isPublic ? "enabled":"disabled");
 
       const loadedCategory = categories?.find((cat: any) => cat.id === productData?.category);
       if (loadedCategory) {
@@ -534,6 +538,7 @@ const EditProduct = () => {
         leftTopContent: values?.leftTopContent,
         leftBottomHeader: values?.leftBottomHeader,
         leftBottomContent: values?.leftBottomContent,
+        isPublic: selectedStatus
       };
 
       try {
@@ -541,6 +546,7 @@ const EditProduct = () => {
 
         if (response?.status && response?.httpStatusCode === 200) {
           toast.success(response?.message);
+          navigate("/account/product-list", { replace: true });
         }
       } catch (error: any) {
         console.error(error);
@@ -556,7 +562,7 @@ const EditProduct = () => {
     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg">
       <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
         <div className="flex justify-between">
-          <div className="font-bold">Add Product</div>
+          <div className="font-bold">Edit Product</div>
         </div>
         <div className="flex w-full gap-4">
           <div className="flex-[3] flex flex-col gap-4">
@@ -719,7 +725,7 @@ const EditProduct = () => {
                     />
                   </div>
 
-                  {isFileLoading ? <CircularProgress /> : img?.imageUrl && <MagnifyProductImage img={img} />}
+                  {img?.imageUrl && <MagnifyProductImage img={img} />}
 
                   <FormGroup>
                     <StyledFormControlLabel

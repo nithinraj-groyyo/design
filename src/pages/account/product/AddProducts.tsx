@@ -40,9 +40,10 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
 import { setError } from "../../../redux/shoppingBagSlice";
-import { useGetAllColorsQuery, useGetAllSizesQuery } from "../../../rtk-query/productApiSlice";
+import { useAddProductMutation, useGetAllColorsQuery, useGetAllSizesQuery } from "../../../rtk-query/productApiSlice";
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 import MagnifyProductImage from "./MagnifyProductImage";
+import { useNavigate } from "react-router-dom";
 
 interface ImageData {
   id: string;
@@ -56,9 +57,9 @@ interface ImageData {
 
 interface PriceListData {
   id: number;
-  qtyFrom: string;
-  qtyTo: string;
-  price: string;
+  minQty: string;
+  maxQty: string;
+  pricePerPiece: string;
 }
 
 interface FormData {
@@ -105,11 +106,13 @@ const AddProducts = () => {
     { id: uuidv1(), side: "", file: null, isThumbnail: true, fileName: "", isDeleted: false, imageUrl: "" },
   ]);
 
-  const [priceList, setPriceList] = useState<PriceListData[]>([{ id: 1, qtyFrom: "", qtyTo: "", price: "" }]);
+  const [priceList, setPriceList] = useState<PriceListData[]>([{ id: 1, minQty: "", maxQty: "", pricePerPiece: "" }]);
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
 
-  const [uploadSingleFile, { isLoading: isFileLoading }] = useUploadSingleFileMutation();
+  const [uploadSingleFile] = useUploadSingleFileMutation();
+
+  const [addProduct] = useAddProductMutation();
 
   const { data: categories, isLoading: isCategoriesLoading, isError } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
   const {
@@ -134,7 +137,7 @@ const AddProducts = () => {
     }
   }, [selectedCategory]);
 
-  const userId = JSON.stringify(localStorage.getItem("userId") as string);
+  const navigate = useNavigate();
 
   const handleCategoryChange = (e: any) => {
     const selectedCategoryId = e.target.value as number;
@@ -198,12 +201,12 @@ const AddProducts = () => {
             prev.map((img) =>
               img.id === id
                 ? {
-                    ...img,
-                    file: file,
-                    fileName: responseData.fileName,
-                    isDeleted: false,
-                    id: fileId,
-                  }
+                  ...img,
+                  file: file,
+                  fileName: responseData.fileName,
+                  isDeleted: false,
+                  id: fileId,
+                }
                 : img
             )
           );
@@ -232,7 +235,7 @@ const AddProducts = () => {
   };
 
   const handleAddRow = () => {
-    setPriceList((prevRows) => [...prevRows, { id: prevRows.length + 1, qtyFrom: "", qtyTo: "", price: "" }]);
+    setPriceList((prevRows) => [...prevRows, { id: prevRows.length + 1, minQty: "", maxQty: "", pricePerPiece: "" }]);
   };
 
   const handleDeleteRow = (id: number) => {
@@ -282,6 +285,10 @@ const AddProducts = () => {
       category: Yup.string().required("Category is required"),
       otherCategory: Yup.string().required("Sub Category is required"),
       description: Yup.string().required("Description is required"),
+      leftTopHeader: Yup.string().required("Field is required"),
+      leftTopContent: Yup.string().required("Field is required"),
+      leftBottomHeader: Yup.string().required("Field is required"),
+      leftBottomContent: Yup.string().required("Field is required"),
       sizes: Yup.array()
         .of(Yup.string().required("Each size must be a string"))
         .min(1, "At least one size is required")
@@ -295,7 +302,7 @@ const AddProducts = () => {
       if (imgList?.filter((x) => x.side.trim() === "" || (x.file == null && x.fileName === "" && x.isDeleted === false)).length > 0) {
         toast.error("Please enter product image and it's side!");
       } else {
-        if (priceList?.filter((x) => +x.price === 0).length > 0) {
+        if (priceList?.filter((x) => +x.pricePerPiece === 0).length > 0) {
           toast.error("Please enter quantity range and price!");
         } else {
           const payload = {
@@ -311,28 +318,60 @@ const AddProducts = () => {
             leftTopContent: values?.leftTopContent,
             leftBottomHeader: values?.leftBottomHeader,
             leftBottomContent: values?.leftBottomContent,
+            isPublic: selectedStatus
           };
 
           const convertPriceList = priceList?.map((price) => {
             return {
-              qtyFrom: +price?.qtyFrom,
-              qtyTo: +price?.qtyTo,
-              price: +price?.price,
-            };
-          });
+              minQty: +price?.minQty,
+              maxQty: isNaN(+price?.maxQty) ? null : +price?.maxQty,
+              pricePerPiece: +price?.pricePerPiece,
+            }
+          })
 
-          const formData = new FormData();
+          const images = imgList?.map(item => {
+            if (item?.id && !isNaN(+item.id)) {
+              return {
+                fileId: +item?.id,
+                sideName: item?.side,
+                isThumbnail: item?.isThumbnail,
+              };
+            }
+            return undefined;
+          }).filter(Boolean);
 
-          imgList.forEach((item) => {
-            formData.append("upload_file", item?.file ?? "");
-          });
+          const hasInvalidFileId = imgList?.some(item => isNaN(+item?.id));
 
-          formData.append("content", JSON.stringify(payload));
-          formData.append("imgList", JSON.stringify(imgList));
-          formData.append("priceList", JSON.stringify(convertPriceList));
-          formData.append("userId", userId);
-          console.log({ convertPriceList, imgList, payload });
-          console.log(formData);
+          const finalImages = hasInvalidFileId ? undefined : images;
+
+          const requestBody = {
+            name: payload.productName,
+            description: payload.description,
+            styleName: payload.styleName,
+            categoryId: +payload.category,
+            subCategoryId: +payload.otherCategory,
+            productColorIds: values?.colors,
+            productSizeIds: values?.sizes,
+            productPrices: convertPriceList,
+            productImages: finalImages,
+            leftTopHeader: values?.leftTopHeader,
+            leftTopContent: values?.leftTopContent,
+            leftBottomHeader: values?.leftBottomHeader,
+            leftBottomContent: values?.leftBottomContent,
+            isPublic: selectedStatus
+          };
+
+          try {
+            const response = await addProduct({ payload: requestBody }).unwrap();
+
+            if (response?.status && response?.httpStatusCode === 201) {
+              toast.success(response?.message);
+              navigate("/account/product-list", { replace: true });
+            }
+          } catch (error: any) {
+            console.error(error)
+            toast.error(error?.error ?? "Error while Updatin g product")
+          }
         }
       }
     },
@@ -524,7 +563,7 @@ const AddProducts = () => {
                     />
                   </div>
 
-                  {isFileLoading ? <CircularProgress /> : img?.imageUrl && <MagnifyProductImage img={img} />}
+                  {img?.imageUrl && <MagnifyProductImage img={img} />}
 
                   <FormGroup>
                     <StyledFormControlLabel
@@ -693,9 +732,9 @@ const AddProducts = () => {
                                   type="number"
                                   fullWidth
                                   variant="outlined"
-                                  value={row?.qtyFrom}
+                                  value={row?.minQty}
                                   placeholder="0"
-                                  onChange={(e) => handleInputChange(row?.id, "qtyFrom", e.target.value)}
+                                  onChange={(e) => handleInputChange(row?.id, "minQty", e.target.value)}
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
@@ -705,8 +744,8 @@ const AddProducts = () => {
                                   fullWidth
                                   variant="outlined"
                                   placeholder="0"
-                                  value={row?.qtyTo}
-                                  onChange={(e) => handleInputChange(row?.id, "qtyTo", e.target.value)}
+                                  value={row?.maxQty}
+                                  onChange={(e) => handleInputChange(row?.id, "maxQty", e.target.value)}
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
@@ -716,8 +755,8 @@ const AddProducts = () => {
                                   fullWidth
                                   variant="outlined"
                                   placeholder="0"
-                                  value={row?.price}
-                                  onChange={(e) => handleInputChange(row?.id, "price", e.target.value)}
+                                  value={row?.pricePerPiece}
+                                  onChange={(e) => handleInputChange(row?.id, "pricePerPiece", e.target.value)}
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
@@ -768,7 +807,16 @@ const AddProducts = () => {
               </FormControl>
               <Divider />
               <div className="font-bold">Left Top Section</div>
-              <TextField label="Heading" name="leftTopHeader" value={formik.values.leftTopHeader} onChange={formik.handleChange} fullWidth />
+              <div className="font-bold">Left Top Section</div>
+              <TextField
+                label="Heading"
+                name="leftTopHeader"
+                value={formik.values.leftTopHeader}
+                onChange={formik.handleChange}
+                fullWidth
+                error={formik.touched.leftTopHeader && Boolean(formik.errors.leftTopHeader)}
+                helperText={formik.touched.leftTopHeader && formik.errors.leftTopHeader}
+              />
               <TextField
                 label="Content"
                 name="leftTopContent"
@@ -777,10 +825,20 @@ const AddProducts = () => {
                 fullWidth
                 multiline
                 rows={2}
+                error={formik.touched.leftTopContent && Boolean(formik.errors.leftTopContent)}
+                helperText={formik.touched.leftTopContent && formik.errors.leftTopContent}
               />
               <Divider />
               <div className="font-bold">Left Bottom Section</div>
-              <TextField label="Heading" name="leftBottomHeader" value={formik.values.leftBottomHeader} onChange={formik.handleChange} fullWidth />
+              <TextField
+                label="Heading"
+                name="leftBottomHeader"
+                value={formik.values.leftBottomHeader}
+                onChange={formik.handleChange}
+                fullWidth
+                error={formik.touched.leftBottomHeader && Boolean(formik.errors.leftBottomHeader)}
+                helperText={formik.touched.leftBottomHeader && formik.errors.leftBottomHeader}
+              />
               <TextField
                 label="Content"
                 name="leftBottomContent"
@@ -789,6 +847,8 @@ const AddProducts = () => {
                 fullWidth
                 multiline
                 rows={2}
+                error={formik.touched.leftBottomContent && Boolean(formik.errors.leftBottomContent)}
+                helperText={formik.touched.leftBottomContent && formik.errors.leftBottomContent}
               />
             </Card>
           </div>
