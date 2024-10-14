@@ -57,10 +57,10 @@ export interface IProductResponse {
     price: string;
     isDelete: boolean;
     status: boolean;
-    leftHeading1: string;
-    leftHeading1Content: string;
-    leftHeading2: string;
-    leftHeading2Content: string;
+    leftTopHeader: string;
+    leftTopContent: string;
+    leftBottomHeader: string;
+    leftBottomContent: string;
     createdDate: string;
     createdBy: string;
     modifiedDate: string;

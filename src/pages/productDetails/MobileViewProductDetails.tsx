@@ -130,7 +130,7 @@ const MobileViewProductDetails = () => {
                     <div className='my-2'>
                         <AddToBagButton />
                     </div>
-                    {(product?.leftHeading1 && product?.leftHeading2) && (
+                    {(product?.leftTopHeader && product?.leftBottomHeader) && (
                         <div>
                             <Accordion>
                                 <AccordionSummary
@@ -138,10 +138,10 @@ const MobileViewProductDetails = () => {
                                     aria-controls="panel1-content"
                                     id="left-heading-1"
                                 >
-                                    {product?.leftHeading1}
+                                    {product?.leftTopHeader}
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    {product?.leftHeading1Content}
+                                    {product?.leftTopContent}
                                 </AccordionDetails>
                             </Accordion>
                             <Accordion>
@@ -150,10 +150,10 @@ const MobileViewProductDetails = () => {
                                     aria-controls="panel1-content"
                                     id="left-heading-2"
                                 >
-                                    {product?.leftHeading2}
+                                    {product?.leftBottomHeader}
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                {product?.leftHeading2Content}
+                                {product?.leftBottomContent}
                                 </AccordionDetails>
                             </Accordion>
                         </div>

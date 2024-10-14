@@ -70,10 +70,10 @@ interface FormData {
   colors: string;
   sizes: string;
   status: boolean;
-  leftHeading1: string;
-  leftHeading1Content: string;
-  leftHeading2: string;
-  leftHeading2Content: string;
+  leftTopHeader: string;
+  leftTopContent: string;
+  leftBottomHeader: string;
+  leftBottomContent: string;
 }
 
 const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
@@ -294,10 +294,10 @@ const AddProducts = () => {
       colors: "",
       sizes: "",
       status: true,
-      leftHeading1: "",
-      leftHeading1Content: "",
-      leftHeading2: "",
-      leftHeading2Content: "",
+      leftTopHeader: "",
+      leftTopContent: "",
+      leftBottomHeader: "",
+      leftBottomContent: "",
     },
     validationSchema: Yup.object({
       productName: Yup.string().required("Product Name is required"),
@@ -336,10 +336,10 @@ const AddProducts = () => {
             colors: values?.colors,
             sizes: values?.sizes,
             status: values?.status,
-            leftHeading1: values?.leftHeading1,
-            leftHeading1Content: values?.leftHeading1Content,
-            leftHeading2: values?.leftHeading2,
-            leftHeading2Content: values?.leftHeading2Content,
+            leftTopHeader: values?.leftTopHeader,
+            leftTopContent: values?.leftTopContent,
+            leftBottomHeader: values?.leftBottomHeader,
+            leftBottomContent: values?.leftBottomContent,
           };
 
           const convertPriceList = priceList?.map((price) => {
@@ -901,15 +901,15 @@ const AddProducts = () => {
               <div className="font-bold">Left Top Section</div>
               <TextField
                 label="Heading"
-                name="leftHeading1"
-                value={formik.values.leftHeading1}
+                name="leftTopHeader"
+                value={formik.values.leftTopHeader}
                 onChange={formik.handleChange}
                 fullWidth
               />
               <TextField
                 label="Content"
-                name="leftHeading1Content"
-                value={formik.values.leftHeading1Content}
+                name="leftTopContent"
+                value={formik.values.leftTopContent}
                 onChange={formik.handleChange}
                 fullWidth
                 multiline
@@ -919,15 +919,15 @@ const AddProducts = () => {
               <div className="font-bold">Left Bottom Section</div>
               <TextField
                 label="Heading"
-                name="leftHeading2"
-                value={formik.values.leftHeading2}
+                name="leftBottomHeader"
+                value={formik.values.leftBottomHeader}
                 onChange={formik.handleChange}
                 fullWidth
               />
               <TextField
                 label="Content"
-                name="leftHeading2Content"
-                value={formik.values.leftHeading2Content}
+                name="leftBottomContent"
+                value={formik.values.leftBottomContent}
                 onChange={formik.handleChange}
                 fullWidth
                 multiline

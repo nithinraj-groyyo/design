@@ -151,10 +151,10 @@ interface FormData {
     colors: [];
     sizes: [];
     status: boolean;
-    leftHeading1: string;
-    leftHeading1Content: string;
-    leftHeading2: string;
-    leftHeading2Content: string;
+    leftTopHeader: string;
+    leftTopContent: string;
+    leftBottomHeader: string;
+    leftBottomContent: string;
 }
 
 const EditProduct = () => {
@@ -459,10 +459,10 @@ const EditProduct = () => {
             colors: [],
             sizes: [],
             status: true,
-            leftHeading1: "",
-            leftHeading1Content: "",
-            leftHeading2: "",
-            leftHeading2Content: "",
+            leftTopHeader: "",
+            leftTopContent: "",
+            leftBottomHeader: "",
+            leftBottomContent: "",
         },
         validationSchema: Yup.object({
             productName: Yup.string().required("Product Name is required"),
@@ -470,6 +470,10 @@ const EditProduct = () => {
             category: Yup.string().required("Category is required"),
             otherCategory: Yup.string().required("Sub Category is required"),
             description: Yup.string().required("Description is required"),
+            leftTopHeader: Yup.string().required("Field is required"),
+            leftTopContent: Yup.string().required("Field is required"),
+            leftBottomHeader: Yup.string().required("Field is required"),
+            leftBottomContent: Yup.string().required("Field is required"),
             sizes: Yup.array()
                 .of(Yup.string().required("Each size must be a string"))
                 .min(1, "At least one size is required")
@@ -495,10 +499,10 @@ const EditProduct = () => {
                 colors: values?.colors,
                 sizes: values?.sizes,
                 status: values?.status,
-                leftHeading1: values?.leftHeading1,
-                leftHeading1Content: values?.leftHeading1Content,
-                leftHeading2: values?.leftHeading2,
-                leftHeading2Content: values?.leftHeading2Content
+                leftTopHeader: values?.leftTopHeader,
+                leftTopContent: values?.leftTopContent,
+                leftBottomHeader: values?.leftBottomHeader,
+                leftBottomContent: values?.leftBottomContent
             };
 
             const convertPriceList = priceList?.map((price) => {
@@ -1042,37 +1046,45 @@ const EditProduct = () => {
                             <div className="font-bold">Left Top Section</div>
                             <TextField
                                 label="Heading"
-                                name="leftHeading1"
-                                value={formik.values.leftHeading1}
+                                name="leftTopHeader"
+                                value={formik.values.leftTopHeader}
                                 onChange={formik.handleChange}
                                 fullWidth
+                                error={formik.touched.leftTopHeader && Boolean(formik.errors.leftTopHeader)}
+                                helperText={formik.touched.leftTopHeader && formik.errors.leftTopHeader}
                             />
                             <TextField
                                 label="Content"
-                                name="leftHeading1Content"
-                                value={formik.values.leftHeading1Content}
+                                name="leftTopContent"
+                                value={formik.values.leftTopContent}
                                 onChange={formik.handleChange}
                                 fullWidth
                                 multiline
                                 rows={2}
+                                error={formik.touched.leftTopContent && Boolean(formik.errors.leftTopContent)}
+                                helperText={formik.touched.leftTopContent && formik.errors.leftTopContent}
                             />
                             <Divider />
                             <div className="font-bold">Left Bottom Section</div>
                             <TextField
                                 label="Heading"
-                                name="leftHeading2"
-                                value={formik.values.leftHeading2}
+                                name="leftBottomHeader"
+                                value={formik.values.leftBottomHeader}
                                 onChange={formik.handleChange}
                                 fullWidth
+                                error={formik.touched.leftBottomHeader && Boolean(formik.errors.leftBottomHeader)}
+                                helperText={formik.touched.leftBottomHeader && formik.errors.leftBottomHeader}
                             />
                             <TextField
                                 label="Content"
-                                name="leftHeading2Content"
-                                value={formik.values.leftHeading2Content}
+                                name="leftBottomContent"
+                                value={formik.values.leftBottomContent}
                                 onChange={formik.handleChange}
                                 fullWidth
                                 multiline
                                 rows={2}
+                                error={formik.touched.leftBottomContent && Boolean(formik.errors.leftBottomContent)}
+                                helperText={formik.touched.leftBottomContent && formik.errors.leftBottomContent}
                             />
                         </Card>
                     </div>
