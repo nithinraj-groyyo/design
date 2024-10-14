@@ -42,7 +42,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useFormik } from "formik";
 import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useSelector } from "react-redux";
 import { useFetchSubCategories } from "../../../hooks/useFetchSubCategories";
 import { ICategory } from "../../../types/categories";
@@ -212,13 +212,16 @@ const EditProduct = () => {
 
     const [updateProduct] = useUpdateProductMutation();
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         if (productData) {
             formik.setFieldValue('productId', productData?.id);
             formik.setFieldValue('productName', productData?.name);
             formik.setFieldValue('styleName', productData?.styleName);
             formik.setFieldValue('description', productData?.description);
-
+            setSelectedStatus(productData?.isPublic ? "enabled" : "disabled");
+            
             const loadedCategory = categories?.find((cat: any) => cat.id === productData?.category);
             if (loadedCategory) {
                 formik.setFieldValue("category", loadedCategory?.id);
@@ -249,11 +252,15 @@ const EditProduct = () => {
             setPriceList(initialPricings);
 
             const initialImageList = productData?.productImages?.map((price: any) => {
-                return  { id: price?.fileId, side: price?.sideName, file: null, isThumbnail: price?.isThumbnail, fileName: price?.fileName, isDeleted: false, imageUrl: price?.imageUrl }
+                return  { id: price?.fileId, side: price?.sideName, file: null, isThumbnail: price?.isThumbnail, fileName: price?.fileName, isDeleted: false, imageUrl: price?.signedUrl }
             });
             setImgList(initialImageList)
         }
     }, [productData, categories, subCategories])
+
+   
+
+
 
     useEffect(() => {
         if (selectedCategory) {
@@ -290,8 +297,8 @@ const EditProduct = () => {
             }
 
             const fileSizeInKB = file.size / 1024;
-            if (fileSizeInKB > 100) {
-                toast.error("File size must be between 50 KB and 100 KB.");
+            if (fileSizeInKB > 1024) {
+                toast.error("File size must be between 50 KB and 1 MB.");
                 return;
             }
 
@@ -539,6 +546,7 @@ const EditProduct = () => {
                 productSizeIds: values?.sizes,
                 productPrices: convertPriceList,
                 productImages: finalImages,
+                isPublic: selectedStatus
               };
 
             try {
@@ -546,14 +554,12 @@ const EditProduct = () => {
                 
                 if (response?.status && response?.httpStatusCode===200) {
                     toast.success(response?.message);
+                    navigate("/account/product-list", { replace: true });
                 }
             } catch (error: any) {
                 console.error(error)
                 toast.error(error?.error ?? "Error while Updatin g product")
             }
-            // }
-
-            // }
         },
     });
 
@@ -564,7 +570,7 @@ const EditProduct = () => {
         >
             <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
                 <div className="flex justify-between">
-                    <div className="font-bold">Add Product</div>
+                    <div className="font-bold">Edit Product</div>
                 </div>
                 <div className="flex w-full gap-4">
                     <div className="flex-[3] flex flex-col gap-4">

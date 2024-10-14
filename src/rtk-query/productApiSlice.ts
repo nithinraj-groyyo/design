@@ -72,7 +72,15 @@ const productApiSlice = apiSlice.injectEndpoints({
                method: "PUT",
                body: payload
             })
-        })
+        }),
+        addProduct: builder.mutation({
+            query: ({payload}: {payload: any}) => ({
+               url: `${productUrl}/add`,
+               method: "POST",
+               body: payload
+            })
+        }),
+
     })
 });
 
@@ -84,5 +92,6 @@ export const {
     useGetProductByIdQuery,
     useAddNewSizeMutation,
     useAddNewColorMutation,
-    useUpdateProductMutation
+    useUpdateProductMutation,
+    useAddProductMutation
 } = productApiSlice;
