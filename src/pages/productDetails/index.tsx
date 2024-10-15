@@ -18,43 +18,51 @@ import useWindowWidth from '../../hooks/useWindowWidth';
 import { useLazyFetchProductsQuery, useLazyGetProductByIdQuery } from '../../rtk-query/productApiSlice';
 import { IProduct } from '../../types/products';
 
-const ProductDetails = () => {   
+const ProductDetails = () => {
     const { productId } = useParams<{ productId: string }>();
 
     const [expanded, setExpanded] = useState(false);
 
     const { isMobileView } = useWindowWidth();
 
-    const [getProductById, {data}] = useLazyGetProductByIdQuery();
-    const [fetchProducts, { data: products=[], isLoading: isProductLoading }] = useLazyFetchProductsQuery();
-console.log(products)
+    const [getProductById, { data }] = useLazyGetProductByIdQuery();
+    const [fetchProducts, { data: products = [], isLoading: isProductLoading }] = useLazyFetchProductsQuery();
+
     const [product, setProduct] = useState<IProduct>();
 
     useEffect(() => {
-        if(productId){
-            void getProductById({productId: +productId});
+        if (productId) {
+            void getProductById({ productId: +productId });
         }
-    }, []);
+    }, [productId]);
 
     useEffect(() => {
-        if(data?.data){
+        if (data?.data) {
             setProduct(data?.data)
         }
     }, [data]);
 
+    useEffect(() => {
+        setExpanded(false)
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }, [productId]);
+
     const loadProducts = async () => {
         const response = await fetchProducts({
-          page: 1,
-          limit: 10,
-          isProductActive: true
+            page: 1,
+            limit: 10,
+            isProductActive: true
         });
-      };
+    };
 
-      
+
     useEffect(() => {
         loadProducts();
     }, []);
-    
+
 
     const handleToggle = () => {
         setExpanded(!expanded);
@@ -82,14 +90,15 @@ console.log(products)
                 <Typography className='text-[#2D2D2A] text-sm tracking-widest px-4'>YOU MAY ALSO LIKE</Typography>
                 <div className='grid grid-cols-6'>
                     {products?.data && products?.data?.slice(0, 6).map((product: any) => {
-                        
+
                         return (
-                        <ProductCard
-                            key={product?.id}
-                            className='border border-black !rounded-none'
-                            product={product}
-                        />
-                    )})}
+                            <ProductCard
+                                key={product?.id}
+                                className='border border-black !rounded-none'
+                                product={product}
+                            />
+                        )
+                    })}
                 </div>
             </div>
             {/* <MobileViewProductDetails /> */}
