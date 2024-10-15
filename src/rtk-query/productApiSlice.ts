@@ -8,12 +8,14 @@ const colorUrl = "color";
 const productApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         fetchProducts: builder.query({
-            query: ({ page, limit, isProductActive }) => ({
+            query: ({ page, limit, isProductActive, categoryId, subCategoryId }) => ({
                 url: `${productUrl}/list`,
                 params: {
                     page,
                     limit,
-                    isProductActive
+                    isProductActive,
+                    categoryId,
+                    subCategoryId
                 }
             }),
             providesTags: ["Products"],
@@ -90,6 +92,7 @@ export const {
     useGetAllSizesQuery,
     useGetAllColorsQuery,
     useGetProductByIdQuery,
+    useLazyGetProductByIdQuery,
     useAddNewSizeMutation,
     useAddNewColorMutation,
     useUpdateProductMutation,

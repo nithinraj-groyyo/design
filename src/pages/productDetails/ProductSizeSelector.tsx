@@ -4,9 +4,13 @@ import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { addItem, updateQuantity } from '../../redux/productSizeSlice';
+import { IProduct } from '../../types/products';
 
-const ProductSizeSelector = () => {
-    const { product } = useSelector((state: RootState) => state.products.singleProductData);
+interface IProductSizeSelectorProps {
+    product: IProduct;
+}
+
+const ProductSizeSelector = ({product}: IProductSizeSelectorProps) => {
     const { items } = useSelector((state: RootState) => state.productSize);
     const dispatch = useDispatch();
 
@@ -23,14 +27,14 @@ const ProductSizeSelector = () => {
         <div className="bg-gray-100 w-full p-4">
             <p className="text-[#8E8E8E] text-sm mb-4">Select Size</p>
             <div className="flex flex-col gap-4">
-                {product?.productSizes?.map((size) => {
+                {product?.sizes?.map((size) => {
                     const existingItem = items.find(item => item.sizeId === size.id);
                     return (
-                        <div key={size.id} className="flex items-center justify-between">
-                            <p className="text-gray-800 flex-1">{size.sizeName}</p>
+                        <div key={size?.id} className="flex items-center justify-between">
+                            <p className="text-gray-800 flex-1">{size?.name}</p>
                             <div className="flex items-center gap-2">
                                 <IconButton
-                                    onClick={() => handleQuantityChange(size.id, size.sizeName, Number(product?.price), (existingItem?.quantity || 0) + 1)}
+                                    onClick={() => handleQuantityChange(size?.id, size?.name, Number(product?.productPrices[0]?.pricePerPiece), (existingItem?.quantity || 0) + 1)}
                                 >
                                     <AddIcon sx={{ fontSize: "1rem" }} />
                                 </IconButton>
@@ -38,17 +42,17 @@ const ProductSizeSelector = () => {
                                     type="number"
                                     className="w-12 bg-transparent border-b border-[#646463] text-[#646464] text-center outline-none"
                                     value={existingItem?.quantity || 0}
-                                    onChange={(e) => handleQuantityChange(size.id, size.sizeName, Number(product?.price), parseInt(e.target.value, 10))}
+                                    onChange={(e) => handleQuantityChange(size?.id, size?.name, Number(product?.productPrices[0]?.pricePerPiece), parseInt(e.target.value, 10))}
                                     min="0"
                                     step="1"
                                 />
                                 <IconButton
-                                    onClick={() => handleQuantityChange(size.id, size.sizeName, Number(product?.price), Math.max((existingItem?.quantity || 0) - 1, 0))}
+                                    onClick={() => handleQuantityChange(size?.id, size?.name, Number(product?.productPrices[0]?.pricePerPiece), Math.max((existingItem?.quantity || 0) - 1, 0))}
                                 >
                                     <RemoveIcon sx={{ fontSize: "1rem" }} />
                                 </IconButton>
                             </div>
-                            <p className="text-gray-800 text-center flex-1">₹ {Number(product?.price) * (existingItem?.quantity || 0)}</p>
+                            <p className="text-gray-800 text-center flex-1">₹ {(product?.productPrices[0]?.pricePerPiece) * (existingItem?.quantity || 0)}</p>
                         </div>
                     );
                 })}

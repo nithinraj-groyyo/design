@@ -10,12 +10,14 @@ import { useDispatch } from 'react-redux';
 import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';
 import { toast } from 'react-toastify';
 import { setLocalWishlistItems } from '../../redux/wishlistSlice';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import { IProduct } from '../../types/products';
 
 interface ProductCardProps {
   showDetails?: boolean;
   className?: string;
   isAlreadyInWishlist?: boolean;
-  product: any;
+  product: IProduct;
   onRemoveFromWishlist?: (productId: number) => void;
 }
 
@@ -26,57 +28,57 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    setIsInWishlist(product?.WishLists?.length > 0 ? product?.WishLists[0]?.productId === product?.id : false)
-  }, [isInWishlist, product])
+  // useEffect(() => {
+  //   setIsInWishlist(product?.WishLists?.length > 0 ? product?.WishLists[0]?.productId === product?.id : false)
+  // }, [isInWishlist, product])
 
   const navigateToProductDetails = () => {
-    navigate(`/product-details/${categoryKey}/${product?.id}`);
+    navigate(`/product-details/${product?.id}`);
   };
 
   const handleWishlistToggle = async () => {
-    if (!userId && product) {
-      dispatch(setLocalWishlistItems({ product }))
-      return
-    }
-    try {
-      const add = !isInWishlist;
-      const response = await updateWishlistResponse({ add, productId: product?.id, userId });
-      if (response) {
-        setIsInWishlist(add);
-        dispatch(updateSingleProductWishlist({ isInWishlist: add, productId: product?.id }))
-        dispatch(updateProductWishlist({ isInWishlist: add, productId: product?.id }));
-      }
-    } catch (error: any) {
-      console.error('Error updating wishlist:', error?.message);
-    }
+    // if (!userId && product) {
+    //   dispatch(setLocalWishlistItems({ product }))
+    //   return
+    // }
+    // try {
+    //   const add = !isInWishlist;
+    //   const response = await updateWishlistResponse({ add, productId: product?.id, userId });
+    //   if (response) {
+    //     setIsInWishlist(add);
+    //     dispatch(updateSingleProductWishlist({ isInWishlist: add, productId: product?.id }))
+    //     dispatch(updateProductWishlist({ isInWishlist: add, productId: product?.id }));
+    //   }
+    // } catch (error: any) {
+    //   console.error('Error updating wishlist:', error?.message);
+    // }
   };
 
   const handleRemoveFromWishlist = async () => {
-    if(!userId){
-      dispatch(setLocalWishlistItems({product}))
-      return 
-    }
-    try {
-      const response = await updateWishlistResponse({ add: false, productId: product.id, userId });
-      if (response) {
-        toast.success("Removed from WishList")
-        if (onRemoveFromWishlist) {
-          onRemoveFromWishlist(product.id);
-        }
-      }
-    } catch (error: any) {
-      toast.error(error?.message ?? "Unable to remove from Wishlist")
-    }
+    // if(!userId){
+    //   dispatch(setLocalWishlistItems({product}))
+    //   return 
+    // }
+    // try {
+    //   const response = await updateWishlistResponse({ add: false, productId: product.id, userId });
+    //   if (response) {
+    //     toast.success("Removed from WishList")
+    //     if (onRemoveFromWishlist) {
+    //       onRemoveFromWishlist(product.id);
+    //     }
+    //   }
+    // } catch (error: any) {
+    //   toast.error(error?.message ?? "Unable to remove from Wishlist")
+    // }
   }
   return (
     <Card className={className}>
       <CardMedia
         component="img"
-        image={getImagesFromUrl(product?.CoverImageLink ?? product?.image)}
+        image={(product?.productImages.find(image => image.isThumbnail === true))?.signedUrl}
         alt={product?.name}
         className="cursor-pointer"
-        sx={{ objectFit: 'cover', aspectRatio: '0.64' }}
+        sx={{ objectFit: 'cover', aspectRatio: '1' }}
         onClick={navigateToProductDetails}
       />
       {showDetails && (
@@ -94,8 +96,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
               )}
             </Box>
             <Typography component="div" className="uppercase font-light text-xs">
-              <span>&#8377;</span>
-              <span>{product?.price}</span>
+              <span><CurrencyRupeeIcon /></span>
+              <span>{product?.productPrices[0]?.pricePerPiece}</span>
             </Typography>
           </CardContent>
 
@@ -103,8 +105,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
           <div className='lg:hidden px-2 py-1'>
             <div className='flex justify-between items-center'>
               <div className="uppercase font-light text-xs">
-                <span>&#8377;</span>
-                <span>{product?.price}</span>
+                <span><CurrencyRupeeIcon/></span>
+                <span>{product?.productPrices[0]?.pricePerPiece}</span>
               </div>
               {!isAlreadyInWishlist && (
                 <IconButton aria-label="add to wishlist" onClick={handleWishlistToggle}>

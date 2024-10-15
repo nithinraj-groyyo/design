@@ -59,7 +59,7 @@ import {
 } from "../../../rtk-query/productApiSlice";
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
-import { UpdateProductDTO } from "../../../types/products";
+import { IProduct, UpdateProductDTO } from "../../../types/products";
 import MagnifyProductImage from "./MagnifyProductImage";
 
 const CustomPaper = styled("div")(({ theme }) => ({
@@ -97,42 +97,7 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
   },
 }));
 
-interface ProductSize {
-  id: number;
-  name: string;
-}
 
-interface ProductPrice {
-  id: number;
-  minQty: number;
-  maxQty: number;
-  pricePerPiece: number;
-}
-
-interface ProductImage {
-  fileId: number;
-  isThumbnail: boolean;
-  sideName: string;
-}
-
-interface IProduct {
-  id: number;
-  name: string;
-  styleName: string;
-  category: number;
-  subCategory: number;
-  description: string;
-  productSizeIds: number[];
-  productColors: number[];
-  productPrices: ProductPrice[];
-  productImages: ProductImage[];
-  isPublic: boolean;
-  sizes: ProductSize[];
-  leftTopHeader: string;
-  leftTopContent: string;
-  leftBottomHeader: string;
-  leftBottomContent: string;
-}
 
 interface ImageData {
   id: string;
@@ -279,7 +244,7 @@ const EditProduct = () => {
       });
       setImgList(initialImageList);
     }
-  }, [productData, categories, subCategories]);
+  }, [productData, categories, subCategories, productId]);
 
   useEffect(() => {
     if (selectedCategory) {
@@ -538,7 +503,7 @@ const EditProduct = () => {
         leftTopContent: values?.leftTopContent,
         leftBottomHeader: values?.leftBottomHeader,
         leftBottomContent: values?.leftBottomContent,
-        isPublic: selectedStatus
+        isPublic: selectedStatus === "enabled" ? true : false
       };
 
       try {
@@ -734,7 +699,7 @@ const EditProduct = () => {
                     />
                   </FormGroup>
 
-                  {imgList.length > 1 && (
+                  {(imgList.length > 1 || imgList[0]?.fileName?.length > 0) && (
                     <div className="flex gap-2">
                       <IconButton color="error" onClick={handleRemoveImage(img.id)}>
                         <DeleteIcon />

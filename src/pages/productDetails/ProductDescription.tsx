@@ -1,19 +1,21 @@
 import React from 'react';
 import { Typography, Link } from '@mui/material';
+import { IProduct } from '../../types/products';
 
 interface IProductDescriptionProps{
     expanded: any;
-    onToggle: any
+    onToggle: any;
+    product: IProduct;
 }
 
-const ProductDescription = ({ expanded, onToggle }: IProductDescriptionProps) => {
+const ProductDescription = ({ expanded, onToggle, product }: IProductDescriptionProps) => {
     return (
         <>
             <Typography className='text-[#8E8E8E] text-xs whitespace-nowrap !tracking-[0.3rem] font-semibold text-left'>
                 COMPOSITION, CARE AND ORIGIN
             </Typography>
 
-            <div className='flex flex-col gap-2'>
+            {/* <div className='flex flex-col gap-2'>
                 <Typography className='text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left'>
                     COMPOSITION
                 </Typography>
@@ -21,11 +23,19 @@ const ProductDescription = ({ expanded, onToggle }: IProductDescriptionProps) =>
                     We work with monitoring programmes to ensure compliance with our social, environmental and health and safety standards for our products. To assess compliance, we have developed a programme of audits and continuous improvement plans.
                 </Typography>
                 <Typography className='text-xs text-[#8E8E8E]'>100% COTTON</Typography>
+            </div> */}
+            <div className='flex flex-col gap-2'>
+                <Typography className='text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left'>
+                    {product?.leftTopHeader}
+                </Typography>
+                <Typography className='text-xs text-[#8E8E8E]'>
+                {product?.leftTopContent}
+                </Typography>
             </div>
 
             {expanded && (
                 <>
-                    <div className='flex flex-col gap-2'>
+                    {/* <div className='flex flex-col gap-2'>
                         <Typography className='text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left'>
                             CARE
                         </Typography>
@@ -54,6 +64,14 @@ const ProductDescription = ({ expanded, onToggle }: IProductDescriptionProps) =>
                             Thanks to the collaboration with our suppliers, we work to know the facilities and processes used to manufacture our products in order to understand their traceability.
                         </Typography>
                         <Typography className='text-xs text-[#8E8E8E]'>MADE IN INDIA</Typography>
+                    </div> */}
+                    <div className='flex flex-col gap-2'>
+                        <Typography className='text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left'>
+                            {product?.leftBottomHeader}
+                        </Typography>
+                        <Typography className='text-xs text-[#8E8E8E]'>
+                            {product?.leftBottomContent}
+                        </Typography>
                     </div>
                 </>
             )}

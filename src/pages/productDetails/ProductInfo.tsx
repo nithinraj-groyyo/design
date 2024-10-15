@@ -2,21 +2,21 @@ import { useEffect, useState } from 'react';
 import FavoriteBorderOutlined from '@mui/icons-material/FavoriteBorderOutlined';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { updateWishlistResponse } from '../../api/userApi';
-import { IProductResponse } from '../../types/products';
+import { IProduct, IProductResponse } from '../../types/products';
 import { useDispatch } from 'react-redux';
 import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';
 import { setLocalWishlistItems } from '../../redux/wishlistSlice';
 
 interface IProductInfoProps {
-    product: IProductResponse;
+    product: IProduct;
 }
 
 const ProductInfo = ({ product }: IProductInfoProps) => {
     const [isInWishlist, setIsInWishlist] = useState(false);
 
-    useEffect(() => {
-        setIsInWishlist(product?.WishLists?.length > 0 ? +product?.WishLists[0]?.productId === +product?.id : false)
-    },[isInWishlist, product])
+    // useEffect(() => {
+    //     setIsInWishlist(product?.WishLists?.length > 0 ? +product?.WishLists[0]?.productId === +product?.id : false)
+    // },[isInWishlist, product])
 
     const userId = JSON.parse(localStorage.getItem('userId') as string);
 
@@ -46,7 +46,7 @@ const ProductInfo = ({ product }: IProductInfoProps) => {
                 <h1 className="text-sm text-black font-bold max-w-xs">{product?.name}</h1>
                 <div className="text-xs">
                     <span>&#8377;</span>
-                    <span>{product?.price}</span>
+                    <span>{product?.productPrices[0]?.pricePerPiece}</span>
                 </div>
                 <p className="text-xs text-gray-500">MRP INC OF ALL TAXES</p>
             </div>

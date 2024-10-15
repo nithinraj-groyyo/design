@@ -358,7 +358,7 @@ const AddProducts = () => {
             leftTopContent: values?.leftTopContent,
             leftBottomHeader: values?.leftBottomHeader,
             leftBottomContent: values?.leftBottomContent,
-            isPublic: selectedStatus
+            isPublic: selectedStatus === "enabled" ? true : false
           };
 
           try {

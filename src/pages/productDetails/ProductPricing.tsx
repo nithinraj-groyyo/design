@@ -1,10 +1,13 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import { IProduct } from '../../types/products';
 
-const ProductPricing = () => {
-    const { product } = useSelector((state: RootState) => state.products.singleProductData);
+interface IProductPricingProps {
+    product: IProduct;
+}
 
-    if (!product?.ProductPricings || product.ProductPricings.length === 0) {
+const ProductPricing = ({product}: IProductPricingProps) => {
+    if (!product?.productPrices || product?.productPrices?.length === 0) {
         return <div className="bg-gray-100 w-full p-4">No pricing information available.</div>;
     }
 
@@ -16,14 +19,14 @@ const ProductPricing = () => {
             </div>
 
             <div className="grid gap-4">
-                {product.ProductPricings.map((pricing) =>{
+                {product && product?.productPrices.map((pricing) =>{
                     return (
-                    <div key={pricing.id} className={`grid grid-cols-2 gap-4  border-gray-300 py-2 ${+pricing?.id === +product?.ProductPricings[product?.ProductPricings.length - 1]?.id ? '' : 'border-b'}`}>
+                    <div key={pricing.id} className={`grid grid-cols-2 gap-4  border-gray-300 py-2 ${+pricing?.id === +product?.productPrices[product?.productPrices?.length - 1]?.id ? '' : 'border-b'}`}>
                         <p className="text-gray-800 text-center">
-                            {pricing.MinQuantity} - {pricing.MaxQuantity} <span className="ml-2">pcs</span>
+                            {pricing?.minQty} - {Boolean(pricing?.maxQty) ? pricing?.maxQty: "above"} <span className="ml-2">pcs</span>
                         </p>
                         <p className="text-gray-800 text-center">
-                            ₹{pricing.Price} <span className="ml-2">/ pc</span>
+                            ₹{pricing?.pricePerPiece} <span className="">/pc</span>
                         </p>
                     </div>
                 )})}
