@@ -1,21 +1,26 @@
-import React from 'react';
-import { Typography, Link } from '@mui/material';
-import { IProduct } from '../../types/products';
+import React from "react";
+import { Typography, Link } from "@mui/material";
+import { IProduct } from "../../types/products";
 
-interface IProductDescriptionProps{
-    expanded: any;
-    onToggle: any;
-    product: IProduct;
+interface IProductDescriptionProps {
+  expanded: any;
+  onToggle: any;
+  product: IProduct;
 }
 
-const ProductDescription = ({ expanded, onToggle, product }: IProductDescriptionProps) => {
-    return (
-        <>
-            <Typography className='text-[#8E8E8E] text-xs whitespace-nowrap !tracking-[0.3rem] font-semibold text-left'>
-                COMPOSITION, CARE AND ORIGIN
-            </Typography>
+const ProductDescription = ({
+  expanded,
+  onToggle,
+  product,
+}: IProductDescriptionProps) => {
+  return (
+    <>
+      <div className="w-fit border border-black p-4">
+        <Typography className="text-[#8E8E8E] text-xs whitespace-nowrap !tracking-[0.3rem] font-semibold text-left">
+          COMPOSITION, CARE AND ORIGIN
+        </Typography>
 
-            {/* <div className='flex flex-col gap-2'>
+        {/* <div className='flex flex-col gap-2'>
                 <Typography className='text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left'>
                     COMPOSITION
                 </Typography>
@@ -24,18 +29,18 @@ const ProductDescription = ({ expanded, onToggle, product }: IProductDescription
                 </Typography>
                 <Typography className='text-xs text-[#8E8E8E]'>100% COTTON</Typography>
             </div> */}
-            <div className='flex flex-col gap-2'>
-                <Typography className='text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left'>
-                    {product?.leftTopHeader}
-                </Typography>
-                <Typography className='text-xs text-[#8E8E8E]'>
-                {product?.leftTopContent}
-                </Typography>
-            </div>
+        <div className="flex flex-col gap-2">
+          <Typography className="text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left">
+            {product?.leftTopHeader}
+          </Typography>
+          <Typography className="text-xs text-[#8E8E8E]">
+            {product?.leftTopContent}
+          </Typography>
+        </div>
 
-            {expanded && (
-                <>
-                    {/* <div className='flex flex-col gap-2'>
+        {expanded && (
+          <>
+            {/* <div className='flex flex-col gap-2'>
                         <Typography className='text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left'>
                             CARE
                         </Typography>
@@ -65,22 +70,26 @@ const ProductDescription = ({ expanded, onToggle, product }: IProductDescription
                         </Typography>
                         <Typography className='text-xs text-[#8E8E8E]'>MADE IN INDIA</Typography>
                     </div> */}
-                    <div className='flex flex-col gap-2'>
-                        <Typography className='text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left'>
-                            {product?.leftBottomHeader}
-                        </Typography>
-                        <Typography className='text-xs text-[#8E8E8E]'>
-                            {product?.leftBottomContent}
-                        </Typography>
-                    </div>
-                </>
-            )}
+            <div className="flex flex-col gap-2">
+              <Typography className="text-[#8E8E8E] text-xs !tracking-[0.3rem] font-semibold text-left">
+                {product?.leftBottomHeader}
+              </Typography>
+              <Typography className="text-xs text-[#8E8E8E]">
+                {product?.leftBottomContent}
+              </Typography>
+            </div>
+          </>
+        )}
 
-            <Link onClick={onToggle} className='cursor-pointer !text-[#8E8E8E] whitespace-nowrap'>
-                {expanded ? 'View Less' : 'View More'}
-            </Link>
-        </>
-    );
+        <Link
+          onClick={onToggle}
+          className="cursor-pointer !text-[#8E8E8E] whitespace-nowrap"
+        >
+          {expanded ? "View Less" : "View More"}
+        </Link>
+      </div>
+    </>
+  );
 };
 
 export default ProductDescription;

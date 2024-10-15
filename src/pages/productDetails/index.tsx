@@ -63,8 +63,10 @@ console.log(products)
     return (
         <BasicLayout showFooter={isMobileView ? false : true}>
             <div className="hidden lg:grid grid-cols-3 min-h-[40rem] mt-[12rem] mb-[4rem]">
-                <div className='flex flex-col gap-4 justify-end items-start border border-black p-[1rem] mx-[6rem]'>
-                    <ProductDescription product={product!} expanded={expanded} onToggle={handleToggle} />
+                <div className='flex flex-col gap-4 justify-end items-start  p-[1rem] mx-[6rem]'>
+                    <div className=''>
+                        <ProductDescription product={product!} expanded={expanded} onToggle={handleToggle} />
+                    </div>
                 </div>
                 <div>
                     <ImageSlider product={product!} />
