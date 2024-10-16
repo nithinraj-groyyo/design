@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';
 import { toast } from 'react-toastify';
 import { setLocalWishlistItems } from '../../redux/wishlistSlice';
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import CurrencyRupeeIcon  from '@mui/icons-material/CurrencyRupee';
 import { IProduct } from '../../types/products';
 
 interface ProductCardProps {
@@ -96,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
               )}
             </Box>
             <Typography component="div" className="uppercase font-light text-xs">
-              <span><CurrencyRupeeIcon /></span>
+              <span><CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} /></span>
               <span>{product?.productPrices[0]?.pricePerPiece}</span>
             </Typography>
           </CardContent>
@@ -105,7 +105,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
           <div className='lg:hidden px-2 py-1'>
             <div className='flex justify-between items-center'>
               <div className="uppercase font-light text-xs">
-                <span><CurrencyRupeeIcon/></span>
+                <span><CurrencyRupeeIcon sx={{ fontSize: 'inherit' }}/></span>
                 <span>{product?.productPrices[0]?.pricePerPiece}</span>
               </div>
               {!isAlreadyInWishlist && (

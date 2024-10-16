@@ -6,6 +6,7 @@ import { IProduct, IProductResponse } from '../../types/products';
 import { useDispatch } from 'react-redux';
 import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';
 import { setLocalWishlistItems } from '../../redux/wishlistSlice';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 
 interface IProductInfoProps {
     product: IProduct;
@@ -43,12 +44,12 @@ const ProductInfo = ({ product }: IProductInfoProps) => {
     return (
         <div className="flex items-start w-full">
             <div className="flex flex-col gap-2 flex-1">
-                <h1 className="text-sm text-black font-bold max-w-xs">{product?.name}</h1>
-                <div className="text-xs">
-                    <span>&#8377;</span>
+                <h1 className="text-sm 2xl:text-[1rem] text-black font-bold max-w-xs">{product?.name}</h1>
+                <div className="text-xs 2xl:text-sm">
+                    <CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} />
                     <span>{product?.productPrices[0]?.pricePerPiece}</span>
                 </div>
-                <p className="text-xs text-gray-500">MRP INC OF ALL TAXES</p>
+                <p className="text-xs 2xl:text-sm text-gray-500">MRP INC OF ALL TAXES</p>
             </div>
             <div className="flex justify-center items-center">
                 <button className="p-2" onClick={handleWishlistToggle}>
