@@ -1,5 +1,25 @@
 import React, { useState } from "react";
-import { Box, Button, Modal, TextField, Typography, Switch, FormControlLabel } from "@mui/material";
+import {
+  Box,
+  Button,
+  Modal,
+  TextField,
+  Typography,
+  Switch,
+  FormControlLabel,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Pagination,
+  MenuItem,
+  Select,
+  FormControl,
+  SelectChangeEvent,
+} from "@mui/material";
+import { useLoadCategoriesWithPaginationQuery } from "../../../rtk-query/categoriesApiSlice";
 
 const style = {
   position: "absolute",
@@ -13,14 +33,22 @@ const style = {
   p: 4,
 };
 
-const CategoriesTable = ({ categories }: any) => {
+const CategoriesTable = () => {
   const [open, setOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [categoryName, setCategoryName] = useState("");
   const [isActive, setIsActive] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0); 
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const { data: categoriesData, isLoading: isCategoriesLoading, isError } = useLoadCategoriesWithPaginationQuery({
+    pageIndex: currentPage,
+    pageSize: itemsPerPage,
+  });
+
+  const totalItems = categoriesData?.totalItems ?? 0;
+  const pageCount = Math.ceil(totalItems / itemsPerPage); 
 
   const handleEditClick = (category: any) => {
-    setSelectedCategory(category);
     setCategoryName(category.name);
     setIsActive(category.status === "Active");
     setOpen(true);
@@ -37,60 +65,81 @@ const CategoriesTable = ({ categories }: any) => {
     handleClose();
   };
 
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setCurrentPage(value); 
+  };
+
+  const handleItemsChange = (event: SelectChangeEvent<number>) => {
+    setItemsPerPage(Number(event.target.value));
+    setCurrentPage(0); 
+  };
+
+  console.log(categoriesData,"Kesavvv")
+
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-200">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border-b">Categories</th>
-            <th className="py-2 px-4 border-b">Status</th>
-            <th className="py-2 px-4 border-b">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories?.map((category: any) => (
-            <tr key={category.id} className="text-center">
-              <td className="py-2 px-4 border-b">{category?.name}</td>
-              <td
-                className={`py-2 px-4 border-b ${
-                  category.status === "Active" ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {category.status} Disabled
-              </td>
-              <td className="py-2 px-4 border-b flex justify-center">
-                <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded"
-                  onClick={() => handleEditClick(category)}
-                >
-                  Edit
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TableContainer>
+        <Table className="min-w-full bg-white border border-gray-200">
+          <TableHead>
+            <TableRow >
+              <TableCell className="!text-xl !font-semibold">Categories</TableCell>
+              <TableCell className="!text-xl !font-semibold">Status</TableCell>
+              <TableCell className="!text-xl !font-semibold">Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {categoriesData?.map((category: any) => (
+              <TableRow key={category?.id}>
+                <TableCell>{category?.name}</TableCell>
+                <TableCell className={category.status === "Active" ? "text-green-500" : "text-red-500"}>
+                  {category?.status} Inactive
+                </TableCell>
+                <TableCell>
+                  <Button
+                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    onClick={() => handleEditClick(category)}
+                  >
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+      <Box display="flex" justifyContent="space-between" mt={2}>
+        <Pagination
+          count={pageCount}
+          page={currentPage}
+          onChange={handlePageChange}
+          variant="outlined"
+          color="primary"
+        />
+        <FormControl>
+          <Select value={itemsPerPage} onChange={handleItemsChange}>
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={15}>15</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2" gutterBottom>
-            Edit Category
-          </Typography>
-
+          <Typography variant="h6">Edit Category</Typography>
           <TextField
             label="Category Name"
-            variant="outlined"
             fullWidth
             value={categoryName}
             onChange={(e) => setCategoryName(e.target.value)}
-            sx={{ marginBottom: 2}}
+            sx={{ marginBottom: 2 }}
+            className="!mt-8"
           />
-
           <FormControlLabel
             control={<Switch checked={isActive} onChange={handleStatusChange} />}
             label={isActive ? "Active" : "Inactive"}
           />
-
           <Box display="flex" justifyContent="space-between" mt={2}>
             <Button variant="contained" color="secondary" onClick={handleClose}>
               Cancel

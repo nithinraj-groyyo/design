@@ -1,5 +1,6 @@
 import { Box, Button, Modal, TextField, Typography, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import React, { useState } from "react";
+import { useLoadCategoriesWithPaginationQuery } from "../../../rtk-query/categoriesApiSlice";
 
 const style = {
   position: "absolute",
@@ -16,6 +17,11 @@ const style = {
 const AddSubCategoriesModal = ({ subCategoryModal, toggleAddSubCategory, categoriesOptions }: any) => {
   const [subcategoryName, setSubcategoryName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+
+  const { data: categoriesData, isLoading: isCategoriesLoading, isError } = useLoadCategoriesWithPaginationQuery({
+    pageIndex: 0,
+    pageSize: 999,
+  });
 
   return (
     <Modal
@@ -34,7 +40,7 @@ const AddSubCategoriesModal = ({ subCategoryModal, toggleAddSubCategory, categor
           Add Subcategory
         </Typography>
 
-        <FormControl fullWidth sx={{ marginBottom: 2 }}>
+        <FormControl fullWidth sx={{ marginBottom: 2 }} className="!mt-8">
           <InputLabel id="category-select-label">Select Category</InputLabel>
           <Select
             labelId="category-select-label"
@@ -42,7 +48,7 @@ const AddSubCategoriesModal = ({ subCategoryModal, toggleAddSubCategory, categor
             label="Select Category"
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
-            {categoriesOptions?.map((category: any) => (
+            {categoriesData?.map((category: any) => (
               <MenuItem key={category?.id} value={category?.name}>
                 {category?.name}
               </MenuItem>
