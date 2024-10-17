@@ -78,7 +78,7 @@ export interface IWishlistItem {
     userId: number;
     productId: number;
     createdDate: string;
-    Product: IProductResponse;
+    Product: IProduct;
 }
 
 export interface IWishlistResponse {

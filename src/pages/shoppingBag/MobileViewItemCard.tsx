@@ -63,7 +63,7 @@ const MobileViewItemCard: React.FC<MobileViewItemCardProps> = ({
 
     const handleWishlistToggle = async () => {
         if(!userId){
-            dispatch(setLocalWishlistItems({product}))
+            dispatch(setLocalWishlistItems({productId: product?.id}))
             return 
         }
         try {

@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { SignInIcon } from '../../assets/svg/home/SignInIcon';
-import { WishlistIcon } from '../../assets/svg/home/WishlistIcon';
-// import { ShoppingBagIcon } from '../../assets/svg/home/ShoppingBagIcon';
 import useAuth from '../../hooks/useAuth';
 import { IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import CustomizedShoppingBadges from '../Badge';
+import CustomizedShoppingBadges from './badges/CustomizedShoppingBadges';
 import useSignOut from '../../hooks/useSignOut';
 import SignOutModal from './SignOutModal';
+import CustomizedWishlist from './badges/CustomizedWishlist';
 
 interface IconButtonConfig {
     icon: React.ReactNode;
@@ -31,7 +30,7 @@ interface HeaderIconsProps {
 
 const iconButtons: IconButtonConfig[] = [
     { icon: <SignInIcon />, label: "sign in", redirect: "/login", id: "login" },
-    { icon: <WishlistIcon />, label: "wishlist", redirect: "/wishlist", id: "wishlist" },
+    { icon: <CustomizedWishlist />, label: "wishlist", redirect: "/wishlist", id: "wishlist" },
     { icon: <CustomizedShoppingBadges />, label: "shopping bag", redirect: "/bag", id: "bag" },
 ];
 

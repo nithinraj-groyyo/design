@@ -15,6 +15,10 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import BasicLayout from "../../layouts/BasicLayout";
 import { useForgotPasswordMutation } from "../../rtk-query/authApiSlice";
 import { useSignInMutation } from "../../rtk-query/authApiSlice";
+import { jwtDecode } from "jwt-decode";
+import { useUpdateLocalWishlistMutation } from "../../rtk-query/wishlistApiSlice";
+import { useDispatch } from "react-redux";
+import { setWishlistItems } from "../../redux/wishlistSlice";
 
 const Login = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
@@ -22,6 +26,7 @@ const Login = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [apiData, setApiData] = useState();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [signIn, { isLoading }] = useSignInMutation();
   const [forgotPassword] = useForgotPasswordMutation();
 
@@ -36,6 +41,8 @@ const Login = () => {
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
+
+  const [updateLocalWishlist] = useUpdateLocalWishlistMutation()
 
   const formik = useFormik({
     initialValues: {
@@ -64,7 +71,18 @@ const Login = () => {
         if(response?.status && response?.httpStatusCode === 200){
           toast.success(response?.message);
           localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
-          localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin))
+          localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin));
+
+          const decodedToken: any = jwtDecode(response?.data?.access_token);
+          localStorage.setItem('userId', JSON.stringify(decodedToken?.id));
+
+          const productIds = JSON.parse(localStorage.getItem("localWishList") as string);
+          await updateLocalWishlist({token: response?.data?.access_token, payload: productIds})?.then((res) => {
+            const response = res?.data;
+            dispatch(setWishlistItems(response?.data?.count));
+            localStorage.removeItem("localWishList")
+          })
+
           resetForm(); 
           navigate("/")
         }else if(response?.statusCode === 400){
