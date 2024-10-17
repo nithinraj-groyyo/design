@@ -68,14 +68,14 @@ const adminMenuItems = [
   //   title: "Customer",
   //   subItems: [{ title: "Queries", route: "/account/queries" }],
   // },
-  // {
-  //   title: "Site Settings",
-  //   subItems: [
-  //     { title: "Brands", route: "/account/brands" },
-  //     { title: "Add Brands", route: "/account/add-brands" },
-  //     { title: "Manage Categories", route: "/account/manage-categories" },
-  //   ],
-  // },
+  {
+    title: "Site Settings",
+    subItems: [
+      { title: "Brands", route: "/account/brands" },
+      { title: "Add Brands", route: "/account/add-brands" },
+      { title: "Manage Categories", route: "/account/manage-categories" },
+    ],
+  },
 ];
 
 const AccountPage = () => {
