@@ -3,7 +3,7 @@ import BasicLayout from "../../layouts/BasicLayout";
 import ProductFilter from "./ProductFilter";
 import ProductGrid from "./ProductGrid";
 import { ProductViewEnum } from "../../utilities/enum";
-import { IProductView } from "../../types/products";
+import { IProduct, IProductView } from "../../types/products";
 import ProductLargeView from "./ProductLargeView";
 import { useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +21,7 @@ const ProductList: React.FC = () => {
   const { categoryId, subCategoryId } = location?.state;
 
   const [fetchProducts, { data, isLoading }] = useLazyFetchProductsQuery();
+  const [products, setProducts] = useState<IProduct[] | undefined>();
 
   useEffect(() => {
     if (subCategoryId) {
@@ -41,7 +42,12 @@ const ProductList: React.FC = () => {
     }
   }, [categoryId, subCategoryId]);
 
-  console.log(data, "datat");
+
+  useEffect(() => {
+    if (data?.data) {
+      setProducts(data?.data)
+    }
+  }, [data])
 
   const handleFilterChange = (size: IProductView) => {
     setCurrentView(size);
@@ -88,7 +94,7 @@ const ProductList: React.FC = () => {
       </div>
 
       <div className="mt-[12rem]">
-        {currentView === ProductViewEnum.LARGE ? <ProductLargeView /> : <ProductGrid products={productData?.products} currentView={currentView} />}
+        {currentView === ProductViewEnum.LARGE ? <ProductLargeView /> : <ProductGrid products={products!} currentView={currentView} />}
       </div>
     </BasicLayout>
   );

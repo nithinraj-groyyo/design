@@ -30,63 +30,29 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Box,
-  List,
-  ListItem,
 } from "@mui/material";
 import React, { useEffect, useState, ChangeEvent } from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import RemoveIcon from "@mui/icons-material/Remove";
 import UploadIcon from "@mui/icons-material/Upload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useFormik } from "formik";
 import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
-import { useLocation, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useFetchSubCategories } from "../../../hooks/useFetchSubCategories";
-import { ICategory } from "../../../types/categories";
-import { RootState } from "../../../redux/store";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { addUpdateProductResponse } from "../../../api/productsApi";
 import {
   useAddNewColorMutation,
   useAddNewSizeMutation,
   useGetAllColorsQuery,
   useGetAllSizesQuery,
-  useGetProductByIdQuery,
+  useLazyGetProductByIdQuery,
   useUpdateProductMutation,
 } from "../../../rtk-query/productApiSlice";
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
-import { UpdateProductDTO } from "../../../types/products";
+import { IProduct } from "../../../types/products";
 import MagnifyProductImage from "./MagnifyProductImage";
 
-const CustomPaper = styled("div")(({ theme }) => ({
-  position: "relative",
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: theme.shadows[5],
-  padding: theme.spacing(2),
-  overflow: "hidden",
-  maxHeight: "250px",
-  display: "flex",
-  flexDirection: "column",
-}));
-
-const ScrollableList = styled("div")(() => ({
-  overflowY: "auto",
-  flexGrow: 1,
-  maxHeight: "200px",
-}));
-
-const AddButtonWrapper = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(1),
-  borderTop: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.background.default,
-  textAlign: "center",
-}));
 
 const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
   display: "flex",
@@ -96,43 +62,6 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
     marginBottom: theme.spacing(1),
   },
 }));
-
-interface ProductSize {
-  id: number;
-  name: string;
-}
-
-interface ProductPrice {
-  id: number;
-  minQty: number;
-  maxQty: number;
-  pricePerPiece: number;
-}
-
-interface ProductImage {
-  fileId: number;
-  isThumbnail: boolean;
-  sideName: string;
-}
-
-interface IProduct {
-  id: number;
-  name: string;
-  styleName: string;
-  category: number;
-  subCategory: number;
-  description: string;
-  productSizeIds: number[];
-  productColors: number[];
-  productPrices: ProductPrice[];
-  productImages: ProductImage[];
-  isPublic: boolean;
-  sizes: ProductSize[];
-  leftTopHeader: string;
-  leftTopContent: string;
-  leftBottomHeader: string;
-  leftBottomContent: string;
-}
 
 interface ImageData {
   id: string;
@@ -170,7 +99,7 @@ interface FormData {
 const EditProduct = () => {
   const { productId } = useParams();
 
-  const userId = JSON.stringify(localStorage.getItem("userId") as string);
+  const [product, setProduct] = useState<IProduct>()
 
   const [selectedCategory, setSelectedCategory] = useState<{ id: number; name: string } | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<{ id: number; name: string } | null>(null);
@@ -194,7 +123,7 @@ const EditProduct = () => {
 
   const [selectedStatus, setSelectedStatus] = useState("enabled");
 
-  const [uploadSingleFile, { isLoading: isFileLoading }] = useUploadSingleFileMutation();
+  const [uploadSingleFile] = useUploadSingleFileMutation();
 
   const { data: categories, isLoading: isCategoriesLoading } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
   const {
@@ -207,6 +136,8 @@ const EditProduct = () => {
     pageSize: 10,
   });
 
+  const navigate = useNavigate();
+
   const [addNewSize] = useAddNewSizeMutation();
   const [addNewColor] = useAddNewColorMutation();
 
@@ -216,66 +147,78 @@ const EditProduct = () => {
   const { data: colors, isLoading: isColorsLoading } = useGetAllColorsQuery({});
   const colorOptions = colors?.data;
 
-  const { data: productByIdResponse } = useGetProductByIdQuery({ productId: +productId! });
-  const productData: IProduct = productByIdResponse?.data;
+  const [getProductById] = useLazyGetProductByIdQuery();
 
   const [updateProduct] = useUpdateProductMutation();
 
   useEffect(() => {
-    if (productData) {
-      formik.setFieldValue("productId", productData?.id);
-      formik.setFieldValue("productName", productData?.name);
-      formik.setFieldValue("styleName", productData?.styleName);
-      formik.setFieldValue("description", productData?.description);
-      formik.setFieldValue("leftTopHeader", productData?.leftTopHeader);
-      formik.setFieldValue("leftTopContent", productData?.leftTopContent);
-      formik.setFieldValue("leftBottomHeader", productData?.leftBottomHeader);
-      formik.setFieldValue("leftBottomContent", productData?.leftBottomContent);
-
-      const loadedCategory = categories?.find((cat: any) => cat.id === productData?.category);
-      if (loadedCategory) {
-        formik.setFieldValue("category", loadedCategory?.id);
-        setSelectedCategory(loadedCategory);
-      }
-
-      const loadedSubCategory = subCategories?.find((subCat: any) => subCat.id === productData?.subCategory);
-
-      if (loadedSubCategory) {
-        formik.setFieldValue("otherCategory", loadedSubCategory?.id);
-        setSelectedSubCategory(loadedSubCategory!);
-      }
-
-      const initialSizeIds = productData?.sizes?.map((size: any) => size?.id) || [];
-      formik.setFieldValue("sizes", initialSizeIds);
-
-      const initialColorIds = productData?.productColors?.map((size: any) => size?.id) || [];
-      formik.setFieldValue("colors", initialColorIds);
-
-      const initialPricings =
-        productData?.productPrices?.map((price) => {
-          return {
-            id: price.id,
-            minQty: price.minQty?.toString(),
-            maxQty: price.maxQty?.toString(),
-            pricePerPiece: price.pricePerPiece?.toString(),
-          };
-        }) || [];
-      setPriceList(initialPricings);
-
-      const initialImageList = productData?.productImages?.map((price: any) => {
-        return {
-          id: price?.fileId,
-          side: price?.sideName,
-          file: null,
-          isThumbnail: price?.isThumbnail,
-          fileName: price?.fileName,
-          isDeleted: false,
-          imageUrl: price?.signedUrl,
-        };
-      });
-      setImgList(initialImageList);
+    async function loadProducts () {
+        if(productId){
+            const response = await getProductById({ productId: +productId }).unwrap();
+            const responseData = response?.data;
+            setProduct(responseData); 
+        }
     }
-  }, [productData, categories, subCategories]);
+    loadProducts()
+  }, [productId]);
+
+  useEffect(() => {
+    if (product && categories?.length > 0 && subCategories && subCategories?.length > 0) {
+        formik.setFieldValue("productId", product?.id);
+        formik.setFieldValue("productName", product?.name);
+        formik.setFieldValue("styleName", product?.styleName);
+        formik.setFieldValue("description", product?.description);
+        formik.setFieldValue("leftTopHeader", product?.leftTopHeader);
+        formik.setFieldValue("leftTopContent", product?.leftTopContent);
+        formik.setFieldValue("leftBottomHeader", product?.leftBottomHeader);
+        formik.setFieldValue("leftBottomContent", product?.leftBottomContent);
+  
+        setSelectedStatus(product?.isPublic ? "enabled":"disabled");
+  
+        const loadedCategory = categories?.find((cat: any) => cat.id === product?.category);
+        if (loadedCategory) {
+          formik.setFieldValue("category", loadedCategory?.id);
+          setSelectedCategory(loadedCategory);
+        }
+  
+        const loadedSubCategory = subCategories?.find((subCat: any) => subCat.id === product?.subCategory);
+
+        if (loadedSubCategory) {
+          formik.setFieldValue("otherCategory", loadedSubCategory?.id);
+          setSelectedSubCategory(loadedSubCategory!);
+        }
+  
+        const initialSizeIds = product?.sizes?.map((size: any) => size?.id) || [];
+        formik.setFieldValue("sizes", initialSizeIds);
+  
+        const initialColorIds = product?.productColors?.map((size: any) => size?.id) || [];
+        formik.setFieldValue("colors", initialColorIds);
+  
+        const initialPricings =
+          product?.productPrices?.map((price: any) => {
+            return {
+              id: price.id,
+              minQty: price.minQty?.toString(),
+              maxQty: price.maxQty?.toString(),
+              pricePerPiece: price.pricePerPiece?.toString(),
+            };
+          }) || [];
+        setPriceList(initialPricings);
+  
+        const initialImageList = product?.productImages?.map((price: any) => {
+          return {
+            id: price?.fileId,
+            side: price?.sideName,
+            file: null,
+            isThumbnail: price?.isThumbnail,
+            fileName: price?.fileName,
+            isDeleted: false,
+            imageUrl: price?.signedUrl,
+          };
+        });
+        setImgList(initialImageList);
+      }
+  }, [product, categories, subCategories, productId])
 
   useEffect(() => {
     if (selectedCategory) {
@@ -534,13 +477,17 @@ const EditProduct = () => {
         leftTopContent: values?.leftTopContent,
         leftBottomHeader: values?.leftBottomHeader,
         leftBottomContent: values?.leftBottomContent,
+        isPublic: selectedStatus === "enabled" ? true : false
       };
 
       try {
-        const response = await updateProduct({ payload: requestBody, productId: productData?.id }).unwrap();
+        if(productId){
+            const response = await updateProduct({ payload: requestBody, productId: +productId }).unwrap();
 
         if (response?.status && response?.httpStatusCode === 200) {
           toast.success(response?.message);
+          navigate("/account/product-list", { replace: true });
+        }
         }
       } catch (error: any) {
         console.error(error);
@@ -556,7 +503,7 @@ const EditProduct = () => {
     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg">
       <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
         <div className="flex justify-between">
-          <div className="font-bold">Add Product</div>
+          <div className="font-bold">Edit Product</div>
         </div>
         <div className="flex w-full gap-4">
           <div className="flex-[3] flex flex-col gap-4">
@@ -701,13 +648,16 @@ const EditProduct = () => {
                               style={{ display: "none" }}
                               id={`upload-file-${img.id}`}
                               type="file"
+                              disabled={Boolean(img?.fileName)}
                               onChange={handleFileUpload(img.id)}
                             />
-                            <label htmlFor={`upload-file-${img.id}`}>
-                              <IconButton color="primary" component="span">
-                                <UploadIcon />
-                              </IconButton>
-                            </label>
+                            {!img?.fileName && (
+                                <label htmlFor={`upload-file-${img.id}`}>
+                                    <IconButton color="primary" component="span">
+                                        <UploadIcon />
+                                    </IconButton>
+                                </label>
+                            )}
                           </InputAdornment>
                         ),
                         sx: {
@@ -719,7 +669,7 @@ const EditProduct = () => {
                     />
                   </div>
 
-                  {isFileLoading ? <CircularProgress /> : img?.imageUrl && <MagnifyProductImage img={img} />}
+                  {img?.imageUrl && <MagnifyProductImage img={img} />}
 
                   <FormGroup>
                     <StyledFormControlLabel
@@ -728,7 +678,7 @@ const EditProduct = () => {
                     />
                   </FormGroup>
 
-                  {imgList.length > 1 && (
+                  {(imgList.length > 1 || imgList[0]?.fileName?.length > 0) && (
                     <div className="flex gap-2">
                       <IconButton color="error" onClick={handleRemoveImage(img.id)}>
                         <DeleteIcon />

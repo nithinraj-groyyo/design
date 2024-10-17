@@ -5,7 +5,8 @@ const useSignOut = () => {
 
   const signOut = () => {
     localStorage.removeItem('isAdmin');  
-    localStorage.removeItem('authToken')
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userId');
 
     navigate('/login');
   };
