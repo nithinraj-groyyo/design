@@ -1,9 +1,9 @@
 import * as React from 'react';
 import Badge, { BadgeProps } from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
-import { ShoppingBagIcon } from '../assets/svg/home/ShoppingBagIcon';
+import { ShoppingBagIcon } from '../../../assets/svg/home/ShoppingBagIcon';
 import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import { RootState } from '../../../redux/store';
 
 const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
   '& .MuiBadge-badge': {

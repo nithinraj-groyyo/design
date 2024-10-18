@@ -159,7 +159,7 @@ const MobileViewProductDetails = () => {
                         </div>
                     </div>
                     <div className='my-2'>
-                        <AddToBagButton />
+                        {/* <AddToBagButton /> */}
                     </div>
                     {(product?.leftTopHeader && product?.leftBottomHeader) && (
                         <div>

@@ -163,7 +163,7 @@ const EditProduct = () => {
   }, [productId]);
 
   useEffect(() => {
-    if (product) {
+    if (product && categories?.length > 0 && subCategories && subCategories?.length > 0) {
         formik.setFieldValue("productId", product?.id);
         formik.setFieldValue("productName", product?.name);
         formik.setFieldValue("styleName", product?.styleName);
@@ -182,7 +182,7 @@ const EditProduct = () => {
         }
   
         const loadedSubCategory = subCategories?.find((subCat: any) => subCat.id === product?.subCategory);
-  
+
         if (loadedSubCategory) {
           formik.setFieldValue("otherCategory", loadedSubCategory?.id);
           setSelectedSubCategory(loadedSubCategory!);
@@ -219,8 +219,6 @@ const EditProduct = () => {
         setImgList(initialImageList);
       }
   }, [product, categories, subCategories, productId])
-
-  console.log("product", product)
 
   useEffect(() => {
     if (selectedCategory) {
@@ -650,12 +648,13 @@ const EditProduct = () => {
                               style={{ display: "none" }}
                               id={`upload-file-${img.id}`}
                               type="file"
+                              disabled={Boolean(img?.fileName)}
                               onChange={handleFileUpload(img.id)}
                             />
-                            {img?.fileName && (
+                            {!img?.fileName && (
                                 <label htmlFor={`upload-file-${img.id}`}>
                                     <IconButton color="primary" component="span">
-                                    <UploadIcon />
+                                        <UploadIcon />
                                     </IconButton>
                                 </label>
                             )}

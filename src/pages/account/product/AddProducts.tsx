@@ -545,13 +545,16 @@ const AddProducts = () => {
                               style={{ display: "none" }}
                               id={`upload-file-${img.id}`}
                               type="file"
+                              disabled={Boolean(img?.fileName)}
                               onChange={handleFileUpload(img.id)}
                             />
-                            <label htmlFor={`upload-file-${img.id}`}>
-                              <IconButton color="primary" component="span">
-                                <UploadIcon />
-                              </IconButton>
-                            </label>
+                            {!img?.fileName && (
+                                <label htmlFor={`upload-file-${img.id}`}>
+                                    <IconButton color="primary" component="span">
+                                        <UploadIcon />
+                                    </IconButton>
+                                </label>
+                            )}
                           </InputAdornment>
                         ),
                         sx: {

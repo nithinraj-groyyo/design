@@ -17,7 +17,7 @@ const ImageSlider = ({product}:IImageSliderProps) => {
 
   return (
     <div className="flex-1">
-      <div className="flex h-[47rem]">
+      <div className="flex">
     
         <div className="flex-shrink-0 w-[80%]">
           <Slider
@@ -53,14 +53,14 @@ const ImageSlider = ({product}:IImageSliderProps) => {
             dots={false}
             focusOnSelect={true}
             centerPadding="0px"
-            className="product-img-nav h-[47rem]"
+            // className="product-img-nav h-[47rem]"
           >
             {product?.productImages?.map((img, index) => (
               <div key={index}>
                 <img
                    src={img?.signedUrl}
                   alt={`Thumbnail ${index}`}
-                  className="w-full h-[10rem] object-cover"
+                  className="w-full h-[5rem] object-cover"
                 />
               </div>
             ))}
