@@ -163,7 +163,7 @@ const EditProduct = () => {
   }, [productId]);
 
   useEffect(() => {
-    if (product && categories?.length > 0 && subCategories && subCategories?.length > 0) {
+    if (product && categories?.length > 0) {
         formik.setFieldValue("productId", product?.id);
         formik.setFieldValue("productName", product?.name);
         formik.setFieldValue("styleName", product?.styleName);
