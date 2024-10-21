@@ -78,11 +78,37 @@ const categoriesApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    
+    updateCategory: builder.mutation<
+    { message: string; data: any },
+    { name: string } 
+  >({
+    query: (categoryData) => ({
+      url: `${categoryUrl}/add`,
+      method: "POST",
+      body: categoryData, 
+    }),
+    transformResponse: (
+      response: ResponseDTO<{ message: string; data: any }>
+    ) => {
+      try {
+        return handleSuccessResponse(response);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error("Error in transformResponse:", error.message);
+        } else {
+          console.error("Unknown error in transformResponse");
+        }
+        return { message: "Failed to update category", data: null };
+      }
+    },
   }),
+}),
 });
 
 export const {
   useLazyLoadAllCategoriesWithSubCategoriesQuery,
   useLoadCategoriesWithPaginationQuery,
-  useLoadSubCategoriesWithIdQuery
+  useLoadSubCategoriesWithIdQuery,
+  useUpdateCategoryMutation
 } = categoriesApiSlice;
