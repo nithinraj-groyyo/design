@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography, Tooltip } from '@mui/material';
+import { Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography, Tooltip, Switch } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
 
@@ -9,14 +9,40 @@ const AdminSubscriptionPage = () => {
   const [currentSubscription, setCurrentSubscription] = useState({
     name: '',
     price: '',
-    features: '',
+    features: [] as string[], // Initialize features as an empty array
   });
 
-  // Dummy subscription data
   const subscriptions = [
-    { id: 1, name: 'Basic Plan', price: '$10/month', features: 'Basic Support, Feature A, Feature B' },
-    { id: 2, name: 'Premium Plan', price: '$30/month', features: 'Premium Support, Feature C, Feature D' },
-    { id: 3, name: 'Pro Plan', price: '$50/month', features: 'Pro Support, Feature E, Feature F' },
+    { 
+      id: 1, 
+      name: 'Basic Plan', 
+      price: 10, 
+      actualPrice: 20, 
+      duration: 'month', 
+      features: ['Basic Support', 'Feature A', 'Feature B'],
+      active: true,
+      activeUser:102,
+    },
+    { 
+      id: 2, 
+      name: 'Premium Plan', 
+      price: 30, 
+      actualPrice: 50, 
+      duration: 'month',
+      features: ['Premium Support', 'Feature C', 'Feature D'],
+      active: false,
+      activeUser:95,
+    },
+    { 
+      id: 3, 
+      name: 'Pro Plan', 
+      price: 50, 
+      actualPrice: 80, 
+      duration: 'month',
+      features: ['Pro Support', 'Feature E', 'Feature F'],
+      active: true,
+      activeUser:34,
+    },
   ];
 
   const handleOpen = (subscription = null) => {
@@ -27,7 +53,7 @@ const AdminSubscriptionPage = () => {
       setCurrentSubscription({
         name: '',
         price: '',
-        features: '',
+        features: [],
       });
     }
     setOpen(true);
@@ -35,7 +61,6 @@ const AdminSubscriptionPage = () => {
 
   const handleClose = () => {
     setOpen(false);
-    // setCurrentSubscription(1);
   };
 
   const handleSave = () => {
@@ -45,69 +70,78 @@ const AdminSubscriptionPage = () => {
 
   return (
     <AccountSettingsLayout>
+      <AccountSettingsLayout.Header title="Manage Subscription">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpen()}
+          >
+            Add New Subscription
+          </Button>
+        </AccountSettingsLayout.Header>
       <div className='p-8'>
-        {/* Overview section */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <Card className="bg-[#ececec] p-6 rounded-lg shadow-md">
-            <Typography variant="h5">Total Subscriptions</Typography>
-            <Typography variant="h2" className="font-bold">120</Typography>
+        {/* Overview Section */}
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <Card className="bg-gradient-to-r from-blue-400 to-blue-600 text-white p-6 rounded-lg shadow-lg">
+            <Typography variant="h5" className="font-semibold">Total Subscriptions</Typography>
+            <Typography variant="h2" className="font-bold mt-2">120</Typography>
           </Card>
-          <Card className="bg-[#ececec] p-6 rounded-lg shadow-md">
-            <Typography variant="h5">Active Subscriptions</Typography>
-            <Typography variant="h2" className="font-bold">95</Typography>
+          <Card className="bg-gradient-to-r from-green-400 to-green-600 text-white p-6 rounded-lg shadow-lg">
+            <Typography variant="h5" className="font-semibold">Active Subscriptions</Typography>
+            <Typography variant="h2" className="font-bold mt-2">95</Typography>
           </Card>
         </div>
 
-        {/* Subscription cards */}
-        <div className="grid grid-cols-3 gap-4">
+        {/* Subscription Cards */}
+        <div className="grid grid-cols-3 gap-6">
           {subscriptions?.map((subscription:any) => (
-            <div key={subscription.id} className="card-container">
-              <Card className="p-6 shadow-md relative">
-                <Typography variant="h6">{subscription.name}</Typography>
-                <Typography variant="body1" className="mb-4">{subscription.price}</Typography>
-                <Typography variant="body2" className="mb-4">{subscription.features}</Typography>
+            <Card key={subscription.id} className="p-6 shadow-md hover:shadow-lg transition-shadow rounded-lg relative bg-white border border-gray-100">
+              <div className='flex justify-between'>
+                <Typography variant="h6" className="text-blue-600 font-bold">{subscription.name}</Typography>
+                <div className="flex items-center mb-4">
+                <Typography variant="body2" className="text-gray-500 mr-2">Active:</Typography>
+                <Switch aria-label="Switch demo" defaultChecked />
+              </div>
+              </div>
+              <Typography variant="body1" className="mb-4 text-gray-500">Discounted Price: <span className='!font-semibold !text-xl'>${subscription.price}/month</span></Typography>
+              <Typography variant="body2" className="text-gray-600 mb-4">Actual Price: ${subscription.actualPrice}</Typography>
+              
+              <div className="flex flex-col mb-4">
+                <Typography variant="body2" className="font-semibold text-gray-700">Features:</Typography>
+                <ul className="list-disc pl-5 text-gray-600">
+                  {subscription.features.map((feature:any, idx:any) => (
+                    <li key={idx}>{feature}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center mt-4">
+                <div className='flex gap-2'>
+                  <Typography variant="body2" className="font-semibold text-gray-700">Number of Active Users: </Typography>
+                  <Typography variant="body2" className="font-semibold text-gray-700">{subscription?.activeUser} </Typography>
 
-                <div className="flex justify-end space-x-2 absolute bottom-4 right-4">
-                  <Tooltip title="Edit">
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleOpen(subscription)}
-                    >
-                      <EditIcon />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <Button variant="contained" color="secondary">
-                      <DeleteIcon />
-                    </Button>
-                  </Tooltip>
                 </div>
-              </Card>
-            </div>
+              
+
+                <Tooltip title="Edit">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => handleOpen(subscription)}
+                  >
+                    <EditIcon />
+                  </Button>
+                </Tooltip>
+                {/* <Tooltip title="Delete">
+                  <Button variant="contained" color="secondary">
+                    <DeleteIcon />
+                  </Button>
+                </Tooltip> */}
+              </div>
+            </Card>
           ))}
         </div>
-
-        {/* Floating Action Button to Add Subscription */}
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{
-            position: 'fixed',
-            bottom: '2rem',
-            right: '2rem',
-            borderRadius: '50%',
-            width: '3.5rem',
-            height: '3.5rem',
-            boxShadow: '0 6px 12px rgba(0,0,0,0.2)',
-            "&:hover": {
-              backgroundColor: '#4a90e2',
-            },
-          }}
-          onClick={() => handleOpen()}
-        >
-          <AddIcon />
-        </Button>
 
         {/* Add/Edit Subscription Modal */}
         <Dialog open={open} onClose={handleClose}>
@@ -127,7 +161,7 @@ const AdminSubscriptionPage = () => {
               label="Price"
               fullWidth
               variant="outlined"
-              type="text"
+              type="number"
               value={currentSubscription?.price || ''}
               onChange={(e) => setCurrentSubscription({ ...currentSubscription, price: e.target.value })}
             />
@@ -138,10 +172,9 @@ const AdminSubscriptionPage = () => {
               variant="outlined"
               multiline
               rows={3}
-              value={currentSubscription?.features || ''}
-              onChange={(e) => setCurrentSubscription({ ...currentSubscription, features: e.target.value })}
+              value={currentSubscription?.features.join(', ') || ''}
+              onChange={(e) => setCurrentSubscription({ ...currentSubscription, features: e.target.value.split(', ') })}
             />
-            {/* Add more fields as needed */}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
