@@ -73,8 +73,8 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
     };
 
     const filteredIconButtons = isAuthenticated
-        ? iconButtons.filter(button => button.id !== 'login').filter(button => location.pathname !== "/bag" || button.id !== "bag")
-        : location?.pathname === "/bag" ? iconButtons.filter(button => button.id !== "bag") : iconButtons;
+        ? iconButtons.filter(button => button.id !== 'login')
+        : iconButtons;
 
     const { signOut } = useSignOut();
 
