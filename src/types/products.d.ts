@@ -110,6 +110,7 @@ export interface UpdateProductDTO {
 export interface INewProductSize {
     id: number;
     name: string;
+    productSizeId: number;
 }
 
 export interface INewProductPrice {

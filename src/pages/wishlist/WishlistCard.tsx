@@ -29,9 +29,9 @@ const WishlistCard: React.FC<WishlistCardProps> = ({
           {name}
         </p>
         <div className="uppercase font-semibold text-xs">
-                <span><CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} /></span>
-                <span>{price}</span>
-              </div>
+            <span><CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} /></span>
+            <span>{price}</span>
+        </div>
       </div>
       <button
         onClick={() => onRemove(id)}

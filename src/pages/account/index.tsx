@@ -46,7 +46,7 @@ const adminMenuItems = [
     title: "Product",
     subItems: [
       { title: "Add Product", route: "/account/add-product" },
-      { title: "Bulk Upload", route: "/account/bulk-upload" },
+      // { title: "Bulk Upload", route: "/account/bulk-upload" },
       { title: "Product List", route: "/account/product-list" },
     ],
   },
@@ -82,7 +82,7 @@ const adminMenuItems = [
 const AccountPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("roles") as string);
+  const isAdmin = JSON.parse(localStorage.getItem("isAdmin") as string === "undefined" ? "false": localStorage.getItem("isAdmin") as string);
 
   const handleSelectedList = (selectedRoute: string) => {
     navigate(selectedRoute);

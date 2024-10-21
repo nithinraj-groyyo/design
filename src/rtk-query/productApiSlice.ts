@@ -88,7 +88,7 @@ const productApiSlice = apiSlice.injectEndpoints({
                 method: "POST",
                 body: {ids}
             })
-        })
+        }),
     })
 });
 

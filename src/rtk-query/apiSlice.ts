@@ -18,10 +18,13 @@ const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, Fetch
 
   try {
     const result: any = await baseQuery(args, api, extraOptions);
-
+console.log(result)
     if (result.data) {
       if (result?.data?.httpStatusCode === 500) {
         toast.error(result?.data?.errorReason?.message);
+      }
+      if (result?.data?.statusCode === 401) {
+        toast.error(result?.data?.message);
       }
     }
     return result;
