@@ -31,6 +31,7 @@ import AdminFAQPage from "./pages/account/websiteInformation/faq/AdminFAQPage";
 import ForgotPassword from "./pages/forgotPassword";
 import useAuth from "./hooks/useAuth";
 import ManageCategories from "./pages/account/siteSetting/ManageCategories";
+import ManageSubscriptions from "./pages/account/siteSetting/ManageSubscriptions";
 
 const App = () => {
   const isAuthenticated = useAuth();
@@ -70,6 +71,7 @@ const App = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="changePassword" element={<ChangePassword />} />
         <Route path="manage-categories" element={<ManageCategories />} />
+        <Route path="manage-subscriptions" element={<ManageSubscriptions />} />
         
         <Route path="web-info" element={<AdminRoutes />}>
           <Route path="about-us" element={<AboutUsInfo />} />
