@@ -5,7 +5,10 @@ const CustomerService = () => {
   const navigate = useNavigate();
 
   const handleContactUs = () => {
-    navigate('/contact-us')
+    navigate("/contact-us?tab=contact-us");
+  }
+  const handleFaq = () => {
+    navigate("/contact-us?tab=faq");
   }
 
   return (
@@ -14,7 +17,7 @@ const CustomerService = () => {
 
         <div className='flex flex-col xxs:gap-1 lg:gap-3'>
             <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem] cursor-pointer' onClick={handleContactUs} >Contact us</Typography>
-            <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>FAQs</Typography>
+            <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem] cursor-pointer' onClick={handleFaq}>FAQs</Typography>
             <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>Orders and Delivery</Typography>
             <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>Returns and refunds</Typography>
             <Typography className='text-[#8E8E8E] xxs:text-xs lg:text-[1rem] font-light xxs:!tracking-[0] md:!tracking-[0.15rem]'>Payments and Pricing</Typography>

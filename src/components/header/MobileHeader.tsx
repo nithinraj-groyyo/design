@@ -2,19 +2,14 @@ import { IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import MenuDrawer from './MenuDrawer';
-import { setActiveCategoryTab } from '../../redux/categoriesSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import useFetchCategories from '../../hooks/useFetchCategories';
-import { RootState } from '../../redux/store';
 import { useNavigate } from 'react-router-dom';
+import CustomizedWishlist from './badges/CustomizedWishlist';
+import CustomizedShoppingBadges from './badges/CustomizedShoppingBadges';
 
 const MobileHeader = () => {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-
-    const dispatch = useDispatch();
+    const [isAccountOpened, setIsAccountOpened] = useState(false);
     const navigate = useNavigate();
-
-    useFetchCategories();
 
     const handleDrawerOpen = () => {
         setDrawerOpen(true);
@@ -22,24 +17,32 @@ const MobileHeader = () => {
 
     const handleDrawerClose = () => {
         setDrawerOpen(false);
-        dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: '' }));
+        setIsAccountOpened(false)
     };
-    const {cart} = useSelector((state: RootState)=> state.shoppingBag)
 
-    const handleNavigationToShoppingBag = () => {
-        navigate("/bag")
-    }
+    const navigateToHomePage = () => {
+        navigate("/");
+      };
+
   return (
-    <div className='flex justify-between items-center fixed w-full p-2 text-black z-30 h-[3rem]'>
+    <div className='flex justify-between items-center fixed w-full mb-3 px-3 py-10 text-black z-30 h-[3rem] bg-white shadow-sm'>
         <IconButton onClick={handleDrawerOpen}>
             <MenuIcon />
         </IconButton>
 
-        <div className="flex" onClick={handleNavigationToShoppingBag}>
-            <span className='uppercase '>Shopping Bag</span>
-            <span>({cart?.savedItems?.length})</span>
+        <div className="cursor-pointer">
+          <img
+            src="/images/Groyyo_Studio_Logo.png"
+            className="w-16 h-16"
+            onClick={navigateToHomePage}
+          />
         </div>
-        <MenuDrawer open={drawerOpen} onClose={handleDrawerClose} />
+
+        <div className='flex flex-row gap-5'>
+            <CustomizedWishlist />
+            <CustomizedShoppingBadges />
+        </div>
+        <MenuDrawer open={drawerOpen} onClose={handleDrawerClose} setIsAccountOpened={setIsAccountOpened} isAccountOpened={isAccountOpened} />
     </div>
   )
 }

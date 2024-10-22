@@ -27,63 +27,11 @@ const carouselDetails = [
   },
 ];
 
-const serviceDetails = [
-  {
-    title: "Exclusive Apparel Designs",
-    img: "/images/DummyImages/service1.png",
-    description:
-      "Explore our collection of unique, pre-designed apparel. Each design is carefully crafted by our in-house designers, tailored to the latest trends and market demands.",
-    descriptionListKeys: [
-      {
-        "Industry Expertise":
-          " Leverage our experience in the apparel sector to get design recommendations tailored to your target market.",
-      },
-      {
-        "Trend Forecasting":
-          " Stay ahead with our trend analysis and market insights.",
-      },
-    ],
-    buttonName: "Explore our Designs",
-  },
-  {
-    title: "Customization Services",
-    img: "/images/DummyImages/service2.png",
-    description:
-      " We offer customization services to tailor designs to your specific needs.",
-    descriptionListKeys: [
-      {
-        "Tailored for You":
-          " Modify colors, patterns, or fabrics to match your brand.",
-      },
-      {
-        "Bespoke Creations":
-          " Work with us to develop a design from scratch that aligns with your vision.",
-      },
-    ],
-    buttonName: "Book an appointment",
-  },
-  {
-    title: "Design Consultation",
-    img: "/images/DummyImages/service3.png",
-    description: "Expert guidance to perfect your design ideas.",
-    descriptionListKeys: [
-      {
-        "Industry Expertise":
-          " Leverage our experience in the apparel sector to get design recommendations tailored to your market.",
-      },
-      {
-        "Trend Forecasting":
-          " Stay ahead with our trend analysis and insights.",
-      },
-    ],
-    buttonName: "Contact us",
-  },
-];
-
 const ServicePage = () => {
-  const [expandedCard, setExpandedCard] = useState<number | null>(null); // Track which card is expanded
+  const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [currentService, setCurrentService] = useState(0);
   const [services, setServices] = useState<Service[]>([]);
+
   const handleIndex = (val: number) => {
     setCurrentService((currentService + val + 3) % 3);
   };
@@ -103,6 +51,7 @@ const ServicePage = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     loadServices();
   }, []);
@@ -119,14 +68,14 @@ const ServicePage = () => {
 
   return (
     <BasicLayout>
+      {/* Carousel Section */}
       <motion.div
-        className="w-screen min-h-[70vh] mt-[10rem]"
+        className="relative w-full min-h-[70vh] mt-[4rem] sm:mt-[6rem] lg:mt-[10rem] flex justify-center items-center"
         style={{
           backgroundImage: "url(/images/landingPages/floralPattern4.png)",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
           backgroundSize: "cover",
-          position: "relative",
           fontFamily: "Poppins",
         }}
         initial={{ opacity: 0, y: 5 }}
@@ -134,38 +83,38 @@ const ServicePage = () => {
         transition={{ duration: 1 }}
       >
         <motion.div
-          className="p-8 flex items-center justify-between rounded-xl w-full max-w-[50vw]"
+          className="p-4 sm:p-6 lg:p-8 flex items-center justify-between rounded-xl w-full max-w-[90vw] lg:max-w-[50vw]"
           style={{
-            height: "auto",
-            position: "absolute",
-            top: "25%",
-            left: "25%",
-            transform: "translate(-25%, -25%)",
+            position: "relative", 
           }}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
         >
+          {/* Left Arrow */}
           <div
-            className="flex items-center cursor-pointer absolute left-20"
+            className="flex items-center cursor-pointer absolute left-5 sm:left-10 lg:left-20"
             onClick={() => handleIndex(-1)}
           >
             <KeyboardArrowLeftIcon />
           </div>
 
+          {/* Carousel Content */}
           <motion.div
-            className="flex flex-col gap-8 bg-white p-8 rounded w-full min-w-[30vw] text-center"
+            className="flex flex-col gap-4 sm:gap-6 lg:gap-8 bg-white p-4 sm:p-6 lg:p-8 rounded w-full text-center min-w-[80vw] sm:min-w-[50vw] lg:min-w-[30vw] shadow-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
           >
-            <div className="text-4xl font-bold whitespace-nowrap">
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">
               {carouselDetails[currentService]?.title}
             </div>
-            <div style={{ fontFamily: "Poppins" }}>
+            <div
+              className="text-xs sm:text-sm p-2"
+              style={{ fontFamily: "Poppins" }}
+            >
               {carouselDetails[currentService]?.description}
             </div>
-
             <div>
               <Button
                 variant="outlined"
@@ -173,8 +122,8 @@ const ServicePage = () => {
                   color: "white",
                   borderColor: "black",
                   backgroundColor: "black",
-                  padding: "1rem",
-                  minWidth: "15rem",
+                  padding: "0.75rem",
+                  minWidth: "12rem",
                   "&:hover": {
                     backgroundColor: "transparent",
                     borderColor: "black",
@@ -187,17 +136,20 @@ const ServicePage = () => {
             </div>
           </motion.div>
 
+          {/* Right Arrow */}
           <div
-            className="flex items-center cursor-pointer absolute right-20"
+            className="flex items-center cursor-pointer absolute right-5 sm:right-10 lg:right-20"
             onClick={() => handleIndex(1)}
           >
             <KeyboardArrowRightIcon />
           </div>
+
+          {/* Dots Indicator */}
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-2">
             {carouselDetails.map((_, index) => (
               <motion.div
                 key={index}
-                className={`w-3 h-3 rounded-full cursor-pointer ${
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer ${
                   index === currentService ? "bg-black" : "bg-gray-400"
                 }`}
                 onClick={() => setCurrentService(index)}
@@ -210,152 +162,134 @@ const ServicePage = () => {
         </motion.div>
       </motion.div>
 
-      <motion.div
-        className="px-32 py-8 flex flex-col gap-8"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2 }}
-      >
-        <div className="text-center font-semibold text-4xl">Services</div>
+      {/* Services Section */}
+      {/* Services Section */}
+<motion.div
+  className="px-4 sm:px-16 lg:px-32 py-8 flex flex-col gap-8"
+  initial={{ opacity: 0, y: 50 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 1.2 }}
+>
+  <div className="text-center font-semibold text-2xl sm:text-3xl lg:text-4xl">
+    Services
+  </div>
 
-        <div className="flex flex-row gap-16 flex-wrap justify-center">
-          {services.map((serviceDetail, index) => {
-            const sanitizedDescription = DOMPurify.sanitize(
-              serviceDetail?.description
-            );
-            return (
-              <motion.div
-                key={index}
-                className="px-10 py-8 flex flex-col gap-16 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 max-w-xs h-fit"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 1 }}
+  {/* Grid Layout for Services */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 lg:gap-16 justify-center">
+    {services.map((serviceDetail, index) => {
+      const sanitizedDescription = DOMPurify.sanitize(serviceDetail?.description);
+      return (
+        <motion.div
+          key={index}
+          className="px-6 py-4 sm:px-8 sm:py-8 flex flex-col gap-8 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 w-full h-fit"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 1 }}
+        >
+          <div className="flex flex-col gap-6 justify-between">
+            <div className="flex justify-center items-center">
+              <img
+                src={serviceDetail?.imagePath}
+                alt="Thumbnail"
+                className="h-40 sm:h-48 w-full sm:w-64 object-cover rounded-xl"
+              />
+            </div>
+
+            <div className="flex-2">
+              <div className="font-bold text-md sm:text-lg text-center">
+                {serviceDetail?.title}
+              </div>
+              <div
+                className="whitespace-normal text-justify my-2 text-xs sm:text-sm"
+                dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+              />
+              {expandedCard === index &&
+                serviceDetail?.featuresList?.map((feature, featureIndex) => (
+                  <div key={featureIndex} className="flex flex-col gap-2">
+                    <li className="text-xs">
+                      <span className="font-semibold">{feature?.featureName}</span>
+                      <span className="ml-2">{feature?.featureDetail}</span>
+                    </li>
+                  </div>
+                ))}
+              <Button
+                onClick={() => handleToggleDetails(index)}
+                className="cursor-pointer"
+                sx={{
+                  fontSize: "0.725rem",
+                  borderRadius: "0.5rem",
+                }}
               >
-                <div className="flex flex-col gap-6 justify-between">
-                  <div className="flex justify-center items-center">
-                    <img
-                      src={serviceDetail?.imagePath}
-                      alt="Thumbnail"
-                      className="h-48 w-64 object-cover rounded-xl"
-                    />
-                  </div>
+                {expandedCard === index ? "View Less" : "View More"}
+              </Button>
+            </div>
 
-                  <div className="flex-2">
-                    <div className="font-bold text-lg text-center">
-                      {serviceDetail?.title}
-                    </div>
-                    <div
-                      className="whitespace-normal text-justify my-4 text-xs min-h-20"
-                      dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
-                    />
-                    {expandedCard === index &&
-                      serviceDetail?.featuresList?.map(
-                        (feature, featureIndex) => {
-                          return (
-                            <>
-                              <div className="flex flex-col gap-2">
-                                <li className="text-xs">
-                                  <span className="font-semibold">
-                                    {feature?.featureName}
-                                  </span>
-                                  <span className="ml-2">
-                                    {feature?.featureDetail}
-                                  </span>
-                                </li>
-                              </div>
-                            </>
-                          );
-                        }
-                      )}
-                    {/* {expandedCard === index &&
-                      serviceDetail?.featuresList?.map(
-                        (featureList, i) => (
-                          <div key={i} className="flex flex-col gap-2">
-                            {Object.entries(featureList).map(
-                              ([key, value]) => (
-                                <li key={key} className="text-xs">
-                                  <span className="font-semibold">{key}:</span>
-                                  <span className="ml-2">{value}</span>
-                                </li>
-                              )
-                            )}
-                          </div>
-                        )
-                      )} */}
-                    <Button
-                      onClick={() => handleToggleDetails(index)}
-                      className="cursor-pointer"
-                      sx={{
-                        fontSize: "0.725rem",
-                        borderRadius: "0.5rem",
-                      }}
-                    >
-                      {expandedCard === index ? "View Less" : "View More"}
-                    </Button>
-                  </div>
+            <div className="text-center">
+              <Button
+                variant="outlined"
+                sx={{
+                  color: "black",
+                  borderColor: "black",
+                  backgroundColor: "transparent",
+                  minWidth: "12rem",
+                  "&:hover": {
+                    backgroundColor: "black",
+                    color: "white",
+                  },
+                }}
+              >
+                {serviceDetail?.buttonLabel}
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      );
+    })}
+  </div>
+</motion.div>
 
-                  <div className="text-center">
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        color: "black",
-                        borderColor: "black",
-                        backgroundColor: "transparent",
-                        minWidth: "12rem",
-                        "&:hover": {
-                          backgroundColor: "black",
-                          color: "white",
-                        },
-                      }}
-                    >
-                      {serviceDetail?.buttonLabel}
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.div>
 
-      <section className="w-screen h-[100vh] flex">
+          {/* Subscription */}
+      <section className="w-screen h-auto sm:h-[100vh] flex flex-col sm:flex-row">
         {/* Left Part */}
-        <div className="bg-[#B7A99A] min-w-[40%] flex flex-col justify-center items-center">
+        <div className="bg-[#B7A99A] w-full sm:w-1/2 flex flex-col justify-center items-center py-8 sm:py-0">
           <div className="flex flex-col items-center">
             <img
               src="/images/DummyImages/contact.png"
               alt="Illustration"
-              className="object-cover w-[24rem] h-[24rem] mb-4"
+              className="object-cover w-[18rem] h-[18rem] sm:w-[24rem] sm:h-[24rem] mb-4"
             />
-            <h2 className="text-[#F3EDE5] text-4xl font-bold">Subscription</h2>
+            <h2 className="text-[#F3EDE5] text-3xl sm:text-4xl font-bold">
+              Subscription
+            </h2>
           </div>
         </div>
 
         {/* Right Part with layered boxes */}
-        <div className="flex justify-center items-center flex-1 relative">
+        <div className="flex justify-center items-center w-full sm:w-1/2 relative py-8 sm:py-0 my-32 sm:my-0">
           {/* First Background Layer */}
-          <div className="bg-gradient-to-br from-[#CEC1B2] to-[#D8C9BB] w-[26rem] h-[15rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">
+          <div className="bg-gradient-to-br from-[#CEC1B2] to-[#D8C9BB] w-[20rem] sm:w-[26rem] h-[13rem] sm:h-[15rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">
             {/* Second Layer */}
-            <div className="bg-gradient-to-br from-[#B9A99A] to-[#CAB7A9] w-[23rem] h-[20rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">
+            <div className="bg-gradient-to-br from-[#B9A99A] to-[#CAB7A9] w-[18rem] sm:w-[23rem] h-[18rem] sm:h-[20rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">
               {/* Main Card */}
-              <div className="bg-gradient-to-br from-[#978776] to-[#B19C89] w-[20rem] h-[25rem] rounded-3xl shadow-2xl relative z-20 transform hover:scale-105 transition-transform duration-300 ease-out">
+              <div className="bg-gradient-to-br from-[#978776] to-[#B19C89] w-[15rem] sm:w-[20rem] h-[22rem] sm:h-[25rem] rounded-3xl shadow-2xl relative z-20 transform hover:scale-105 transition-transform duration-300 ease-out">
                 {/* Bear Icon */}
-                <div className="absolute -top-8 left-[50%] transform -translate-x-[50%]">
-                  <div className="w-16 h-16 bg-[#B9A99A] rounded-full flex justify-center items-center shadow-md">
-                    <span className="text-4xl">💎</span>
+                <div className="absolute -top-8 sm:-top-12 left-[50%] transform -translate-x-[50%]">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#B9A99A] rounded-full flex justify-center items-center shadow-md">
+                    <span className="text-3xl sm:text-4xl">💎</span>
                   </div>
                 </div>
 
                 {/* Design + Label */}
                 <div className="text-center mt-12">
-                  <span className="inline-block bg-[#60594D] text-white text-xs px-4 py-1 rounded-full shadow-lg">
+                  <span className="inline-block bg-[#60594D] text-white text-xs px-4 sm:px-4 py-1 rounded-full shadow-lg">
                     Design +
                   </span>
                 </div>
 
                 {/* Price */}
-                <div className="text-center mt-4 flex justify-center items-baseline">
-                  <h3 className="text-[#F3EDE5] text-6xl font-bold drop-shadow-lg">
+                <div className="text-center mt-4 sm:mt-6 flex justify-center items-baseline">
+                  <h3 className="text-[#F3EDE5] text-5xl sm:text-6xl font-bold drop-shadow-lg">
                     $10
                   </h3>
                   <span className="text-[#F3EDE5] text-lg ml-1 drop-shadow-md">
@@ -364,7 +298,7 @@ const ServicePage = () => {
                 </div>
 
                 {/* Features List */}
-                <div className="text-[#F3EDE5] text-center mt-8 text-opacity-90 space-y-2">
+                <div className="text-[#F3EDE5] text-center mt-6 sm:mt-8 text-opacity-90 space-y-2">
                   <p className="flex items-center justify-center">
                     <span className="mr-2">🔥</span> Best Price ever
                   </p>
@@ -377,8 +311,8 @@ const ServicePage = () => {
                 </div>
 
                 {/* Get Started Button */}
-                <div className="flex justify-center mt-8">
-                  <button className="bg-[#60594D] text-white px-8 py-3 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 ease-out">
+                <div className="flex justify-center mt-6 sm:mt-8">
+                  <button className="bg-[#60594D] text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 ease-out">
                     Get Started
                   </button>
                 </div>

@@ -36,7 +36,7 @@ const adminMenuItems = [
   {
     title: "Website Info",
     subItems: [
-      { title: "About us", route: "/account/web-info/about-us" },
+      // { title: "About us", route: "/account/web-info/about-us" },
       { title: "Teams", route: "/account/web-info/teams" },
       { title: "Services", route: "/account/web-info/services" },
       { title: "FAQ", route: "/account/web-info/faq" },
@@ -71,8 +71,8 @@ const adminMenuItems = [
   {
     title: "Site Settings",
     subItems: [
-      { title: "Brands", route: "/account/brands" },
-      { title: "Add Brands", route: "/account/add-brands" },
+      // { title: "Brands", route: "/account/brands" },
+      // { title: "Add Brands", route: "/account/add-brands" },
       { title: "Manage Categories", route: "/account/manage-categories" },
       { title: "Manage Subscriptions", route: "/account/manage-subscriptions" },
     ],
