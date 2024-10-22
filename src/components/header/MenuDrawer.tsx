@@ -85,7 +85,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose }) => {
                 onClose={onClose}
                 classes={{ paper: 'w-full h-full' }}
             >
-                <div className="flex flex-col p-4 mx-2">
+                <div className="flex flex-col p-4 ">
                     <div className="flex justify-between">
                         <IconButton onClick={onClose} className="self-start">
                             <CloseIcon />

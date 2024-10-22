@@ -29,15 +29,27 @@ const MobileHeader = () => {
     const handleNavigationToShoppingBag = () => {
         navigate("/bag")
     }
+
+    const navigateToHomePage = () => {
+        navigate("/");
+      };
+
   return (
-    <div className='flex justify-between items-center fixed w-full p-2 text-black z-30 h-[3rem]'>
+    <div className='flex justify-between items-center fixed w-full mb-3 px-3 py-10 text-black z-30 h-[3rem] bg-white shadow-sm'>
         <IconButton onClick={handleDrawerOpen}>
             <MenuIcon />
         </IconButton>
 
-        <div className="flex" onClick={handleNavigationToShoppingBag}>
-            <span className='uppercase '>Shopping Bag</span>
-            <span>({cart?.savedItems?.length})</span>
+        <div className="cursor-pointer">
+          <img
+            src="/images/Groyyo_Studio_Logo.png"
+            className="w-16 h-16"
+            onClick={navigateToHomePage}
+          />
+        </div>
+
+        <div className="cursor-pointer text-sm"  onClick={handleNavigationToShoppingBag}>
+            SHOPPING BAG ({cart?.savedItems?.length})
         </div>
         <MenuDrawer open={drawerOpen} onClose={handleDrawerClose} />
     </div>
