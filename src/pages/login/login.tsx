@@ -142,7 +142,7 @@ const Login = () => {
             background:
               "linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(153, 153, 153, 0.3) 198.83%)",
           }}
-          className="w-[30rem] rounded p-4 flex flex-col gap-4"
+          className="w-[25rem] xl:w-[30rem] rounded p-4 flex flex-col gap-4"
         >
           <div>Login with your Credentials</div>
           <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">

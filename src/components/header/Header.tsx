@@ -12,15 +12,9 @@ const Header: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const [menuListOpen, setMenuListOpen] = useState<boolean>(false);
 
   const [opacity, setOpacity] = useState(1);
   const [lastScrollTop, setLastScrollTop] = useState(0);
-
-  useFetchCategories();
-
-  const { activeCategoryTab } = useSelector((state: RootState) => state.categories);
-  const { fetchSubCategories } = useFetchSubCategories();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -54,7 +48,6 @@ const Header: React.FC = () => {
   const handleClickOutside = (event: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
       dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: "" }));
-      setMenuListOpen(false);
     }
   };
 
@@ -64,20 +57,6 @@ const Header: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  const handleTabChange = (event: React.SyntheticEvent, categoryId: number | undefined, categoryKey: string | undefined) => {
-    dispatch(setActiveCategoryTab({ categoryId: categoryId || -1, categoryKey: categoryKey || "" }));
-    fetchSubCategories(categoryId || -1);
-    setMenuListOpen(true);
-  };
-
-  const navigateToProducts = () => {
-    if (activeCategoryTab.categoryKey && activeCategoryTab.categoryId) {
-      navigate(`/designs/${activeCategoryTab.categoryKey}/${activeCategoryTab.categoryId}`);
-      setMenuListOpen(false);
-      dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: "" }));
-    }
-  };
 
   const handleHeaderOpacity = () => {
     setOpacity(1);
@@ -97,22 +76,10 @@ const Header: React.FC = () => {
         <div className="cursor-pointer">
           <img
             src="/images/Groyyo_Studio_Logo.png"
-            // width={100}
-            // height={100}
             className="md:w-24 md:h-24"
-            // style={{mixBlen\dMode: "color-burn"}}
             onClick={navigateToHomePage}
           />
         </div>
-        {/* <div className='xxs:hidden lg:flex flex-col relative min-w-[30rem]' ref={modalRef}>
-                    <div className={`absolute p-2 top-[-4rem] ${menuListOpen ? 'bg-white border border-[#646463] rounded-md' : ''}`}>
-                        <HeaderLogo />
-                        <MenuTabs onTabChange={handleTabChange} />
-                        {(activeCategoryTab.categoryId !== -1 && menuListOpen) && (
-                            <SubCategoriesList onItemClick={navigateToProducts} />
-                        )}
-                    </div>
-                </div> */}
         <NavigationBar />
       </div>
       <nav className="flex items-center">
