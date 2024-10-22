@@ -11,30 +11,38 @@ const SignOutModal: React.FC<SignOutModalProps> = ({ open, onClose, onConfirm })
   return (
     <Modal open={open} onClose={onClose}>
       <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 300,
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-          textAlign: 'center',
-        }}
+        className="
+          absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+          bg-white rounded-lg shadow-lg
+          w-[90%] xs:w-[400px] md:w-[450px]
+          p-3 xs:p-4
+        "
       >
-        <Typography variant="h6" component="h2">
+        <Typography
+          variant="h6"
+          component="h2"
+          className="text-lg sm:text-xl font-bold text-gray-800"
+        >
           Sign Out
         </Typography>
-        <Typography sx={{ mt: 2 }}>
+        <Typography className="mt-2 text-sm sm:text-base text-gray-600">
           Are you sure you want to sign out?
         </Typography>
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-          <Button variant="contained" color="primary" onClick={onConfirm}>
+        <Box className="flex justify-between mt-6">
+          <Button
+            variant="contained"
+            color="primary"
+            className="bg-blue-600 text-white hover:bg-blue-500 px-4 sm:px-6 py-2 rounded-lg"
+            onClick={onConfirm}
+          >
             Yes
           </Button>
-          <Button variant="outlined" color="secondary" onClick={onClose}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            className="border-gray-400 text-gray-600 hover:bg-gray-100 px-4 sm:px-6 py-2 rounded-lg"
+            onClick={onClose}
+          >
             No
           </Button>
         </Box>
