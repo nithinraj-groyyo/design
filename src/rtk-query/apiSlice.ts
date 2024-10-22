@@ -38,7 +38,7 @@ console.log(result)
 export const apiSlice = createApi({
   baseQuery: baseQueryWithErrorHandling,
   endpoints: () => ({}),
-  tagTypes: ["FAQ", "Service", "Category", "CategorySubCategories", "Products", "UserProfile", "Sizes", "Colors"],
+  tagTypes: ["FAQ", "Service", "Category", "CategorySubCategories", "Products", "UserProfile", "Sizes", "Colors", "Team"],
 });
 
 export default apiSlice;

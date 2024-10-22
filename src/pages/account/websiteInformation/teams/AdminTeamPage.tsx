@@ -7,35 +7,37 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   DialogContentText,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
 import AccountSettingsLayout from "../../../../layouts/AccountSettingsLayout";
 import AdminTeamCard from "./AdminTeamCard";
 import { toast } from "react-toastify";
 import { Team } from "../../../../types/team";
-import {
-  createTeamMember,
-  deleteTeamMember,
-  fetchAllTeamMembers,
-  updateTeamMember,
-} from "../../../../api/teamsApi";
 import JoditEditor from "jodit-react";
+import {
+  useCreateTeamMemberMutation,
+  useDeleteTeamMemberMutation,
+  useFetchAllTeamMembersQuery,
+  useUpdateTeamMemberMutation,
+} from "../../../../rtk-query/teamsApiSlice";
+import DOMPurify from "dompurify";
 
 const AdminTeamPage: React.FC = () => {
-  const [teamMembers, setTeamMembers] = useState<Team[]>([]);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [editTeamMember, setEditTeamMember] = useState<Team | null>(null);
   const [teamMemberToDelete, setTeamMemberToDelete] = useState<Team | null>(
     null
   );
   const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
   const editor = useRef(null);
+
+  // RTK Query Hooks
+  const { data: teamMembers, refetch: refetchTeamMembers } =
+    useFetchAllTeamMembersQuery();
+  const [createTeamMember] = useCreateTeamMemberMutation();
+  const [updateTeamMember] = useUpdateTeamMemberMutation();
+  const [deleteTeamMember] = useDeleteTeamMemberMutation();
 
   const handleContentChange = (newContent: string) => {
     setEditTeamMember((prev) => {
@@ -51,23 +53,6 @@ const AdminTeamPage: React.FC = () => {
   const config = {
     readonly: false,
   };
-
-  const loadTeamMembers = async () => {
-    setLoading(true);
-    try {
-      const data: any = await fetchAllTeamMembers();
-      console.log(data);
-      setTeamMembers(data?.data);
-    } catch (error) {
-      setError("Failed to fetch team members");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadTeamMembers();
-  }, []);
 
   const handleOpenDialog = (teamMember: Team | null = null) => {
     setEditTeamMember(
@@ -89,20 +74,20 @@ const AdminTeamPage: React.FC = () => {
 
     try {
       if (editTeamMember.id) {
-        const updatedMemberResponse: any = await updateTeamMember(
-          editTeamMember.id,
-          editTeamMember
-        );
+        const updatedMemberResponse: any = await updateTeamMember({
+          id: editTeamMember.id,
+          updateData: editTeamMember,
+        });
         if (updatedMemberResponse?.statusCode === 200) {
-          loadTeamMembers();
+          refetchTeamMembers();
           setOpenDialog(false);
           setEditTeamMember(null);
           toast.success(updatedMemberResponse?.message);
         }
       } else {
         const newMemberResponse: any = await createTeamMember(editTeamMember);
-        if (newMemberResponse?.statusCode === 201) {
-          loadTeamMembers();
+        if (newMemberResponse?.status) {
+          refetchTeamMembers();
           setOpenDialog(false);
           setEditTeamMember(null);
           toast.success(newMemberResponse?.message);
@@ -115,9 +100,9 @@ const AdminTeamPage: React.FC = () => {
 
   const handleDeleteTeamMember = async (teamMemberToDelete: Team) => {
     try {
-      const response = await deleteTeamMember(teamMemberToDelete.id!);
+      const response: any = await deleteTeamMember(teamMemberToDelete.id!);
       if (response?.statusCode === 200) {
-        loadTeamMembers();
+        refetchTeamMembers();
         handleCloseConfirmDialog();
         toast.success(response?.message);
       }
@@ -150,30 +135,35 @@ const AdminTeamPage: React.FC = () => {
         </AccountSettingsLayout.Header>
 
         <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4">
-          {teamMembers?.map((teamMember) => (
-            <motion.div
-              key={teamMember.name}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.4 }}
-            >
-              <AdminTeamCard
-                teamMember={teamMember}
-                onEdit={handleOpenDialog}
-                onDelete={(teamMember) => {
-                  setTeamMemberToDelete(teamMember);
-                  setOpenConfirmDialog(true);
-                }}
-              />
-            </motion.div>
-          ))}
+          {teamMembers?.data?.map((teamMember) => {
+            
+            return (
+              <>
+                <motion.div
+                  key={teamMember.name}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <AdminTeamCard
+                    teamMember={teamMember}
+                    onEdit={handleOpenDialog}
+                    onDelete={(teamMember) => {
+                      setTeamMemberToDelete(teamMember);
+                      setOpenConfirmDialog(true);
+                    }}
+                  />
+                </motion.div>
+              </>
+            );
+          })}
         </motion.div>
       </AccountSettingsLayout>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>
-          {editTeamMember?.name ? "Edit Team Member" : "Add Team Member"}
+          {editTeamMember?.id ? "Edit Team Member" : "Add Team Member"}
         </DialogTitle>
         <DialogContent>
           <TextField
@@ -197,21 +187,12 @@ const AdminTeamPage: React.FC = () => {
               setEditTeamMember((prev) => ({ ...prev!, role: e.target.value }))
             }
           />
-          {/* <TextField
-                        margin="dense"
-                        label="Bio"
-                        type="text"
-                        fullWidth
-                        value={editTeamMember?.description || ''}
-                        onChange={(e) => setEditTeamMember(prev => ({ ...prev!, description: e.target.value }))}
-                    /> */}
           <div>
             <div className="">Bio</div>
             <JoditEditor
               ref={editor}
               value={editTeamMember?.description || ""}
               config={config}
-              // tabIndex={1}
               onBlur={handleContentChange}
             />
           </div>
@@ -247,7 +228,7 @@ const AdminTeamPage: React.FC = () => {
             Cancel
           </Button>
           <Button onClick={handleAddEditTeamMember} color="primary">
-            {editTeamMember?.name ? "Update" : "Add"}
+            {editTeamMember?.id ? "Update" : "Add"}
           </Button>
         </DialogActions>
       </Dialog>
