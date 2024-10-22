@@ -16,11 +16,11 @@ import { Team } from "../../../../types/team";
 import JoditEditor from "jodit-react";
 import {
   useCreateTeamMemberMutation,
-  useDeleteTeamMemberMutation,
+  useToggleTeamMemberStatusMutation,
   useFetchAllTeamMembersQuery,
   useUpdateTeamMemberMutation,
 } from "../../../../rtk-query/teamsApiSlice";
-import DOMPurify from "dompurify";
+import NoDataAvailable from "../../../../components/NoDataAvailable";
 
 const AdminTeamPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -32,12 +32,11 @@ const AdminTeamPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const editor = useRef(null);
 
-  // RTK Query Hooks
   const { data: teamMembers, refetch: refetchTeamMembers } =
     useFetchAllTeamMembersQuery();
   const [createTeamMember] = useCreateTeamMemberMutation();
   const [updateTeamMember] = useUpdateTeamMemberMutation();
-  const [deleteTeamMember] = useDeleteTeamMemberMutation();
+  const [toggleTeamMemberStatus] = useToggleTeamMemberStatusMutation();
 
   const handleContentChange = (newContent: string) => {
     setEditTeamMember((prev) => {
@@ -58,7 +57,6 @@ const AdminTeamPage: React.FC = () => {
     setEditTeamMember(
       teamMember || {
         name: "",
-        department: "",
         imageUrl: "",
         isActive: true,
         linkedIn: "",
@@ -78,19 +76,23 @@ const AdminTeamPage: React.FC = () => {
           id: editTeamMember.id,
           updateData: editTeamMember,
         });
-        if (updatedMemberResponse?.statusCode === 200) {
+        const responseData = updatedMemberResponse?.data;
+
+        if (responseData?.status) {
           refetchTeamMembers();
           setOpenDialog(false);
           setEditTeamMember(null);
-          toast.success(updatedMemberResponse?.message);
+          toast.success(responseData?.message);
         }
       } else {
         const newMemberResponse: any = await createTeamMember(editTeamMember);
-        if (newMemberResponse?.status) {
+        const responseData = newMemberResponse?.data
+        
+        if (responseData?.status) {
           refetchTeamMembers();
           setOpenDialog(false);
           setEditTeamMember(null);
-          toast.success(newMemberResponse?.message);
+          toast.success(responseData?.message);
         }
       }
     } catch (error) {
@@ -100,11 +102,13 @@ const AdminTeamPage: React.FC = () => {
 
   const handleDeleteTeamMember = async (teamMemberToDelete: Team) => {
     try {
-      const response: any = await deleteTeamMember(teamMemberToDelete.id!);
-      if (response?.statusCode === 200) {
+      const response: any = await toggleTeamMemberStatus(teamMemberToDelete?.id!);
+      const responseData = response?.data
+      console.log("responseData", responseData)
+      if (responseData.status) {
         refetchTeamMembers();
         handleCloseConfirmDialog();
-        toast.success(response?.message);
+        toast.success(responseData.message);
       }
     } catch (error) {
       setError("Failed to delete team member");
@@ -134,11 +138,10 @@ const AdminTeamPage: React.FC = () => {
           </Button>
         </AccountSettingsLayout.Header>
 
-        <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4">
-          {teamMembers?.data?.map((teamMember) => {
-            
-            return (
-              <>
+        <AccountSettingsLayout.Body>
+          <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4 h-auto">
+            {teamMembers && teamMembers?.data?.length > 0 ? (
+              teamMembers?.data?.map((teamMember:any) => (
                 <motion.div
                   key={teamMember.name}
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -155,10 +158,14 @@ const AdminTeamPage: React.FC = () => {
                     }}
                   />
                 </motion.div>
-              </>
-            );
-          })}
-        </motion.div>
+              ))
+            ) : (
+              <div className="text-center col-span-full">
+                <NoDataAvailable />
+              </div>
+            )}
+          </motion.div>
+        </AccountSettingsLayout.Body>
       </AccountSettingsLayout>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>

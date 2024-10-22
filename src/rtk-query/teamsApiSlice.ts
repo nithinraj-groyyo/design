@@ -7,10 +7,11 @@ const teamUrl = 'team';
 
 export const teamApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        fetchAllTeamMembers: builder.query<ResponseFormat<Team[]>, void>({
+        fetchAllTeamMembers: builder.query<any, void>({
           query: () => ({
             url: `${teamUrl}/list`
           }),
+          providesTags: ['Team']
         }),
     
         createTeamMember: builder.mutation<ResponseFormat<Team>, Partial<Team>>({
