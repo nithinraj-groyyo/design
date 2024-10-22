@@ -2,19 +2,14 @@ import { IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import MenuDrawer from './MenuDrawer';
-import { setActiveCategoryTab } from '../../redux/categoriesSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import useFetchCategories from '../../hooks/useFetchCategories';
-import { RootState } from '../../redux/store';
 import { useNavigate } from 'react-router-dom';
+import CustomizedWishlist from './badges/CustomizedWishlist';
+import CustomizedShoppingBadges from './badges/CustomizedShoppingBadges';
 
 const MobileHeader = () => {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-
-    const dispatch = useDispatch();
+    const [isAccountOpened, setIsAccountOpened] = useState(false);
     const navigate = useNavigate();
-
-    useFetchCategories();
 
     const handleDrawerOpen = () => {
         setDrawerOpen(true);
@@ -22,13 +17,8 @@ const MobileHeader = () => {
 
     const handleDrawerClose = () => {
         setDrawerOpen(false);
-        dispatch(setActiveCategoryTab({ categoryId: -1, categoryKey: '' }));
+        setIsAccountOpened(false)
     };
-    const {cart} = useSelector((state: RootState)=> state.shoppingBag)
-
-    const handleNavigationToShoppingBag = () => {
-        navigate("/bag")
-    }
 
     const navigateToHomePage = () => {
         navigate("/");
@@ -48,10 +38,11 @@ const MobileHeader = () => {
           />
         </div>
 
-        <div className="cursor-pointer text-sm"  onClick={handleNavigationToShoppingBag}>
-            SHOPPING BAG ({cart?.savedItems?.length})
+        <div className='flex flex-row gap-5'>
+            <CustomizedWishlist />
+            <CustomizedShoppingBadges />
         </div>
-        <MenuDrawer open={drawerOpen} onClose={handleDrawerClose} />
+        <MenuDrawer open={drawerOpen} onClose={handleDrawerClose} setIsAccountOpened={setIsAccountOpened} isAccountOpened={isAccountOpened} />
     </div>
   )
 }
