@@ -8,6 +8,7 @@ import AdminServiceCard from './AdminServiceCard';
 import { Service } from '../../../../types/service';
 import { toast } from 'react-toastify';
 import { useCreateServiceMutation, useDeleteServiceMutation, useFetchAllServicesQuery, useUpdateServiceMutation } from '../../../../rtk-query/serviceApiSlice';
+import JoditEditor from "jodit-react";
 
 const AdminServicePage: React.FC = () => {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -21,6 +22,16 @@ const AdminServicePage: React.FC = () => {
     const [createService, {isLoading: isCreationLoading}] = useCreateServiceMutation();
     const [updateService, {isLoading: isUpdationLoading}] = useUpdateServiceMutation();
     const [deleteService, {isLoading: isDeletionLoading}] = useDeleteServiceMutation();
+
+    const editor = useRef(null);
+
+    const handleContentChange = (newContent: string) => {
+      setEditService(prev => ({ ...prev!, description: newContent }))
+    };
+
+    const config = {
+      readonly: false,
+    };
 
     const handleOpenDialog = (service: Service | null = null) => {
         setEditService(service || {
@@ -181,14 +192,24 @@ const AdminServicePage: React.FC = () => {
                         value={editService?.title || ''}
                         onChange={(e) => setEditService(prev => ({ ...prev!, title: e.target.value }))}
                     />
-                    <TextField
+                    {/* <TextField
                         margin="dense"
                         label="Service Description"
                         type="text"
                         fullWidth
                         value={editService?.description || ''}
                         onChange={(e) => setEditService(prev => ({ ...prev!, description: e.target.value }))}
-                    />
+                    /> */}
+                    <div>
+                      <div className="">Bio</div>
+                      <JoditEditor
+                        ref={editor}
+                        value={editService?.description || ''}
+                        config={config}
+                        // tabIndex={1}
+                        onBlur={handleContentChange}
+                      />
+                    </div>
                     {editService?.featuresList?.map((desc, index) => (
                         <div key={index} className="flex items-center gap-4 mt-4">
                             <TextField

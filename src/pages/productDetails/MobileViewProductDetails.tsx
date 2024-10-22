@@ -9,16 +9,18 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { updateWishlistResponse } from '../../api/userApi';
 import { updateProductWishlist, updateSingleProductWishlist } from '../../redux/productsSlice';
 import useFetchProductById from '../../hooks/useFetchProductById';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { getImagesFromUrl } from '../../utilities/helper';
 import AddToBagButton from './AddToBagButton';
 import ProductCard from '../product_list/ProductCard';
 import useFetchProducts from '../../hooks/useFetchProducts';
 import Footer from '../../components/footer/Footer';
 import { setLocalWishlistItems } from '../../redux/wishlistSlice';
+import { IProduct } from '../../types/products';
+import { useLazyFetchProductsQuery } from '../../rtk-query/productApiSlice';
 
 const MobileViewProductDetails = () => {
-    const { productId, categoryKey } = useParams<{ productId: string, categoryKey: string }>();
+    const { productId } = useParams<{ productId: string }>();
 
     const [expanded, setExpanded] = useState(false);
     const [drawerHeight, setDrawerHeight] = useState(25);
@@ -27,8 +29,39 @@ const MobileViewProductDetails = () => {
 
     const userId = JSON.parse(localStorage.getItem('userId') as string);
 
+    const location = useLocation();
+    const { categoryId, subCategoryId } = location?.state;
+  
+    const [fetchProducts, { data, isLoading }] = useLazyFetchProductsQuery();
+    const [products, setProducts] = useState<IProduct[] | undefined>();
+
+    useEffect(() => {
+        if (subCategoryId) {
+          fetchProducts({
+            page: 1,
+            limit: 20,
+            isProductActive: true,
+            categoryId,
+            subCategoryId,
+          });
+        } else if (categoryId) {
+          fetchProducts({
+            page: 1,
+            limit: 20,
+            isProductActive: true,
+            categoryId,
+          });
+        }
+      }, [categoryId, subCategoryId]);
+  
+      useEffect(() => {
+        if(data?.data) {
+          setProducts(data?.data)
+        }
+      }, [data])
+
     const { product } = useSelector((state: RootState) => state.products.singleProductData);
-    const { products } = useSelector((state: RootState) => state.products.productData);
+    // const { products } = useSelector((state: RootState) => state.products.productData);
 
     const [isInWishlist, setIsInWishlist] = useState(false);
 
@@ -44,8 +77,6 @@ const MobileViewProductDetails = () => {
         setExpanded(!expanded);
         setDrawerHeight(expanded ? 25 : 95);
     };
-
-    useFetchProducts({categoryKey});
 
     const handleWishlistToggle = async () => {
         if(!userId && product){
@@ -128,9 +159,9 @@ const MobileViewProductDetails = () => {
                         </div>
                     </div>
                     <div className='my-2'>
-                        <AddToBagButton />
+                        {/* <AddToBagButton /> */}
                     </div>
-                    {(product?.leftHeading1 && product?.leftHeading2) && (
+                    {(product?.leftTopHeader && product?.leftBottomHeader) && (
                         <div>
                             <Accordion>
                                 <AccordionSummary
@@ -138,10 +169,10 @@ const MobileViewProductDetails = () => {
                                     aria-controls="panel1-content"
                                     id="left-heading-1"
                                 >
-                                    {product?.leftHeading1}
+                                    {product?.leftTopHeader}
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                    {product?.leftHeading1Content}
+                                    {product?.leftTopContent}
                                 </AccordionDetails>
                             </Accordion>
                             <Accordion>
@@ -150,10 +181,10 @@ const MobileViewProductDetails = () => {
                                     aria-controls="panel1-content"
                                     id="left-heading-2"
                                 >
-                                    {product?.leftHeading2}
+                                    {product?.leftBottomHeader}
                                 </AccordionSummary>
                                 <AccordionDetails>
-                                {product?.leftHeading2Content}
+                                {product?.leftBottomContent}
                                 </AccordionDetails>
                             </Accordion>
                         </div>

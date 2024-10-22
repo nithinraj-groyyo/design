@@ -41,7 +41,7 @@ const ShoppingBagItem: React.FC<ShoppingBagItemProps> = ({ imageSrc, productId, 
         const add = !isInWishlist;
 
         if(!userId){
-            dispatch(setLocalWishlistItems({product}))
+            dispatch(setLocalWishlistItems({productId: product?.id}))
             return 
         }
         try {

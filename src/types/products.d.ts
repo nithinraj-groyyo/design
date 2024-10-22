@@ -1,6 +1,6 @@
-import {ProductViewEnum} from "../utilities/enum.ts"
+import { ProductViewEnum } from "../utilities/enum.ts"
 
-export type IProductView = ProductViewEnum.LARGE |  ProductViewEnum.MEDIUM |  ProductViewEnum.SMALL;
+export type IProductView = ProductViewEnum.LARGE | ProductViewEnum.MEDIUM | ProductViewEnum.SMALL;
 
 
 export interface IProductImage {
@@ -57,10 +57,10 @@ export interface IProductResponse {
     price: string;
     isDelete: boolean;
     status: boolean;
-    leftHeading1: string;
-    leftHeading1Content: string;
-    leftHeading2: string;
-    leftHeading2Content: string;
+    leftTopHeader: string;
+    leftTopContent: string;
+    leftBottomHeader: string;
+    leftBottomContent: string;
     createdDate: string;
     createdBy: string;
     modifiedDate: string;
@@ -69,7 +69,7 @@ export interface IProductResponse {
     ProductColours: IProductColours[]
     productSizes: IProductSize[];
     ProductPricings: IProductPricing[];
-    WishLists: any[];  
+    WishLists: any[];
     Category: IProductCategory;
 }
 
@@ -78,9 +78,73 @@ export interface IWishlistItem {
     userId: number;
     productId: number;
     createdDate: string;
-    Product: IProductResponse;
+    Product: IProduct;
 }
 
 export interface IWishlistResponse {
     wishlist: IWishlistItem[];
+}
+
+export interface UpdateProductDTO {
+    name?: string;
+    description?: string;
+    styleName?: string;
+    categoryId?: number;
+    subCategoryId?: number;
+    productColorIds?: number[];
+    productSizeIds?: number[];
+    productPrices?: Array<{
+        minQty: number;
+        maxQty: number | null;
+        pricePerPiece: number;
+    }>;
+    productImages?: Array<{
+        fileId: number;
+        sideName: string;
+        isThumbnail: boolean;
+    }> | undefined;
+}
+
+
+
+export interface INewProductSize {
+    id: number;
+    name: string;
+    productSizeId: number;
+}
+
+export interface INewProductPrice {
+    id: number;
+    minQty: number;
+    maxQty: number;
+    pricePerPiece: number;
+}
+
+export interface INewProductImage {
+    id: number;
+    sideName: string;
+    isThumbnail: boolean;
+    fileId: number;
+    fileName: string;
+    imageUrl: string;
+    signedUrl: string;
+}
+
+export interface IProduct {
+    id: number;
+    name: string;
+    styleName: string;
+    category: number;
+    subCategory: number;
+    description: string;
+    productSizeIds: number[];
+    productColors: number[];
+    productPrices: INewProductPrice[];
+    productImages: INewProductImage[];
+    isPublic: boolean;
+    sizes: INewProductSize[];
+    leftTopHeader: string;
+    leftTopContent: string;
+    leftBottomHeader: string;
+    leftBottomContent: string;
 }

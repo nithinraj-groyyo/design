@@ -6,13 +6,17 @@ import { fetchWishlistResponse } from '../../api/userApi';
 import { RootState } from '../../redux/store';
 import { setWishlistItems, removeWishlistItem, setLoading, setError, removeFromLocalWishlist } from '../../redux/wishlistSlice';
 import useWindowWidth from '../../hooks/useWindowWidth';
-import { IconButton } from '@mui/material';
+import { Button, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { motion } from 'framer-motion';
+import { useGetProductByIdsMutation } from '../../rtk-query/productApiSlice';
+import { useLazyGetWishlistQuery, useRemoveWishListMutation } from '../../rtk-query/wishlistApiSlice';
+import WishlistCard from './WishlistCard';
 
 const WishList = () => {
     const userId = JSON.parse(localStorage.getItem("userId") as string);
+    const token = JSON.parse(localStorage.getItem("authToken") as string);
 
     const dispatch = useDispatch();
 
@@ -22,31 +26,31 @@ const WishList = () => {
 
     const { isMobileView } = useWindowWidth();
 
-    const [localWishlistState, setLocalWishlistState] = useState<any[]>([]);
-
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
 
-    useEffect(() => {
-        const fetchWishlist = async () => {
-            dispatch(setLoading(true));
-            try {
-                const response = await fetchWishlistResponse();
-                dispatch(setWishlistItems(response?.wishlist));
-            } catch (error: any) {
-                dispatch(setError(error?.message || 'Failed to fetch wishlist'));
-            } finally {
-                dispatch(setLoading(false));
-            }
-        };
+    const [getProductByIds, {data: localWishlistData}] = useGetProductByIdsMutation();
+    const [getWishlist, {data: wishlistData}] = useLazyGetWishlistQuery();
+    const [removeWishList, {data: removeWishListData}] = useRemoveWishListMutation()
 
-        if (userId) {
-            fetchWishlist();
-        } else {
+    useEffect(() => {
+        if(userId){
+            if(wishlistItems?.length === 0){
+                getWishlist({token})
+            }
+        }else{
             const localWishlist = JSON.parse(localStorage.getItem("localWishList") as string);
-            setLocalWishlistState(localWishlist || []);
+            getProductByIds(localWishlist);
         }
-    }, [dispatch, userId]);
+    },[]);
+
+    useEffect(() => {
+        if(wishlistData){
+            dispatch(setWishlistItems(wishlistData?.data)) 
+        }else if(localWishlistData){
+            dispatch(setWishlistItems(localWishlistData?.data)) 
+        }
+    }, [wishlistData, localWishlistData, removeWishListData]);
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
@@ -62,20 +66,21 @@ const WishList = () => {
           } else {            
             setIsVisible(true);
           }
-      
           setLastScrollY(currentScrollY);
     }
 
-    const handleRemoveFromWishlist = (productId: number) => {
+    const handleRemoveFromWishlist = async(productId: number) => {
         if (!userId) {
             dispatch(removeFromLocalWishlist({ productId }));
             window.location.reload();
             return;
+        }else{
+           await removeWishList({productId, token});
         }
         dispatch(removeWishlistItem(productId));
     };
 
-    const isWishlistEmpty = userId ? wishlistItems.length === 0 : localWishlistState.length === 0;
+    const isWishlistEmpty = wishlistItems?.length === 0;
 
     const cardVariants = {
         hidden: { opacity: 0, y: 50 },
@@ -108,20 +113,33 @@ const WishList = () => {
                     {loading && <p>Loading...</p>}
                     {error && <p className="text-red-500">{error}</p>}
                     {isWishlistEmpty ? (
-                        <div className='text-center mt-10'>
-                            <p>Your wishlist is empty.</p>
-                            <button 
+                       <div className="flex flex-col items-center justify-center min-h-[40vh]">
+                        <div className="bg-white shadow-md rounded-lg p-8 text-center max-w-md mx-auto">
+                            <div className="mb-6">
+                            <img
+                                src="/images/empty-wishlist.webp" 
+                                alt="Empty Wishlist"
+                                className="w-40 h-40 mx-auto mb-4"
+                            />
+                            <p className="text-gray-600 text-lg font-semibold">Your wishlist is empty.</p>
+                            <p className="text-gray-500 mt-2">
+                                You haven’t added anything to your wishlist yet. Start browsing and add items you love.
+                            </p>
+                            </div>
+                            <Button
                                 onClick={() => navigate('/')}
-                                className='mt-4 bg-blue-500 text-white px-6 py-2 rounded'
-                            >
+                                className="mt-4 !bg-black !text-white transition-all duration-300 !px-6 !py-3 rounded-lg shadow-md hover:shadow-lg focus:ring focus:ring-blue-300 focus:outline-none"
+                                >
                                 Continue Shopping
-                            </button>
+                            </Button>
                         </div>
+                        </div>
+                     
                     ) : (
                         <div className='grid xss:grid-cols-1 md:grid-cols-3 lg:grid-cols-6 justify-center xxs:gap-4'>
-                            {(userId ? wishlistItems : localWishlistState)?.map((item) => (
+                            {wishlistItems?.map((item) => (
                                 <motion.div
-                                    key={userId ? item.Product.id : item.id}
+                                    key={item.id}
                                     variants={cardVariants}
                                     initial="hidden"
                                     animate="visible"
@@ -129,11 +147,18 @@ const WishList = () => {
                                     exit="exit"
                                     className='bg-white shadow-lg border border-gray-200 rounded-xl overflow-hidden'
                                 >
-                                    <ProductCard
+                                    {/* <ProductCard
                                         className='!rounded-none'
                                         isAlreadyInWishlist={true}
-                                        product={userId ? item.Product : item}
+                                        product={item}
                                         onRemoveFromWishlist={handleRemoveFromWishlist}
+                                    /> */}
+                                    <WishlistCard
+                                        id={item.id}
+                                        imageUrl={item?.productImages[0].signedUrl}
+                                        name={item.name}
+                                        onRemove={handleRemoveFromWishlist}
+                                        price={item.productPrices[0].pricePerPiece}
                                     />
                                 </motion.div>
                             ))}

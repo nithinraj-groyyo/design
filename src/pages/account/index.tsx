@@ -42,14 +42,14 @@ const adminMenuItems = [
       { title: "FAQ", route: "/account/web-info/faq" },
     ],
   },
-  // {
-  //   title: "Product",
-  //   subItems: [
-  //     { title: "Add Product", route: "/account/add-product" },
-  //     { title: "Bulk Upload", route: "/account/bulk-upload" },
-  //     { title: "Product List", route: "/account/product-list" },
-  //   ],
-  // },
+  {
+    title: "Product",
+    subItems: [
+      { title: "Add Product", route: "/account/add-product" },
+      // { title: "Bulk Upload", route: "/account/bulk-upload" },
+      { title: "Product List", route: "/account/product-list" },
+    ],
+  },
   // {
   //   title: "Blog",
   //   subItems: [
@@ -68,20 +68,21 @@ const adminMenuItems = [
   //   title: "Customer",
   //   subItems: [{ title: "Queries", route: "/account/queries" }],
   // },
-  // {
-  //   title: "Site Settings",
-  //   subItems: [
-  //     { title: "Brands", route: "/account/brands" },
-  //     { title: "Add Brands", route: "/account/add-brands" },
-  //     { title: "Manage Categories", route: "/account/manage-categories" },
-  //   ],
-  // },
+  {
+    title: "Site Settings",
+    subItems: [
+      { title: "Brands", route: "/account/brands" },
+      { title: "Add Brands", route: "/account/add-brands" },
+      { title: "Manage Categories", route: "/account/manage-categories" },
+      { title: "Manage Subscriptions", route: "/account/manage-subscriptions" },
+    ],
+  },
 ];
 
 const AccountPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("roles") as string);
+  const isAdmin = JSON.parse(localStorage.getItem("isAdmin") as string === "undefined" ? "false": localStorage.getItem("isAdmin") as string);
 
   const handleSelectedList = (selectedRoute: string) => {
     navigate(selectedRoute);
@@ -134,7 +135,8 @@ const AccountPage = () => {
               </React.Fragment>
             ))}
 
-            {user && user.role === "Admin" &&
+            {/* {user && user.role === "Admin" && */}
+            {
               adminMenuItems.map((menuItem, index) => (
                 <React.Fragment key={index}>
                   <ListItem>
