@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@mui/material';
 import { Team } from '../../../../types/team';
+import DOMPurify from 'dompurify';
 
 interface AdminTeamCardProps {
   teamMember: Team;
@@ -10,6 +11,8 @@ interface AdminTeamCardProps {
 }
 
 const AdminTeamCard: React.FC<AdminTeamCardProps> = ({ teamMember, onEdit, onDelete }) => {
+  const sanitizedDescription = DOMPurify.sanitize(teamMember?.description);
+  
   const [isExpanded, setIsExpanded] = useState(false);
 
   const limitWords = (text: string, limit: number = 10) => {
@@ -27,14 +30,17 @@ const AdminTeamCard: React.FC<AdminTeamCardProps> = ({ teamMember, onEdit, onDel
     >
       <div>
         {teamMember?.imageUrl && teamMember?.imageUrl?.length > 0 && (
-          <img src={teamMember.imageUrl} alt={teamMember.name} className="aspect-[4/3] object-cover rounded-xl mb-2" />
+          <img src={teamMember?.imageUrl} alt={teamMember.name} className="aspect-[4/3] object-cover rounded-xl mb-2" />
         )}
         <h3 className="text-lg font-bold">{teamMember.name}</h3>
         <p className="text-gray-600 font-semibold">{teamMember.role}</p>
 
-        <p className="text-gray-600">
-          {isExpanded ? teamMember.description : limitWords(teamMember.description)}
-        </p>
+        <p
+          className="text-gray-600"
+          dangerouslySetInnerHTML={{
+            __html: isExpanded ? sanitizedDescription : limitWords(sanitizedDescription)
+          }}
+        />
       </div>
 
       <Button
