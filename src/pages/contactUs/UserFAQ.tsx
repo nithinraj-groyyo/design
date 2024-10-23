@@ -3,34 +3,18 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useEffect, useState } from "react";
-import { fetchFaqs } from "../../api/faqApi";
-import { FAQ } from "../../types/faq";
-import { setLoading } from "../../redux/shoppingBagSlice";
-import { toast } from "react-toastify";
+import { useState } from "react";
+import { useFetchFaqsQuery } from "../../rtk-query/faqApiSlice";
 
 const UserFAQ = () => {
   const [expanded, setExpanded] = useState<string | false>(false);
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
+
+  const { data: faqs = [], isLoading: faqsLoading } = useFetchFaqsQuery();
 
   const handleExpansion =
     (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false);
     };
-
-  useEffect(() => {
-    const loadFaqs = async () => {
-      try {
-        const loadedFaqs = await fetchFaqs();
-        setFaqs(loadedFaqs);
-      } catch (error) {
-        toast.error("Failed to load FAQs.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadFaqs();
-  }, []);
 
   return (
     <div className="bg-white shadow-lg p-6 md:p-10 rounded-lg border border-gray-200 h-[85vh] overflow-y-auto">
@@ -38,7 +22,6 @@ const UserFAQ = () => {
         Frequently Asked Questions
       </h2>
 
-      {/* Accordion Items */}
       {faqs.map((faq) => (
         <Accordion
           key={faq.id}
