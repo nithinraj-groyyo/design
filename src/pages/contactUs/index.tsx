@@ -14,20 +14,23 @@ export const ContactUs = () => {
   };
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const tabParam = queryParams.get("tab");
 
     if (tabParam === "faq") {
       setActiveTab(1);
     } else {
-      setActiveTab(0); // Default to "Contact Us"
+      setActiveTab(0); 
     }
   }, [location.search]);
 
   return (
     <BasicLayout>
-      <div className="w-full p-6 sm:p-8 md:p-10 bg-gray-100 mt-20 flex flex-col md:flex-row justify-center items-stretch space-y-8 md:space-y-0 md:space-x-8">
-        {/* Left Side */}
+      <div className="w-full p-6 sm:p-8 md:p-10 bg-gray-100 mt-20 flex flex-col md:flex-row justify-center items-stretch space-y-8 md:space-y-0 md:space-x-8">        
         <div className="md:w-[35%] bg-[#1E201E] p-6 md:p-8  text-xl font-bold flex flex-col items-center">
           <div className="mb-4 w-full">
             <img
@@ -56,8 +59,7 @@ export const ContactUs = () => {
             </div>
           </div>
         </div>
-
-        {/* Right Side with Tabs */}
+        
         <div className="md:w-[65%] bg-white p-4 sm:p-6">
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">

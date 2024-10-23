@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   FormControl,
@@ -26,11 +26,15 @@ export const ContactUsForm = () => {
     name: "",
     email: "",
     contactPreference: "",
-    phone: "",  // Changed from 'countryId' to 'phone'
+    phone: "",  
     subject: "",
     message: "",
   });
   const [file, setFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleInputChange = (
     event:
@@ -47,7 +51,7 @@ export const ContactUsForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Handle form submission logic here
+    
   };
 
   return (

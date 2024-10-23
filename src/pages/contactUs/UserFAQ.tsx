@@ -3,7 +3,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFetchFaqsQuery } from "../../rtk-query/faqApiSlice";
 
 const UserFAQ = () => {
@@ -15,6 +15,10 @@ const UserFAQ = () => {
     (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpanded(isExpanded ? panel : false);
     };
+
+    useEffect(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, []);
 
   return (
     <div className="bg-white shadow-lg p-6 md:p-10 rounded-lg border border-gray-200 h-[85vh] overflow-y-auto">

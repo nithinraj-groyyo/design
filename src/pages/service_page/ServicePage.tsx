@@ -8,29 +8,39 @@ import { fetchAllServices } from "../../api/servicesApi";
 import { setError, setLoading } from "../../redux/shoppingBagSlice";
 import { Service } from "../../types/service";
 import DOMPurify from "dompurify";
+import { useNavigate } from "react-router-dom";
+import { useFetchAllServicesQuery } from "../../rtk-query/serviceApiSlice";
+
+export enum ServiceButtons {
+  ExploreDesigns = "Explore our Designs",
+  BookAppointment = "Book an appointment",
+  ContactUs = "Contact us"
+}
 
 const carouselDetails = [
   {
     title: "Exclusive Apparel Designs",
     description: "Discover ready-made, trend-driven apparel for your brand.",
-    buttonName: "Explore our Designs",
+    buttonName: ServiceButtons.ExploreDesigns,
   },
   {
     title: "Customization Services",
     description: "Create apparel tailored to your brand’s unique vision.",
-    buttonName: "Book an appointment",
+    buttonName: ServiceButtons.BookAppointment,
   },
   {
     title: "Design Consultation",
     description: "Expert guidance to perfect your design ideas.",
-    buttonName: "Contact us",
+    buttonName: ServiceButtons.ContactUs,
   },
 ];
 
 const ServicePage = () => {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [currentService, setCurrentService] = useState(0);
-  const [services, setServices] = useState<Service[]>([]);
+  const navigate = useNavigate();
+
+  const { data: services = [] } = useFetchAllServicesQuery();
 
   const handleIndex = (val: number) => {
     setCurrentService((currentService + val + 3) % 3);
@@ -40,22 +50,11 @@ const ServicePage = () => {
     setExpandedCard(expandedCard === index ? null : index);
   };
 
-  const loadServices = async () => {
-    setLoading(true);
-    try {
-      const data: any = await fetchAllServices();
-      setServices(data?.data);
-    } catch (error) {
-      setError("Failed to fetch services");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadServices();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+ 
   useEffect(() => {
     const interval = setInterval(() => {
       handleIndex(1);
@@ -66,9 +65,27 @@ const ServicePage = () => {
     };
   }, [currentService]);
 
+  const navigateButtons = (buttonName: ServiceButtons) => {
+    switch(buttonName) {
+      case ServiceButtons.ExploreDesigns:
+        return "/";
+      case ServiceButtons.BookAppointment:
+      case ServiceButtons.ContactUs:
+        return "/contact-us?tab=contact-us";
+      default:
+        return null;
+    }
+  };
+
+  const handleButtonClick = (buttonName: ServiceButtons) => {
+    const path = navigateButtons(buttonName);
+    if (path) {
+      navigate(path); // Perform navigation
+    }
+  };
+
   return (
-    <BasicLayout>
-      {/* Carousel Section */}
+    <BasicLayout>      
       <motion.div
         className="relative w-full min-h-[70vh] mt-[4rem] sm:mt-[6rem] lg:mt-[10rem] flex justify-center items-center"
         style={{
@@ -90,8 +107,7 @@ const ServicePage = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-        >
-          {/* Left Arrow */}
+        >          
           <div
             className="flex items-center cursor-pointer absolute left-5 sm:left-10 lg:left-20"
             onClick={() => handleIndex(-1)}
@@ -99,7 +115,6 @@ const ServicePage = () => {
             <KeyboardArrowLeftIcon />
           </div>
 
-          {/* Carousel Content */}
           <motion.div
             className="flex flex-col gap-4 sm:gap-6 lg:gap-8 bg-white p-4 sm:p-6 lg:p-8 rounded w-full text-center min-w-[80vw] sm:min-w-[50vw] lg:min-w-[30vw] shadow-xl"
             initial={{ opacity: 0 }}
@@ -130,21 +145,20 @@ const ServicePage = () => {
                     color: "black",
                   },
                 }}
+                onClick={() => handleButtonClick(carouselDetails[currentService]?.buttonName)}
               >
                 {carouselDetails[currentService]?.buttonName}
               </Button>
             </div>
           </motion.div>
-
-          {/* Right Arrow */}
+          
           <div
             className="flex items-center cursor-pointer absolute right-5 sm:right-10 lg:right-20"
             onClick={() => handleIndex(1)}
           >
             <KeyboardArrowRightIcon />
           </div>
-
-          {/* Dots Indicator */}
+          
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-2">
             {carouselDetails.map((_, index) => (
               <motion.div
@@ -161,9 +175,7 @@ const ServicePage = () => {
           </div>
         </motion.div>
       </motion.div>
-
-      {/* Services Section */}
-      {/* Services Section */}
+            
 <motion.div
   className="px-4 sm:px-16 lg:px-32 py-8 flex flex-col gap-8"
   initial={{ opacity: 0, y: 50 }}
@@ -173,8 +185,7 @@ const ServicePage = () => {
   <div className="text-center font-semibold text-2xl sm:text-3xl lg:text-4xl">
     Services
   </div>
-
-  {/* Grid Layout for Services */}
+  
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 lg:gap-16 justify-center">
     {services.map((serviceDetail, index) => {
       const sanitizedDescription = DOMPurify.sanitize(serviceDetail?.description);
@@ -237,6 +248,7 @@ const ServicePage = () => {
                     color: "white",
                   },
                 }}
+                onClick={() =>  handleButtonClick(serviceDetail?.buttonLabel as ServiceButtons)}
               >
                 {serviceDetail?.buttonLabel}
               </Button>
@@ -248,10 +260,8 @@ const ServicePage = () => {
   </div>
 </motion.div>
 
-
-          {/* Subscription */}
-      <section className="w-screen h-auto sm:h-[100vh] flex flex-col sm:flex-row">
-        {/* Left Part */}
+          
+      <section className="w-screen h-auto sm:h-[100vh] flex flex-col sm:flex-row">        
         <div className="bg-[#B7A99A] w-full sm:w-1/2 flex flex-col justify-center items-center py-8 sm:py-0">
           <div className="flex flex-col items-center">
             <img
@@ -264,30 +274,23 @@ const ServicePage = () => {
             </h2>
           </div>
         </div>
-
-        {/* Right Part with layered boxes */}
-        <div className="flex justify-center items-center w-full sm:w-1/2 relative py-8 sm:py-0 my-32 sm:my-0">
-          {/* First Background Layer */}
-          <div className="bg-gradient-to-br from-[#CEC1B2] to-[#D8C9BB] w-[20rem] sm:w-[26rem] h-[13rem] sm:h-[15rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">
-            {/* Second Layer */}
-            <div className="bg-gradient-to-br from-[#B9A99A] to-[#CAB7A9] w-[18rem] sm:w-[23rem] h-[18rem] sm:h-[20rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">
-              {/* Main Card */}
-              <div className="bg-gradient-to-br from-[#978776] to-[#B19C89] w-[15rem] sm:w-[20rem] h-[22rem] sm:h-[25rem] rounded-3xl shadow-2xl relative z-20 transform hover:scale-105 transition-transform duration-300 ease-out">
-                {/* Bear Icon */}
+        
+        <div className="flex justify-center items-center w-full sm:w-1/2 relative py-8 sm:py-0 my-32 sm:my-0">          
+          <div className="bg-gradient-to-br from-[#CEC1B2] to-[#D8C9BB] w-[20rem] sm:w-[26rem] h-[13rem] sm:h-[15rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">            
+            <div className="bg-gradient-to-br from-[#B9A99A] to-[#CAB7A9] w-[18rem] sm:w-[23rem] h-[18rem] sm:h-[20rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">              
+              <div className="bg-gradient-to-br from-[#978776] to-[#B19C89] w-[15rem] sm:w-[20rem] h-[22rem] sm:h-[25rem] rounded-3xl shadow-2xl relative z-20 transform hover:scale-105 transition-transform duration-300 ease-out">                
                 <div className="absolute -top-8 sm:-top-12 left-[50%] transform -translate-x-[50%]">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#B9A99A] rounded-full flex justify-center items-center shadow-md">
                     <span className="text-3xl sm:text-4xl">💎</span>
                   </div>
                 </div>
-
-                {/* Design + Label */}
+                
                 <div className="text-center mt-12">
                   <span className="inline-block bg-[#60594D] text-white text-xs px-4 sm:px-4 py-1 rounded-full shadow-lg">
                     Design +
                   </span>
                 </div>
-
-                {/* Price */}
+                
                 <div className="text-center mt-4 sm:mt-6 flex justify-center items-baseline">
                   <h3 className="text-[#F3EDE5] text-5xl sm:text-6xl font-bold drop-shadow-lg">
                     $10
@@ -296,8 +299,7 @@ const ServicePage = () => {
                     /MO
                   </span>
                 </div>
-
-                {/* Features List */}
+                
                 <div className="text-[#F3EDE5] text-center mt-6 sm:mt-8 text-opacity-90 space-y-2">
                   <p className="flex items-center justify-center">
                     <span className="mr-2">🔥</span> Best Price ever
@@ -309,8 +311,7 @@ const ServicePage = () => {
                     <span className="mr-2">🌟</span> 11:11 lorem ipsum
                   </p>
                 </div>
-
-                {/* Get Started Button */}
+                
                 <div className="flex justify-center mt-6 sm:mt-8">
                   <button className="bg-[#60594D] text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 ease-out">
                     Get Started
