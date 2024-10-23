@@ -13,6 +13,7 @@ const ProductTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
   const [itemCount, setItemCount] = useState<number>(CONSTANT.PAGE_LIMIT);
+  const [totalCount, setTotalCount] = useState(0);
 
   const navigate = useNavigate();
 
@@ -41,6 +42,7 @@ const ProductTable: React.FC = () => {
     if (response?.data) {
       setProducts(response?.data?.data || []);
       setPageCount(Math.ceil(response?.data?.total / itemCount));
+      setTotalCount(response?.data?.total)
     }
   };
 
@@ -49,9 +51,6 @@ const ProductTable: React.FC = () => {
     loadProducts();
   }, [currentPage, itemCount, filter]);
 
-  const handleEdit = (id: number) => {
-    console.log(`Edit product with ID: ${id}`);
-  };
 
   const [updateProductStatus] = useUpdateProductStatusMutation(); 
 
@@ -60,13 +59,17 @@ const ProductTable: React.FC = () => {
     const newStatus = !currentStatus; 
 
     try {
-      await updateProductStatus({ id, isProductActive: newStatus }).unwrap();
-      setProducts((prevProducts:any) =>
-        prevProducts.map((product:any) =>
-          product.id === id ? { ...product, isProductActive: newStatus } : product
-        )
-      );
-      toast.success(`${productName} is now ${newStatus ? 'enabled' : 'disabled'}`);
+      const response = await updateProductStatus({ id, isProductActive: newStatus }).unwrap();
+
+      if(response?.status){
+        setProducts((prevProducts:any) =>
+          prevProducts.map((product:any) =>
+            product.id === id ? { ...product, isProductActive: newStatus } : product
+          )
+        );
+        toast.success(`${productName} is now ${newStatus ? 'enabled' : 'disabled'}`);
+        
+      }
     } catch (error) {
       console.error(`Error updating product status for ${productName}:`, error);
       setProducts((prevProducts:any) =>
@@ -173,7 +176,7 @@ const ProductTable: React.FC = () => {
 
       {products.length > 0 && (
         <div className="mt-4 flex justify-between items-center sticky bottom-0 bg-white py-2">
-          <Typography>{data?.total} items total</Typography>
+          <Typography>{totalCount} items total</Typography>
           <Pagination
             count={pageCount}
             page={currentPage}

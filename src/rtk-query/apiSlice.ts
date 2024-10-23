@@ -23,6 +23,9 @@ console.log(result)
       if (result?.data?.httpStatusCode === 500) {
         toast.error(result?.data?.errorReason?.message);
       }
+      if (result?.data?.statusCode === 500) {
+        toast.error(result?.data?.message);
+      }
       if (result?.data?.statusCode === 401) {
         toast.error(result?.data?.message);
       }

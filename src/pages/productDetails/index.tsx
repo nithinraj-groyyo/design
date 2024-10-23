@@ -95,7 +95,7 @@ const ProductDetails = () => {
                                 <ProductColor product={product!} openDrawer={handleOpenDrawer}  />
                                 <ProductSize product={product!} openDrawer={handleOpenDrawer} />
                             </div>
-                            <AddToBagButton totalAmount={totalAmount} />
+                            <AddToBagButton totalAmount={totalAmount} openDrawer={handleOpenDrawer} />
                         </div>
                     </div>
                 </div>

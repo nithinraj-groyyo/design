@@ -24,43 +24,10 @@ import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { toast } from 'react-toastify';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useAddToCartMutation } from '../../rtk-query/cartApiSlice';
-
-const ColorOption = ({ color, count, selectedColor }: { color: string; count: number; selectedColor: boolean }) => (
-    <Box sx={{ position: 'relative' }}>
-        <Box
-            sx={{
-                width: 48,
-                height: 48,
-                borderRadius: '8px',
-                border: selectedColor ? '2px solid black' : "",
-            }}
-            className="!flex !justify-center !items-center"
-        >
-            <Box
-                sx={{
-                    width: 44,
-                    height: 44,
-                    backgroundColor: color,
-                    borderRadius: '8px',
-                    border: '2px solid white',
-                    cursor: 'pointer',
-                    display: 'inline-block',
-                }}
-            />
-            {count > 0 && (
-                <Chip
-                    label={`${count}`}
-                    size="small"
-                    color="error"
-                    sx={{ position: 'absolute', top: -5, right: -5 }}
-                />
-            )}
-        </Box>
-    </Box>
-);
+import ColorOption from '../shoppingBag/ColorOptions';
 
 const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose: () => void, product: IProduct }) => {
-    const token = JSON.parse(localStorage.getItem("authToken") as string);
+
 
     const [quantity, setQuantity] = useState(0);
     const [variations, setVariations] = useState<any[]>([]);
@@ -80,10 +47,10 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     }, [variations]);
 
     const incrementQuantity = () => {
-        if(Object.entries(variations)?.length === 0){
-            toast.error("Select Color and Size");
+        if (!selectedColor || !selectedSize) {
+            toast.error("Select Color and Size")
             return
-        }
+        };
         const newQuantity = quantity + 1;
         setQuantity(newQuantity);
         const totalQty = overallQuantity + newQuantity;
@@ -91,10 +58,10 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     };
 
     const decrementQuantity = () => {
-        if(Object.entries(variations)?.length === 0){
-            toast.error("Select Color and Size");
+        if (!selectedColor || !selectedSize) {
+            toast.error("Select Color and Size")
             return
-        }
+        };
         if (quantity > 0) {
             const newQuantity = quantity - 1;
             setQuantity(newQuantity);
@@ -185,7 +152,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
         }
 
         try {
-            const response = await addToCart({payload, token});
+            const response = await addToCart({payload});
             const responseBody = response?.data;
             if(responseBody?.status){
                 toast.success(responseBody?.message)
@@ -205,7 +172,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     }
 
     return (
-        <Drawer anchor="right" open={isOpen} onClose={onClose} PaperProps={{ sx: { width: '50%' } }}>
+        <Drawer hideBackdrop anchor="right" open={isOpen} onClose={onClose} PaperProps={{ sx: { width: '50%' } }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <Box p={4} sx={{ flexGrow: 1, overflowY: 'auto' }} >
 

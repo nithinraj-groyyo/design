@@ -10,9 +10,10 @@ import { IAddToCartRequest } from '../../types/cart';
 
 interface IAddToBagButtonProps {
     totalAmount: number;
+    openDrawer: () => void;
 }
 
-const AddToBagButton = ({totalAmount}: IAddToBagButtonProps) => {
+const AddToBagButton = ({totalAmount, openDrawer}: IAddToBagButtonProps) => {
     const [addToCart, setAddToCart] = useState<boolean>(true);
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -26,46 +27,53 @@ const AddToBagButton = ({totalAmount}: IAddToBagButtonProps) => {
         setHasQuantity(!hasValidQuantity);
     }, [items]);
 
-    const handleAddToCart = async () => {
-        if (userId === null) {
-            // toast.success("Kindly Login first, You are being redirected to the Login screen");
-            // navigate("/login");
-        } else {
-            try {
-                // const cartItems: IAddToCartRequest[] = items.map(item => ({
-                //     userid: userId,
-                //     productid: productId ?? 0,
-                //     size: item.sizeName,
-                //     qantity: item.quantity,
-                //     price: item.price,
-                //     color: product?.ProductColours[0]?.Color ?? "",
-                //     totalPrice: items.reduce((accumulator, item) =>  accumulator + (item.price * item.quantity), 0) 
-                // }));
+    useEffect(() => {
+        setAddToCart(Boolean(totalAmount))
+    } , [totalAmount]);
 
-                // await Promise.all(cartItems.map((item) => createCartDataResponse(item)));
+    const handleVariantsSelection = () => {
+        openDrawer()
+    }
 
-                // dispatch(setUpdateCartApi(true));
-                // setAddToCart(false);
-                // toast.success("Items added to the cart successfully!");
-            } catch (error) {
-                // console.log(error, "error")
-                // toast.error("Failed to add items to the cart. Please try again.");
-            }
-        }
-    };
+    // const handleAddToCart = async () => {
+    //     if (userId === null) {
+    //         // toast.success("Kindly Login first, You are being redirected to the Login screen");
+    //         // navigate("/login");
+    //     } else {
+    //         try {
+    //             // const cartItems: IAddToCartRequest[] = items.map(item => ({
+    //             //     userid: userId,
+    //             //     productid: productId ?? 0,
+    //             //     size: item.sizeName,
+    //             //     qantity: item.quantity,
+    //             //     price: item.price,
+    //             //     color: product?.ProductColours[0]?.Color ?? "",
+    //             //     totalPrice: items.reduce((accumulator, item) =>  accumulator + (item.price * item.quantity), 0) 
+    //             // }));
 
-    const handleGoToCart = () => {
-        navigate("/bag");
-    };
+    //             // await Promise.all(cartItems.map((item) => createCartDataResponse(item)));
+
+    //             // dispatch(setUpdateCartApi(true));
+    //             // setAddToCart(false);
+    //             // toast.success("Items added to the cart successfully!");
+    //         } catch (error) {
+    //             // console.log(error, "error")
+    //             // toast.error("Failed to add items to the cart. Please try again.");
+    //         }
+    //     }
+    // };
+
+    // const handleGoToCart = () => {
+    //     navigate("/bag");
+    // };
 
     return (
         <Button 
             variant='outlined' 
-            onClick={addToCart ? handleAddToCart : handleGoToCart} 
-            className={`border !border-[#111010] w-full ${totalAmount > 0 ? "!bg-black !text-white !cursor-pointer" : "!cursor-not-allowed"}`}
-            disabled={totalAmount === 0}
+            onClick={handleVariantsSelection} 
+            className={`!bg-black w-full cursor-pointer !text-white`}
         >
-            {addToCart ? "Add to Bag" : "Go to Bag"}
+            Select Your Variants
         </Button>
     );
 };
