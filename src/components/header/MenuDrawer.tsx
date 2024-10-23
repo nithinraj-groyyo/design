@@ -87,7 +87,7 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, isAccountOpened,
     };
 
     const handleAccountList = () => {
-        if(setIsAccountOpened){
+        if (setIsAccountOpened) {
             setIsAccountOpened(true)
         }
     }
@@ -249,10 +249,15 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, isAccountOpened,
                                                             <ListItem
                                                                 key={subcat.id}
                                                                 button
-                                                                onClick={() =>
-                                                                    handleNavigation(
-                                                                        `/designs/${categories[category].id}?subcategoryId=${subcat.id}`
-                                                                    )
+                                                                onClick={() => {
+                                                                    navigate(`/designs/${categories[category].id}`, {
+                                                                        state: {
+                                                                            categoryId: categories[category].id,
+                                                                            subCategoryId: subcat.id,
+                                                                        },
+                                                                    })
+                                                                    onClose()
+                                                                }
                                                                 }
                                                                 sx={{
                                                                     pl: 4,

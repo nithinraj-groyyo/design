@@ -111,16 +111,16 @@ const ProductDetails = () => {
                     <ProductDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} product={product!} />
                 </Drawer>
 
-                <div className="hidden lg:flex flex-col gap-4 ">
+                <div className="hidden lg:flex flex-col gap-4 my-2">
                     <Typography className="text-[#2D2D2A] text-sm tracking-widest px-4">YOU MAY ALSO LIKE</Typography>
-                    <div className="grid grid-cols-6">
+                    <div className="grid grid-cols-6 gap-2 mx-1">
                         {products?.data &&
                             products?.data?.slice(0, 6).map((product: any) => {
                                 return (
                                     <ProductCard
                                         key={product?.id}
-                                        className="border border-black !rounded-none"
                                         product={product}
+                                        className='!rounded-lg shadow-md'
                                     />
                                 );
                             })}

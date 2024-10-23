@@ -11,13 +11,13 @@ interface ProductGridProps {
 
 const ProductGrid: React.FC<ProductGridProps> = ({ products = [], currentView }) => {
   return (
-    <div className={`grid gap-0 p-4 ${currentView === ProductViewEnum.SMALL ? 'xxs:grid-cols-4 lg:grid-cols-12' : 'xxs:grid-cols-2 md:grid-cols-3 lg:grid-cols-6'}`}>
+    <div className={`mt-[7rem] lg:mt-[12rem] grid gap-2 p-4 ${currentView === ProductViewEnum.SMALL ? 'xxs:grid-cols-4 lg:grid-cols-12' : 'xxs:grid-cols-2 md:grid-cols-3 lg:grid-cols-6'}`}>
       {products && products?.map((product: any) => {
         return (
           <ProductCard
             key={product.id}
             showDetails={currentView !== ProductViewEnum.SMALL}
-            className='border border-black !rounded-none'
+            className='!rounded-lg shadow-md'
             product={product}
           />
         )
