@@ -27,8 +27,8 @@ export interface IAddressRequest {
     userId: string;
     addressName: string;
     addressType: string;
-    streetAddress1: string;
-    streetAddress2?: string;
+    streetAddress: string;
+    // streetAddress2?: string;
     phone: string;
     landmark?: string;
     city: string;
@@ -41,15 +41,14 @@ export interface IAddressResponse {
     userId: number;
     addressName: string;
     addressType: string;
-    streetAddress1: string;
-    streetAddress2: string;
+    streetAddress: string;
     phone: string;
     landmark: string;
     city: string;
     state: string;
     emailId: string;
     country: string;
-    zip: number;
+    postalCode: number;
     isActive: boolean;
     flag: boolean;
     createdDate: string;
