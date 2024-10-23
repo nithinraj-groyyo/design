@@ -43,7 +43,7 @@ const VariantsTable = () => {
             </Grid>
             <TableContainer
                 component={Paper}
-                sx={{ mt: 2, p:2, maxHeight: '70vh', overflowY: 'auto' }} // Vertically scrollable
+                sx={{ mt: 2, p:2, maxHeight: '70vh', overflowY: 'auto' }}
             >
                 <Table stickyHeader>
                     <TableHead>
@@ -73,7 +73,7 @@ const VariantsTable = () => {
                                 <TableCell align="center">
                                     <p className='text-sm 2xl:text-[1rem]'>
                                         <CurrencyRupeeIcon sx={{ fontSize: "inherit" }} />
-                                        {selectedCart.price.toFixed(2)}
+                                        {selectedCart?.price?.toFixed(2)}
                                     </p>
                                 </TableCell>
                                 <TableCell align="center">

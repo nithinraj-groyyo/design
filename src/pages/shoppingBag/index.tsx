@@ -680,6 +680,9 @@ const ShoppingBag = () => {
                                                 </div>
                                                 <Drawer
                                                     anchor="right"
+                                                    BackdropProps={{
+                                                        sx: { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                                                    }}
                                                     open={isDrawerOpen}
                                                     onClose={() => setIsDrawerOpen(false)}
                                                     PaperProps={{ sx: { width: "50%" } }}

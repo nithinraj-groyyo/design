@@ -84,7 +84,7 @@ const WishList = () => {
             animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: -100 }}
             transition={{ duration: 0.5 }}
           >
-            <IconButton className="text-2xl lg:text-3xl font-bold" onClick={() => navigate("/")}>
+            <IconButton className="text-2xl lg:text-3xl font-bold" onClick={() => navigate(-1)}>
               <ArrowBackIcon />
             </IconButton>
             <div className="text-2xl lg:text-3xl font-medium my-[1rem]">
