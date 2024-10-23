@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SignInIcon } from '../../assets/svg/home/SignInIcon';
 import useAuth from '../../hooks/useAuth';
 import { IconButton, Menu, MenuItem, Typography } from '@mui/material';
@@ -53,7 +53,6 @@ const IconsButton: React.FC<IconsButtonProps> = ({ icon, label, onMouseEnter, on
 
 const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handleMouseEnterButton }) => {
     const isAuthenticated = useAuth();
-    const location = useLocation();
     const navigate = useNavigate();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

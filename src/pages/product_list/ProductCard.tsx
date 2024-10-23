@@ -80,7 +80,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
     <Card className={className}>
       <CardMedia
         component="img"
-        image={(product?.productImages.find(image => image.isThumbnail === true))?.signedUrl}
+        image={(product?.productImages.find(image => image.isThumbnail))?.signedUrl}
         alt={product?.name}
         className="cursor-pointer"
         sx={{ objectFit: 'cover', aspectRatio: '1' }}

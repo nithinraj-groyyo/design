@@ -529,7 +529,6 @@ import {
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import CloseIcon from '@mui/icons-material/Close';
 import VariantsTable from "./VariantsTable";
-import { useLazyFetchCartListQuery } from "../../rtk-query/cartApiSlice";
 
 const ShoppingBag = () => {
     const navigate = useNavigate();
@@ -540,19 +539,6 @@ const ShoppingBag = () => {
     );
 
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-    const [fetchCartList] = useLazyFetchCartListQuery({});
-
-    useEffect(() => {
-        async function loadCartList() {
-            const response = await fetchCartList({}).unwrap();
-
-            if(response?.status){
-                dispatch(setCartItems(response?.data))
-            }
-        }
-        loadCartList()
-    }, [])
 
     const handleStartShopping = () => {
         navigate("/");
@@ -698,13 +684,13 @@ const ShoppingBag = () => {
                                                     onClose={() => setIsDrawerOpen(false)}
                                                     PaperProps={{ sx: { width: "50%" } }}
                                                 >
-                                                    <Box sx={{ p: 2 }}>
+                                                    <Box>
                                                         <Box
                                                             display="flex"
                                                             justifyContent="space-between"
                                                             alignItems="center"
                                                         >
-                                                            <Typography variant="h6">Cart Variants</Typography>
+                                                            <Typography variant="h6" sx={{p:2}}>Cart Variants</Typography>
                                                             <IconButton
                                                                 onClick={() => setIsDrawerOpen(false)}
                                                             >
