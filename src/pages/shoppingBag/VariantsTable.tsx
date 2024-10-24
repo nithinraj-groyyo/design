@@ -41,7 +41,7 @@ const VariantsTable = ({setIsDrawerOpen}: IVariantsTableProps) => {
                     toast.success(response?.message);
                     setIsDrawerOpen(false);
                     dispatch(setSelectedCart(null));
-                    // window.location.reload();
+                    window.location.reload();
                 }
             }
         } catch (error) {

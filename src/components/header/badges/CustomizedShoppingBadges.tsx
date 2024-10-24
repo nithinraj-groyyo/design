@@ -25,17 +25,28 @@ export default function CustomizedShoppingBadges() {
   const {cart} = useSelector((state: RootState)=> state.bag);
 
   React.useEffect(() => {
-      async function loadCartList() {
-          const response = await fetchCartList({token}).unwrap();
-
-          if(response?.status){
-              dispatch(setCartItems({data: response?.data?.data, totalPrice: response?.data?.totalPrice, cartId: response?.data?.cartId}))
-          }
+    async function loadCartList() {
+      try {
+        const response = await fetchCartList({ token }).unwrap();
+        if (response?.status) {
+          dispatch(
+            setCartItems({
+              data: response?.data?.data,
+              totalPrice: response?.data?.totalPrice,
+              cartId: response?.data?.cartId,
+            })
+          );
+        }
+      } catch (error) {
+        console.error("Failed to load cart list", error);
       }
-      if(!token || !userId || !cart?.cartId){
-        loadCartList()
-      }
-  }, [])
+    }
+  
+  
+    if (!Boolean(cart?.cartId) && Boolean(token)) {
+      loadCartList();
+    }
+  }, [cart?.cartId, token, dispatch]);
 
 
   return (

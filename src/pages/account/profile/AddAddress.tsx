@@ -8,6 +8,8 @@ import {
   MenuItem,
   Select,
   TextField,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import { IAddressRequest, IAddressResponse } from "../../../types/users";
@@ -15,7 +17,7 @@ import { Country, State } from "country-state-city";
 import {
   AddAddressDTO,
   useAddAddressMutation,
-  useUpdateAddressMutation, 
+  useUpdateAddressMutation,
 } from "../../../rtk-query/addressApiSlice";
 
 const validationSchema = Yup.object({
@@ -34,16 +36,17 @@ const validationSchema = Yup.object({
 
 interface IAddAddressProps {
   setAddAddressModal: (val: boolean) => void;
-  address: IAddressResponse; 
+  address: IAddressResponse;
 }
 
 const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
   const countries = Country.getAllCountries();
   const [states, setStates] = useState<any[]>([]);
   const [addAddress] = useAddAddressMutation();
-  const [updateAddress] = useUpdateAddressMutation(); 
+  const [updateAddress] = useUpdateAddressMutation();
+  const [isDefault, setIsDefault] = useState<boolean>(address?.isDefault || false);
 
-  const isEditMode = Boolean(address); 
+  const isEditMode = Boolean(address);
   const token = JSON.parse(localStorage.getItem("authToken") as string);
 
   const formik = useFormik({
@@ -67,30 +70,27 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
           state: values.state,
           postalCode: values.postalCode,
           country: values.country,
-          isDefault: values.addressType === "Home",
+          isDefault: isDefault,
           addressType: values.addressType,
           name: values.name,
           phoneNumber: values.phone,
           landMark: values.landmark,
-
         };
 
         if (isEditMode) {
-          
           const response = await updateAddress({
             body: {
               ...addressPayload,
-              id: address?.id
+              id: address?.id,
             },
             token,
-            addressId: address?.id, 
+            addressId: address?.id,
           }).unwrap();
 
           if (response?.status) {
             toast.success(response?.message || "Address updated successfully");
           }
         } else {
-          
           const response = await addAddress({ body: addressPayload, token }).unwrap();
           if (response?.status) {
             toast.success(response?.message || "Address added successfully");
@@ -120,7 +120,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
 
   const handleCountryChange = (event: any) => {
     const country = event.target.value as string;
-
     const countryData = Country.getAllCountries().find((c) => c.name === country);
     if (countryData) {
       const statesData = State.getStatesOfCountry(countryData.isoCode);
@@ -135,13 +134,18 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
     setAddAddressModal(false);
   };
 
+  const handleDefaultToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsDefault(event.target.checked);
+  };
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <div className="p-4 bg-white m-4 rounded-lg flex flex-col gap-8">
-        <div className="font-bold text-lg">{isEditMode ? "Edit Address" : "Add Address"}</div>
+        <div className="font-bold text-lg">
+          {isEditMode ? "Edit Address" : "Add Address"}
+        </div>
         <div className="flex gap-8">
           <div className="flex flex-col w-1/2 gap-4">
-            {/* Name Field */}
             <TextField
               id="name"
               name="name"
@@ -155,7 +159,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
               helperText={formik.touched.name && formik.errors.name}
             />
 
-            {/* Address Field */}
             <TextField
               id="address"
               name="address"
@@ -169,7 +172,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
               helperText={formik.touched.address && formik.errors.address}
             />
 
-            {/* State Field */}
             <FormControl variant="outlined" className="!w-full">
               <InputLabel>State</InputLabel>
               <Select
@@ -192,7 +194,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
               <div className="text-red-600 text-xs">{formik.errors.state}</div>
             )}
 
-            {/* City Field */}
             <TextField
               id="city"
               name="city"
@@ -206,7 +207,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
               helperText={formik.touched.city && formik.errors.city}
             />
 
-            {/* Landmark Field */}
             <TextField
               id="landmark"
               name="landmark"
@@ -222,7 +222,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
           </div>
 
           <div className="flex flex-col w-1/2 gap-4">
-            {/* Phone Field */}
             <TextField
               id="phone"
               name="phone"
@@ -236,7 +235,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
               helperText={formik.touched.phone && formik.errors.phone}
             />
 
-            {/* Country Field */}
             <FormControl variant="outlined" className="!w-full">
               <InputLabel>Country</InputLabel>
               <Select
@@ -259,7 +257,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
               <div className="text-red-600 text-xs">{formik.errors.country}</div>
             )}
 
-            {/* Zip Code Field */}
             <TextField
               id="postalCode"
               name="postalCode"
@@ -273,7 +270,6 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
               helperText={formik.touched.postalCode && formik.errors.postalCode}
             />
 
-            {/* Address Type Field */}
             <FormControl variant="outlined" className="!w-full">
               <InputLabel>Address Type</InputLabel>
               <Select
@@ -295,8 +291,23 @@ const AddAddress = ({ setAddAddressModal, address }: IAddAddressProps) => {
           </div>
         </div>
 
-        {/* Form Buttons */}
-        <div className="flex justify-end gap-4">
+        {!isEditMode && (
+
+          <div className="flex items-center mt-4">
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isDefault}
+                  onChange={handleDefaultToggle}
+                  color="primary"
+                />
+              }
+              label="Set as Default Address"
+            />
+          </div>
+        )}
+
+        <div className="flex justify-end gap-4 mt-4">
           <Button variant="outlined" onClick={handleCancel}>
             Cancel
           </Button>
