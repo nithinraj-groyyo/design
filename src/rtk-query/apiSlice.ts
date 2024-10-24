@@ -29,6 +29,9 @@ console.log(result)
       if (result?.data?.statusCode === 401) {
         toast.error(result?.data?.message);
       }
+      if (result?.data?.statusCode === 400) {
+        toast.error(result?.data?.message);
+      }
     }
     return result;
   } catch (error) {
@@ -41,7 +44,7 @@ console.log(result)
 export const apiSlice = createApi({
   baseQuery: baseQueryWithErrorHandling,
   endpoints: () => ({}),
-  tagTypes: ["FAQ", "Service", "Category", "CategorySubCategories", "Products", "UserProfile", "Sizes", "Colors", "Team"],
+  tagTypes: ["FAQ", "Service", "Category", "CategorySubCategories", "Products", "UserProfile", "Sizes", "Colors", "Team", "BAG"],
 });
 
 export default apiSlice;

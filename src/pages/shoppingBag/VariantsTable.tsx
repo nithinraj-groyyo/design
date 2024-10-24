@@ -3,16 +3,51 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateQuantity } from '../../redux/bagSlice';
+import { setSelectedCart, updateQuantity } from '../../redux/bagSlice';
 import { RootState } from '../../redux/store';
+import { useUpdateCartQuantityMutation } from '../../rtk-query/cartApiSlice';
+import { toast } from 'react-toastify';
 
-const VariantsTable = () => {
+interface IVariantsTableProps {
+    setIsDrawerOpen: (val: boolean) => void;
+}
+
+const VariantsTable = ({setIsDrawerOpen}: IVariantsTableProps) => {
     const dispatch = useDispatch();
-    const { selectedCart } = useSelector((state: RootState) => state.bag);
+
+    const token = JSON.parse(localStorage.getItem('authToken') as string);
+
+    const { selectedCart, cart } = useSelector((state: RootState) => state.bag);
+
+    const [updateCartQuantity] = useUpdateCartQuantityMutation();
 
     const handleQuantityChange = (variantId: number, newQuantity: number, cartItemId: number) => {
         dispatch(updateQuantity({ cartItemId, variantId, quantity: newQuantity }));
     };
+
+    const handleUpdateQuantity = async() => {
+        try {
+            if(selectedCart){
+                const requestBody = selectedCart?.cartItemVariants?.map((variant) => {
+                    return {
+                        cartItemVariantId: variant?.id,
+                        quantity: variant?.quantity,
+                    }
+                })
+
+                const response = await updateCartQuantity({cartId: cart?.cartId, payload: requestBody, token}).unwrap();
+
+                if(response?.status){
+                    toast.success(response?.message);
+                    setIsDrawerOpen(false);
+                    dispatch(setSelectedCart(null));
+                    // window.location.reload();
+                }
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -120,16 +155,16 @@ const VariantsTable = () => {
                         <Typography variant="body2">Total Amount</Typography>
                         <Typography variant="body2">
                             <CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} />
-                            {selectedCart?.price?.toFixed(2)} 
+                            {(Number(selectedCart?.unitPrice) * Number(selectedCart?.totalQuantity))?.toFixed(2)} 
                             (<CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} />
-                            {selectedCart?.price?.toFixed(2)} /pc)
+                            {selectedCart?.unitPrice?.toFixed(2)} /pc)
                         </Typography>
                     </Grid>
                 </Box>
 
                 <Grid container spacing={1} sx={{ mt: 4 }}>
                     <Grid item xs={12}>
-                        <Button variant="outlined" fullWidth className='!bg-black !text-white'>
+                        <Button variant="outlined" fullWidth className='!bg-black !text-white' onClick={handleUpdateQuantity}>
                             Update Variants Quantity
                         </Button>
                     </Grid>

@@ -33,6 +33,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     const navigate = useNavigate();
     const isMobile = useMediaQuery('(max-width:600px)');
     const isTablet = useMediaQuery('(max-width:900px)');
+    const token = JSON.parse(localStorage.getItem("authToken") as string);
 
 
     const [quantity, setQuantity] = useState(0);
@@ -168,7 +169,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
         }
 
         try {
-            const response = await addToCart({ payload });
+            const response = await addToCart({ payload, token });
             const responseBody = response?.data;
             if (responseBody?.status) {
                 toast.success(responseBody?.message)
@@ -177,7 +178,8 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                 setQuantity(0);
                 setOverallQuantity(0);
                 setPricePerPiece(0);
-                setVariations([])
+                setVariations([]);
+                setOpenVariationTable(false)
             }
         } catch (error: any) {
             console.error(error)
