@@ -15,7 +15,7 @@ const menuItems = [
     title: "Accounts",
     subItems: [
       { title: "Profile", route: "/account/profile" },
-      // { title: "Addresses", route: "/account/address" },
+      { title: "Addresses", route: "/account/address" },
       { title: "Change Password", route: "/account/changePassword" },
     ],
   },
