@@ -529,12 +529,15 @@ import {
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import CloseIcon from '@mui/icons-material/Close';
 import VariantsTable from "./VariantsTable";
+import { useRemoveCartMutation } from "../../rtk-query/cartApiSlice";
+import { toast } from "react-toastify";
 
 const ShoppingBag = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const token = JSON.parse(localStorage.getItem('authToken') as string);
 
-    const { cart, totalPrice } = useSelector(
+    const { cart } = useSelector(
         (state: RootState) => state.bag
     );
 
@@ -547,8 +550,9 @@ const ShoppingBag = () => {
     const handleDrawer = (bag: BagItem) => {
         dispatch(setSelectedCart(bag));
         setIsDrawerOpen(true);
-
     }
+
+    const [removeCart] = useRemoveCartMutation()
 
     const renderEmptyCart = () => (
         <div className="flex flex-col items-center justify-center min-h-[20vh] text-center">
@@ -568,12 +572,20 @@ const ShoppingBag = () => {
         </div>
     );
 
+    const handleRemoveCart = async(productId: number) => {
+        // dispatch(removeFromCart(bag.id))
+        const response = await removeCart({cartId: cart?.cartId, token, productId}).unwrap();
+        if(response?.status){
+            toast.success(response?.message)
+        }
+    }
+
     return (
         <BasicLayout>
             <section className="cart-section flex justify-center items-start min-h-screen mt-[12rem]">
                 <div className="flex gap-8 justify-center w-[90%] mx-auto">
                     <div className="flex flex-col w-3/4">
-                        {cart.length > 0 && (
+                        {cart.data.length > 0 && (
                             <div className="bg-white p-4 mb-6 shadow-md">
                                 <button className="px-4 py-2 bg-black text-white font-semibold">
                                     ADD ADDRESS
@@ -581,11 +593,11 @@ const ShoppingBag = () => {
                             </div>
                         )}
 
-                        {cart.length > 0 ? (
+                        {cart.data.length > 0 ? (
                             <>
                                 <h2 className="text-lg font-bold mb-2">SHOPPING BAG</h2>
                                 <div className="bg-white p-6 shadow-md mb-6">
-                                    {cart.map((bag) => {
+                                    {cart.data.map((bag) => {
                                         const minVariantsToBeShown = 2;
                                         return (
                                             <div
@@ -606,7 +618,7 @@ const ShoppingBag = () => {
                                                             <CurrencyRupeeIcon
                                                                 sx={{ fontSize: "inherit" }}
                                                             />
-                                                            {bag.price}
+                                                            {Number(bag.unitPrice * bag.totalQuantity)?.toFixed(2)}
                                                         </p>
 
                                                         {bag.cartItemVariants.length > 0 && (
@@ -618,7 +630,7 @@ const ShoppingBag = () => {
                                                                 <div className="flex flex-row gap-3 rounded-lg">
                                                                     {bag.cartItemVariants
                                                                         .slice(0, minVariantsToBeShown)
-                                                                        .map((cartItemVariant) => {
+                                                                        .map((cartItemVariant: any) => {
                                                                             return (
                                                                                 <div
                                                                                     key={cartItemVariant?.id}
@@ -673,13 +685,16 @@ const ShoppingBag = () => {
                                                     </button>
                                                     <button
                                                         className="text-sm text-red-500"
-                                                        onClick={() => dispatch(removeFromCart(bag.id))}
+                                                        onClick={() => handleRemoveCart(bag?.product?.id)}
                                                     >
                                                         Remove
                                                     </button>
                                                 </div>
                                                 <Drawer
                                                     anchor="right"
+                                                    BackdropProps={{
+                                                        sx: { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                                                    }}
                                                     open={isDrawerOpen}
                                                     onClose={() => setIsDrawerOpen(false)}
                                                     PaperProps={{ sx: { width: "50%" } }}
@@ -698,7 +713,7 @@ const ShoppingBag = () => {
                                                             </IconButton>
                                                         </Box>
 
-                                                        <VariantsTable />
+                                                        <VariantsTable setIsDrawerOpen={setIsDrawerOpen} />
                                                     </Box>
                                                 </Drawer>
                                             </div>
@@ -718,7 +733,7 @@ const ShoppingBag = () => {
                                 <span>Subtotal</span>
                                 <span>
                                     <CurrencyRupeeIcon sx={{ fontSize: "inherit" }} />
-                                    {totalPrice.toFixed(2)}
+                                    {cart?.totalPrice.toFixed(2)}
                                 </span>
                             </div>
                             <div className="flex justify-between mb-2">
@@ -729,7 +744,7 @@ const ShoppingBag = () => {
                                 <span>Total</span>
                                 <span>
                                     <CurrencyRupeeIcon sx={{ fontSize: "inherit" }} />
-                                    {totalPrice.toFixed(2)}
+                                    {cart?.totalPrice.toFixed(2)}
                                 </span>
                             </div>
 

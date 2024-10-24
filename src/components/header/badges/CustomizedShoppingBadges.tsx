@@ -19,22 +19,27 @@ const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
 export default function CustomizedShoppingBadges() {
   const dispatch = useDispatch();
   const [fetchCartList] = useLazyFetchCartListQuery({});
+  const token = JSON.parse(localStorage.getItem("authToken") as string);
+  const userId = JSON.parse(localStorage.getItem("userId") as string);
+
+  const {cart} = useSelector((state: RootState)=> state.bag);
 
   React.useEffect(() => {
       async function loadCartList() {
-          const response = await fetchCartList({}).unwrap();
+          const response = await fetchCartList({token}).unwrap();
 
           if(response?.status){
-              dispatch(setCartItems(response?.data))
+              dispatch(setCartItems({data: response?.data?.data, totalPrice: response?.data?.totalPrice, cartId: response?.data?.cartId}))
           }
       }
-      loadCartList()
+      if(!token || !userId || !cart?.cartId){
+        loadCartList()
+      }
   }, [])
 
-    const {cart} = useSelector((state: RootState)=> state.bag);
-    console.log(cart?.length, "length")
+
   return (
-    <Badge badgeContent={cart?.length} color="error">
+    <Badge badgeContent={cart?.data?.length} color="error">
         <ShoppingBagIcon  />
     </Badge>
   );

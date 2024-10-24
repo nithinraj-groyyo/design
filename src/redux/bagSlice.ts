@@ -34,7 +34,7 @@ export interface BagItem {
       fileName: string,
       imageUrl: string,
       signedUrl: string
-  };
+    };
     styleName: string;
     description: string;
     isPublic: boolean;
@@ -51,19 +51,35 @@ export interface BagItem {
     }[]
   };
   cartItemVariants: BagItemVariant[];
+  unitPrice: number
 }
 
 interface ShoppingBagState {
-  cart: BagItem[];
+  cart: {
+    totalPrice: number;
+    data: BagItem[];
+    cartId: number
+  };
   savedForLater: BagItem[];
-  totalPrice: number;
   selectedCart: BagItem | null;
 }
 
+const calculateTotalPrice = (items: BagItem[]) => {
+  return items.reduce(
+    (total, item) =>
+      total +
+      item.price * item.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0),
+    0
+  );
+};
+
 const initialState: ShoppingBagState = {
-  cart: [],
+  cart: {
+    totalPrice: 0,
+    data: [],
+    cartId: 0
+  },
   savedForLater: [],
-  totalPrice: 0,
   selectedCart: null
 };
 
@@ -71,97 +87,73 @@ const bagSlice = createSlice({
   name: 'bag',
   initialState,
   reducers: {
-  setSelectedCart(state, action: PayloadAction<BagItem | null>) {
-    state.selectedCart = action.payload;
-  },
-  setCartItems(state, action: PayloadAction<BagItem[]>) {    
-    state.cart = action.payload;
+    setSelectedCart(state, action: PayloadAction<BagItem | null>) {
+      state.selectedCart = action.payload;
+    },
+    setCartItems(state, action: PayloadAction<{totalPrice: number, data: BagItem[], cartId: number}>) {
+      state.cart.data = action.payload.data;
+      state.cart.cartId = action.payload.cartId;
+      state.cart.totalPrice = action.payload.totalPrice;
+    },
+    updateQuantity(
+      state,
+      action: PayloadAction<{ cartItemId: number; variantId: number; quantity: number }>
+    ) {
+      const { cartItemId, variantId, quantity } = action.payload;
+          
+      if (state.selectedCart?.id === cartItemId) {
+        const selectedCartVariant = state.selectedCart.cartItemVariants.find(
+          (v) => v.id === variantId
+        );
     
-    state.totalPrice = state.cart.reduce(
-      (total, item) =>
-        total +
-        item.price * item.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0),
-      0
-    );
-  },
-  updateQuantity(
-    state,
-    action: PayloadAction<{ cartItemId: number; variantId: number; quantity: number }>
-  ) {
-    const { cartItemId, variantId, quantity } = action.payload;
-      
-    const cartItem = state.cart.find((item) => item.id === cartItemId);
-  
-    if (cartItem) {      
-      const variant = cartItem.cartItemVariants.find((v) => v.id === variantId);
-      if (variant) {        
-        variant.quantity = quantity;
-          
-        cartItem.totalQuantity = cartItem.cartItemVariants.reduce(
-          (total, item) => total + item.quantity,
-          0
-        );
-          
-        if (state.selectedCart?.id === cartItemId) {
-          const selectedCartVariant = state.selectedCart.cartItemVariants.find(
-            (v) => v.id === variantId
+        if (selectedCartVariant) {          
+          selectedCartVariant.quantity = quantity;
+              
+          state.selectedCart.totalQuantity = state.selectedCart.cartItemVariants.reduce(
+            (total, item) => total + item.quantity,
+            0
           );
-          if (selectedCartVariant) {
-            selectedCartVariant.quantity = quantity;
-                        
-            state.selectedCart.totalQuantity = state.selectedCart.cartItemVariants.reduce(
-              (total, item) => total + item.quantity,
-              0
-            );
-          }
+              
+          state.cart.totalPrice = state.cart.data.reduce(
+            (total, item) =>
+              item.id === state.selectedCart!.id
+                ? total + state.selectedCart!.price * state.selectedCart!.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0)
+                : total + item.price * item.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0),
+            0
+          );
         }
-  
-        state.totalPrice = state.cart.reduce(
-          (total, item) =>
-            total +
-            item.price * item.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0),
-          0
-        );
       }
-    }
-  },
+    },
     removeFromCart(state, action: PayloadAction<number>) {
-      state.cart = state.cart.filter((item) => item.id !== action.payload);      
-      state.totalPrice = state.cart.reduce(
-        (total, item) =>
-          total +
-          item.price * item.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0),
-        0
-      );
+      state.cart.data = state.cart.data.filter((item) => item.id !== action.payload);
+      state.cart.totalPrice = calculateTotalPrice(state.cart.data);
     },
     moveToSavedForLater(state, action: PayloadAction<number>) {
-      const cartItem = state.cart.find((item) => item.id === action.payload);
+      const cartItem = state.cart.data.find((item) => item.id === action.payload);
       if (cartItem) {
         state.savedForLater.push(cartItem);
-        state.cart = state.cart.filter((item) => item.id !== action.payload);        
-        state.totalPrice = state.cart.reduce(
-          (total, item) =>
-            total +
-            item.price * item.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0),
-          0
-        );
+        state.cart.data = state.cart.data.filter((item) => item.id !== action.payload);
+        state.cart.totalPrice = calculateTotalPrice(state.cart.data);
       }
     },
     restoreToCart(state, action: PayloadAction<number>) {
       const savedItem = state.savedForLater.find((item) => item.id === action.payload);
       if (savedItem) {
-        state.cart.push(savedItem);
-        state.savedForLater = state.savedForLater.filter((item) => item.id !== action.payload);        
-        state.totalPrice = state.cart.reduce(
-          (total, item) =>
-            total +
-            item.price * item.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0),
-          0
-        );
+        state.cart.data.push(savedItem);
+        state.savedForLater = state.savedForLater.filter((item) => item.id !== action.payload);
+        state.cart.totalPrice = calculateTotalPrice(state.cart.data);
       }
     },
   },
 });
 
-export const {setCartItems, setSelectedCart, removeFromCart, updateQuantity, moveToSavedForLater, restoreToCart } = bagSlice.actions;
+export const {
+  setCartItems,
+  setSelectedCart,
+  removeFromCart,
+  updateQuantity,
+  moveToSavedForLater,
+  restoreToCart,
+} = bagSlice.actions;
+
 export default bagSlice.reducer;
