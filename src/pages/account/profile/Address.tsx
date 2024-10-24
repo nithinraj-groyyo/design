@@ -10,28 +10,28 @@ import {
   useGetAddressesQuery,
   useDeleteAddressMutation,
   useUpdateDefaultAddressMutation
-} from '../../../rtk-query/addressApiSlice';  // import the updateDefaultAddress hook
+} from '../../../rtk-query/addressApiSlice';  
 import NoDataAvailable from '../../../components/NoDataAvailable';
 
 const Address = () => {
   const [addAddressModal, setAddAddressModal] = useState(false);
   const [defaultAddress, setDefaultAddress] = useState<number | null>(null);
   const [addressFormType, setAddressFormType] = useState<"create" | "edit">("create");
-  const [selectedAddress, setSelectedAddress] = useState<IAddressResponse | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<IAddressResponse | undefined>();
 
   const token = JSON.parse(localStorage.getItem('authToken') as string);
 
   const { data: addresses, isError, isLoading, refetch } = useGetAddressesQuery({ token });
   const [deleteAddress] = useDeleteAddressMutation();
-  const [updateDefaultAddress] = useUpdateDefaultAddressMutation();  // use the mutation hook
+  const [updateDefaultAddress] = useUpdateDefaultAddressMutation();  
 
   const handleSetDefaultAddress = async (addressId: number) => {
     try {
-      const response = await updateDefaultAddress({ addressId, token }).unwrap();  // use RTK query to call API
+      const response = await updateDefaultAddress({ addressId, token }).unwrap();  
       if (response) {
         setDefaultAddress(addressId);
         toast.success("Updated Default Address Successfully");
-        refetch();  // refetch the addresses list to get updated data
+        refetch();  
       }
     } catch (error: any) {
       toast.error("Unable to Set Default Address");
@@ -44,7 +44,7 @@ const Address = () => {
       const response = await deleteAddress({ addressId, token }).unwrap();
       if (response?.status) {
         toast.success(response?.message);
-        refetch();  // refetch the addresses list after removal
+        refetch();  
       }
     } catch (error: any) {
       toast.error("Unable to Remove this Address");
@@ -60,7 +60,7 @@ const Address = () => {
   };
 
   const handleCreateAddress = () => {
-    setSelectedAddress(null);
+    setSelectedAddress(undefined);
     setAddressFormType("create");
     setAddAddressModal(true);
   };
@@ -83,7 +83,7 @@ const Address = () => {
         {addAddressModal && (
           <AddAddress
             setAddAddressModal={setAddAddressModal}
-            address={selectedAddress}
+            address={selectedAddress!}
           />
         )}
         {!addAddressModal && (

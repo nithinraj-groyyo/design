@@ -11,15 +11,19 @@ export interface AddAddressDTO {
   addressType: string;
 }
 
-export interface AddressResponse {
+
+export interface IAddressResponse {
   id: number;
-  streetAddress1: string;
-  streetAddress2: string;
+  street: string;
   city: string;
   state: string;
-  zip: string;
-  addressType: string;
-  flag: boolean;
+  postalCode: string;
+  country: string;
+  addressType: "Home" | "Work"; 
+  isDefault: boolean;
+  name: string;
+  phoneNumber: string;
+  landMark: string;
 }
 
 const addressUrl = "user/address";
@@ -27,7 +31,7 @@ const addressUrl = "user/address";
 export const addressApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     addAddress: builder.mutation({
-      query: ({ body, token }: { body: AddAddressDTO, token: string }) => ({
+      query: ({ body, token }: { body: Partial<IAddressResponse>, token: string }) => ({
         url: `${addressUrl}/add`,
         method: 'POST',
         body,
@@ -35,8 +39,9 @@ export const addressApiSlice = apiSlice.injectEndpoints({
           Authorization: `Bearer ${token}`,
         },
       }),
+      invalidatesTags: ["Address"],
     }),
-    getAddresses: builder.query<{data: AddressResponse[]}, { token: string }>({
+    getAddresses: builder.query<{data: IAddressResponse[]}, { token: string }>({
       query: ({ token }) => ({
         url: `${addressUrl}/list`,
         method: 'GET',
@@ -44,6 +49,7 @@ export const addressApiSlice = apiSlice.injectEndpoints({
           Authorization: `Bearer ${token}`,
         },
       }),
+      providesTags: ["Address"],
     }),
     deleteAddress: builder.mutation({
       query: ({ addressId, token }: { addressId: number, token: string }) => ({
@@ -53,6 +59,18 @@ export const addressApiSlice = apiSlice.injectEndpoints({
           Authorization: `Bearer ${token}`,
         },
       }),
+      invalidatesTags: ["Address"],
+    }),
+    updateAddress: builder.mutation({
+      query: ({ addressId, token, body }: { addressId: number, token: string, body: Partial<IAddressResponse> }) => ({
+        url: `${addressUrl}/update/${addressId}`,
+        method: 'POST',
+        body,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      invalidatesTags: ["Address"],
     }),
     updateDefaultAddress: builder.mutation({
       query: ({ addressId, token }: { addressId: number, token: string }) => ({
@@ -62,6 +80,7 @@ export const addressApiSlice = apiSlice.injectEndpoints({
           Authorization: `Bearer ${token}`,
         },
       }),
+      invalidatesTags: ["Address"],
     }),
   }),
 });
@@ -71,4 +90,5 @@ export const {
   useGetAddressesQuery, 
   useDeleteAddressMutation, 
   useUpdateDefaultAddressMutation, 
+  useUpdateAddressMutation
 } = addressApiSlice;

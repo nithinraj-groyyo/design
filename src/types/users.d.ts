@@ -38,21 +38,14 @@ export interface IAddressRequest {
 
 export interface IAddressResponse {
     id: number;
-    userId: number;
-    addressName: string;
-    addressType: string;
-    streetAddress: string;
-    phone: string;
-    landmark: string;
+    street: string;
     city: string;
     state: string;
-    emailId: string;
+    postalCode: string;
     country: string;
-    postalCode: number;
-    isActive: boolean;
-    flag: boolean;
-    createdDate: string;
-    createdBy: string;
-    modifiedDate: string | null;
-    modifiedBy: string | null;
-  }
+    addressType: "Home" | "Work"; 
+    isDefault: boolean;
+    name: string;
+    phoneNumber: string;
+    landMark: string;
+}
