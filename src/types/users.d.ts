@@ -19,7 +19,7 @@ export interface IUserDetailsRequest {
     contactNumber: string | null;
     gender: string | null;
     email: string;
-    fileName: File | string | null;
+    // fileName: File | string | null;
 }
 
 export interface IAddressRequest {

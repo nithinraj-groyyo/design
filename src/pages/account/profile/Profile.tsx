@@ -5,6 +5,7 @@ import { IUserProfile } from "../../../types/users";
 import { useLazyGetUserProfileQuery } from "../../../rtk-query/userApiSlice";
 import { toast } from "react-toastify";
 import AccountSettingsLayout from "../../../layouts/AccountSettingsLayout";
+import ProfileMobileSection from "./ProfileMobileSection";
 
 const Profile = () => {
   const [editProfileModal, setEditProfileModal] = useState(false);
@@ -38,25 +39,26 @@ const Profile = () => {
   }, []);
 
   return (
-    <>
-      {editProfileModal && profileData && (
-        <EditProfile
-          profileData={profileData}
-          setProfileData={setProfileData}
-          onClose={() => {
-            setEditProfileModal(false);
-          }}
-        />
-      )}
-      {!editProfileModal && (
-        <>
-          <AccountSettingsLayout>
-                <AccountSettingsLayout.Header title='Profile Details'>
-                    <Button variant="contained" color="primary" className="!w-[10rem] h-[3rem]" onClick={() => editClickHandler()}>
-                      Edit
-                    </Button>
-                </AccountSettingsLayout.Header>
-                <AccountSettingsLayout.Body>
+    <div>
+      <div className="xxs:hidden lg:block">
+        {editProfileModal && profileData && (
+          <EditProfile
+            profileData={profileData}
+            setProfileData={setProfileData}
+            onClose={() => {
+              setEditProfileModal(false);
+            }}
+          />
+        )}
+        {!editProfileModal && (
+          <>
+            <AccountSettingsLayout>
+              <AccountSettingsLayout.Header title='Profile Details'>
+                <Button variant="contained" color="primary" className="!w-[10rem] h-[3rem]" onClick={() => editClickHandler()}>
+                  Edit
+                </Button>
+              </AccountSettingsLayout.Header>
+              <AccountSettingsLayout.Body>
                 <div className="flex flex-col gap-4 mt-8">
                   <div className="flex ml-8">
                     <div className="w-1/2">Customer Name</div>
@@ -103,10 +105,14 @@ const Profile = () => {
                   </div>
                 </div>
               </AccountSettingsLayout.Body>
-          </AccountSettingsLayout>          
-        </>
-      )}
-    </>
+            </AccountSettingsLayout>
+          </>
+        )}
+      </div>
+      <div className="lg:hidden "> 
+        <ProfileMobileSection/>
+      </div>
+    </div>
   );
 };
 

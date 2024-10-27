@@ -20,15 +20,17 @@ const AccountSettingsLayout: React.FC<PropsWithChildren<AccountSettingsLayoutPro
 AccountSettingsLayout.Header = ({ title, children }) => {
     return (
         <div className="border-b border-gray-300 p-4 flex items-center justify-between w-full">
-            <h2 className="text-xl font-bold">{title}</h2>
-            {children}
+            <h2 className="text-xl font-bold xxs:whitespace-nowrap flex-1">{title}</h2>
+            <div className=''>
+                {children}    
+            </div>
         </div>
     );
 };
 
 AccountSettingsLayout.Body = ({ children }) => {
     return (
-        <div className="p-4 h-auto">
+        <div className="p-4 h-auto ">
             {children}
         </div>
     );
