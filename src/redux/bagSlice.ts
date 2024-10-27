@@ -100,24 +100,42 @@ const bagSlice = createSlice({
       action: PayloadAction<{ cartItemId: number; variantId: number; quantity: number }>
     ) {
       const { cartItemId, variantId, quantity } = action.payload;
-          
+    
+      // Check if selectedCart exists and matches cartItemId
       if (state.selectedCart?.id === cartItemId) {
         const selectedCartVariant = state.selectedCart.cartItemVariants.find(
           (v) => v.id === variantId
         );
     
-        if (selectedCartVariant) {          
+        if (selectedCartVariant) {
           selectedCartVariant.quantity = quantity;
-              
+    
+          // Calculate the updated total quantity for the selected cart item
           state.selectedCart.totalQuantity = state.selectedCart.cartItemVariants.reduce(
             (total, item) => total + item.quantity,
             0
           );
-              
+    
+          // Determine the applicable price per piece based on the quantity range
+          const applicablePrice = state.selectedCart.product.productPrices.find((priceRange) => {
+            return (
+              state.selectedCart!.totalQuantity >= priceRange.minQty &&
+              (priceRange.maxQty === null || state.selectedCart!.totalQuantity <= priceRange.maxQty)
+            );
+          });
+    
+          // Update the unit price if applicablePrice is found
+          if (applicablePrice) {
+            state.selectedCart.unitPrice = applicablePrice.pricePerPiece;
+          }
+    
+          // Recalculate the total price for the entire cart
           state.cart.totalPrice = state.cart.data.reduce(
             (total, item) =>
               item.id === state.selectedCart!.id
-                ? total + state.selectedCart!.price * state.selectedCart!.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0)
+                ? total +
+                  (state.selectedCart!.unitPrice || 0) *
+                    state.selectedCart!.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0)
                 : total + item.price * item.cartItemVariants.reduce((qty, v) => qty + v.quantity, 0),
             0
           );

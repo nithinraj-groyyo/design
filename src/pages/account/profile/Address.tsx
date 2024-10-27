@@ -102,7 +102,7 @@ const Address = () => {
                         ) : (
                           <HomeIcon className="text-gray-500" />
                         )}
-                        <div className="ml-2 font-semibold">{address?.street}</div>
+                        <div className="ml-2 font-semibold">{address?.name}</div>
                       </div>
                       <div className="text-sm text-gray-700">
                         <p>{address?.street}</p>
