@@ -15,11 +15,14 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  IconButton
+  IconButton,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
-import { useCreateSubscriptionMutation } from '../../../rtk-query/subscriptonApiSlice';
+import {
+  useCreateSubscriptionMutation,
+  useGetSubscriptionListQuery,
+} from '../../../rtk-query/subscriptonApiSlice';
 
 const AdminSubscriptionPage = () => {
   const [open, setOpen] = useState(false);
@@ -33,40 +36,10 @@ const AdminSubscriptionPage = () => {
     prices: [{ duration: 1, price: 0 }]
   });
 
-  const subscriptions = [
-    {
-      id: 1,
-      name: 'Basic Plan',
-      price: 10,
-      actualPrice: 20,
-      duration: 'month',
-      features: ['Basic Support', 'Feature A', 'Feature B'],
-      active: true,
-      activeUser: 102,
-    },
-    {
-      id: 2,
-      name: 'Premium Plan',
-      price: 30,
-      actualPrice: 50,
-      duration: 'month',
-      features: ['Premium Support', 'Feature C', 'Feature D'],
-      active: false,
-      activeUser: 95,
-    },
-    {
-      id: 3,
-      name: 'Pro Plan',
-      price: 50,
-      actualPrice: 80,
-      duration: 'month',
-      features: ['Pro Support', 'Feature E', 'Feature F'],
-      active: true,
-      activeUser: 34,
-    },
-  ];
-
-  const [ createSubscription ] = useCreateSubscriptionMutation()
+  // RTK Query hooks
+  const [createSubscription] = useCreateSubscriptionMutation();
+  const { data: subscriptions, error, isLoading } = useGetSubscriptionListQuery(null);
+  console.log(subscriptions,"kkkk")
 
   const handleOpen = (subscription = null) => {
     setIsEditing(!!subscription);
@@ -79,19 +52,18 @@ const AdminSubscriptionPage = () => {
   const handleClose = () => setOpen(false);
 
   const handleSave = async () => {
-    console.log(currentSubscription, "currentSubscription");
     const payload = {
       name: currentSubscription?.name,
-      description: currentSubscription?.features,
-      tenuresWithPrice: currentSubscription?.prices?.map((d) => {
-        return {
-          tenurePeriod: d?.duration,
-          price: d?.price
-        }
-      })
-    }
+      description: currentSubscription?.features.join(', '), 
+      tenuresWithPrices: currentSubscription?.prices.map((d) => ({
+        tenurePeriod: d.duration, 
+        price: Number(d.price)      
+      })),
+    };
+    
+    
     try {
-      const response = await createSubscription({payload, token});
+      const response = await createSubscription({ payload, token });
       console.log(response);
       handleClose();
     } catch (error) {
@@ -131,70 +103,68 @@ const AdminSubscriptionPage = () => {
           Add New Subscription
         </Button>
       </AccountSettingsLayout.Header>
-      
-      <div className="grid grid-cols-3 gap-6">
-          {subscriptions.map((subscription: any) => (
-            <Card
-              key={subscription.id}
-              className="p-6 shadow-md hover:shadow-lg transition-shadow rounded-lg relative bg-white border border-gray-100"
-            >
-              <div className="flex justify-between">
-                <Typography variant="h6" className="text-blue-600 font-bold">
-                  {subscription.name}
-                </Typography>
-                <div className="flex items-center mb-4">
-                  <Typography variant="body2" className="text-gray-500 mr-2">
-                    Active:
-                  </Typography>
-                  <Switch aria-label="Switch demo" defaultChecked={subscription.active} />
-                </div>
-              </div>
-              <Typography variant="body1" className="mb-4 text-gray-500">
-                Discounted Price: <span className="!font-semibold !text-xl">${subscription.price}/month</span>
-              </Typography>
-              <Typography variant="body2" className="text-gray-600 mb-4">
-                Actual Price: ${subscription.actualPrice}
-              </Typography>
 
-              <div className="flex flex-col mb-4">
-                <Typography variant="body2" className="font-semibold text-gray-700">
-                  Features:
-                </Typography>
-                <ul className="list-disc pl-5 text-gray-600">
-                  {subscription.features.map((feature:any, idx:any) => (
-                    <li key={idx}>{feature}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex justify-between items-center mt-4">
-                <div className="flex gap-2">
-                  <Typography variant="body2" className="font-semibold text-gray-700">
-                    Number of Active Users:
-                  </Typography>
-                  <Typography variant="body2" className="font-semibold text-gray-700">
-                    {subscription.activeUser}
-                  </Typography>
-                </div>
-
-                <Tooltip title="Edit">
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleOpen(subscription)}
-                  >
-                    <EditIcon />
-                  </Button>
-                </Tooltip>
-              </div>
-            </Card>
-          ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {subscriptions?.data?.map((subscription: any) => (
+    <Card
+      key={subscription.id}
+      className="p-6 border border-gray-200 rounded-lg bg-white"
+    >
+      <div className="flex justify-between mb-4">
+        <Typography variant="h5" className="text-blue-600 font-semibold">
+          {subscription.name}
+        </Typography>
+        <div className="flex items-center">
+          <Typography variant="body2" className="text-gray-600 mr-2">
+            Active:
+          </Typography>
+          <Switch aria-label="Switch demo" defaultChecked={subscription.isActive} color="primary" />
         </div>
-      
+      </div>
+
+      <Typography variant="body1" className="mb-4 text-gray-700">
+        {subscription.description}
+      </Typography>
+
+      {/* Displaying Tenures and Prices */}
+      <div className="flex flex-col mb-4">
+        <Typography variant="body1" className="font-semibold text-gray-800 mb-2">
+          Tenures and Prices:
+        </Typography>
+        <ul className="list-disc pl-5 text-gray-600">
+          {subscription.tenures.map((tenure: any) => (
+            <li key={tenure.id} className="flex justify-between mb-1 text-sm">
+              <span>{tenure.tenureInMonths} month(s)</span>
+              <span className="font-semibold text-gray-800">
+                ${tenure.subscriptionPrice.price}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <Tooltip title="Edit">
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => handleOpen(subscription)}
+            className="text-blue-600 border-blue-600 hover:bg-blue-600 hover:text-white transition"
+          >
+            <EditIcon />
+          </Button>
+        </Tooltip>
+      </div>
+    </Card>
+  ))}
+</div>
+
+
+
       <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
         <DialogTitle>{isEditing ? 'Edit Subscription' : 'Add Subscription'}</DialogTitle>
         <DialogContent>
-          <TextField
+        <TextField
             autoFocus
             margin="dense"
             label="Subscription Name"
