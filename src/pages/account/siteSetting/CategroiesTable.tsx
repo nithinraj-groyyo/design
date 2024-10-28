@@ -83,7 +83,7 @@ const CategoriesTable = () => {
           <TableHead>
             <TableRow >
               <TableCell className="!text-xl !font-semibold">Categories</TableCell>
-              <TableCell className="!text-xl !font-semibold">Status</TableCell>
+              {/* <TableCell className="!text-xl !font-semibold">Status</TableCell> */}
               <TableCell className="!text-xl !font-semibold">Action</TableCell>
             </TableRow>
           </TableHead>
@@ -91,9 +91,9 @@ const CategoriesTable = () => {
             {categoriesData?.map((category: any) => (
               <TableRow key={category?.id}>
                 <TableCell>{category?.name}</TableCell>
-                <TableCell className={category.status === "Active" ? "text-green-500" : "text-red-500"}>
+                {/* <TableCell className={category.status === "Active" ? "text-green-500" : "text-red-500"}>
                   {category?.status} Inactive
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
                   <Button
                     className="bg-blue-500 text-white px-3 py-1 rounded"

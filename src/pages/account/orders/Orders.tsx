@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { useFetchOrderListQuery } from '../../../rtk-query/orderApiSlice';
+import OrderDetailsModal from './OrderDetailsModal';
 
 
 const Orders = () => {
@@ -29,7 +30,19 @@ const Orders = () => {
 
   const { data: ordersList } = useFetchOrderListQuery({ token });
 
-  console.log(ordersList, "ordersList")
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleOpenModal = (order: any) => {
+    setSelectedOrder(order);
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setSelectedOrder(null);
+  };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -41,7 +54,7 @@ const Orders = () => {
   };
 
   const displayedOrders = ordersList?.data?.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-
+console.log(displayedOrders, "displayedOrders")
   return (
     <Card sx={{ width: '95%', margin: '1rem', padding: '1rem' }}>
       <Typography variant="h5" sx={{ marginBottom: '1rem', fontWeight: 'bold' }}>
@@ -76,7 +89,7 @@ const Orders = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {displayedOrders?.map((order: any) => {
+            {displayedOrders && displayedOrders?.map((order: any) => {
               const isoString = order.createdAt;
               const date = new Date(isoString);
               
@@ -123,7 +136,7 @@ const Orders = () => {
                     </p>
                   </TableCell>
                   <TableCell align="center">
-                    <Button variant="contained" color="primary" sx={{ mr: 1 }}>
+                    <Button variant="contained" color="primary" sx={{ mr: 1 }} onClick={() => handleOpenModal(order)}>
                       View
                     </Button>
                     {/* <Button variant="outlined" color="secondary">
@@ -145,6 +158,13 @@ const Orders = () => {
           color="primary"
         />
       </Stack>
+      {selectedOrder && (
+        <OrderDetailsModal
+          open={openModal}
+          handleClose={handleCloseModal}
+          order={selectedOrder}
+        />
+      )}
     </Card>
   );
 };

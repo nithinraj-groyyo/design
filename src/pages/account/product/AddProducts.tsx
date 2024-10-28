@@ -123,8 +123,8 @@ const AddProducts = () => {
     categoryId: selectedCategory?.id!,
     pageIndex: 0,
     pageSize: 10,
-  },{
-    skip: !selectedCategory?.id, 
+  }, {
+    skip: !selectedCategory?.id,
   });
 
   const { data: sizes, isLoading: isSizesLoading } = useGetAllSizesQuery({});
@@ -551,11 +551,11 @@ const AddProducts = () => {
                               onChange={handleFileUpload(img.id)}
                             />
                             {!img?.fileName && (
-                                <label htmlFor={`upload-file-${img.id}`}>
-                                    <IconButton color="primary" component="span">
-                                        <UploadIcon />
-                                    </IconButton>
-                                </label>
+                              <label htmlFor={`upload-file-${img.id}`}>
+                                <IconButton color="primary" component="span">
+                                  <UploadIcon />
+                                </IconButton>
+                              </label>
                             )}
                           </InputAdornment>
                         ),
@@ -799,7 +799,7 @@ const AddProducts = () => {
           </div>
           <div className="flex-[1]">
             <Card className="p-4 flex flex-col gap-4">
-              <div className="font-bold">Product Status</div>
+              {/* <div className="font-bold">Product Status</div>
 
               <FormControl component="fieldset">
                 <FormLabel component="legend">
@@ -810,7 +810,7 @@ const AddProducts = () => {
                   <FormControlLabel value="disabled" control={<Radio />} label="Disabled" />
                 </RadioGroup>
               </FormControl>
-              <Divider />
+              <Divider /> */}
               <div className="font-bold">Left Top Section</div>
               <div className="font-bold">Left Top Section</div>
               <TextField

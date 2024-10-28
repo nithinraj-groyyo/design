@@ -909,7 +909,7 @@ const EditProduct = () => {
           </div>
           <div className="flex-[1]">
             <Card className="p-4 flex flex-col gap-4">
-              <div className="font-bold">Product Status</div>
+              {/* <div className="font-bold">Product Status</div>
 
               <FormControl component="fieldset">
                 <FormLabel component="legend">
@@ -920,7 +920,7 @@ const EditProduct = () => {
                   <FormControlLabel value="disabled" control={<Radio />} label="Disabled" />
                 </RadioGroup>
               </FormControl>
-              <Divider />
+              <Divider /> */}
               <div className="font-bold">Left Top Section</div>
               <TextField
                 label="Heading"
