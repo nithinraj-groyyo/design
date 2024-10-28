@@ -30,14 +30,6 @@ const NavigationBar = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleProductByCategory = () => {
-    handleMainMenuClose();
-  };
-
-  const handleProductBySubCategory = () => {
-    handleMainMenuClose();
-  };
-
   const handleMainMenuClose = () => {
     setAnchorEl(null);
     setHoveredCategory(null);

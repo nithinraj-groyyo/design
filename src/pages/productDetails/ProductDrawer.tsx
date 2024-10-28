@@ -14,7 +14,8 @@ import {
     TableRow,
     TableCell,
     TableBody,
-    Paper
+    Paper,
+    useMediaQuery
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { IProduct } from '../../types/products';
@@ -24,43 +25,16 @@ import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { toast } from 'react-toastify';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useAddToCartMutation } from '../../rtk-query/cartApiSlice';
-
-const ColorOption = ({ color, count, selectedColor }: { color: string; count: number; selectedColor: boolean }) => (
-    <Box sx={{ position: 'relative' }}>
-        <Box
-            sx={{
-                width: 48,
-                height: 48,
-                borderRadius: '8px',
-                border: selectedColor ? '2px solid black' : "",
-            }}
-            className="!flex !justify-center !items-center"
-        >
-            <Box
-                sx={{
-                    width: 44,
-                    height: 44,
-                    backgroundColor: color,
-                    borderRadius: '8px',
-                    border: '2px solid white',
-                    cursor: 'pointer',
-                    display: 'inline-block',
-                }}
-            />
-            {count > 0 && (
-                <Chip
-                    label={`${count}`}
-                    size="small"
-                    color="error"
-                    sx={{ position: 'absolute', top: -5, right: -5 }}
-                />
-            )}
-        </Box>
-    </Box>
-);
+import ColorOption from '../shoppingBag/ColorOptions';
+import { useNavigate } from 'react-router-dom';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
 const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose: () => void, product: IProduct }) => {
+    const navigate = useNavigate();
+    const isMobile = useMediaQuery('(max-width:600px)');
+    const isTablet = useMediaQuery('(max-width:900px)');
     const token = JSON.parse(localStorage.getItem("authToken") as string);
+
 
     const [quantity, setQuantity] = useState(0);
     const [variations, setVariations] = useState<any[]>([]);
@@ -69,7 +43,6 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     const [overallQuantity, setOverallQuantity] = useState(0);
     const [pricePerPiece, setPricePerPiece] = useState(0);
     const [openVariationTable, setOpenVariationTable] = useState(false);
-    const [isAddedToBag, setIsAddedToBag] = useState(false);
 
     const [addToCart] = useAddToCartMutation();
 
@@ -80,10 +53,10 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     }, [variations]);
 
     const incrementQuantity = () => {
-        if(Object.entries(variations)?.length === 0){
-            toast.error("Select Color and Size");
+        if (!selectedColor || !selectedSize) {
+            toast.error("Select Color and Size")
             return
-        }
+        };
         const newQuantity = quantity + 1;
         setQuantity(newQuantity);
         const totalQty = overallQuantity + newQuantity;
@@ -91,10 +64,10 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     };
 
     const decrementQuantity = () => {
-        if(Object.entries(variations)?.length === 0){
-            toast.error("Select Color and Size");
+        if (!selectedColor || !selectedSize) {
+            toast.error("Select Color and Size")
             return
-        }
+        };
         if (quantity > 0) {
             const newQuantity = quantity - 1;
             setQuantity(newQuantity);
@@ -104,7 +77,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     };
 
     const getPriceForTotalQuantity = (totalQty: number) => {
-        const tier = product.productPrices.find(
+        const tier = product?.productPrices.find(
             (price) => totalQty >= price.minQty && (!price.maxQty || totalQty <= price.maxQty)
         );
         return tier ? tier.pricePerPiece : 0;
@@ -124,6 +97,11 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
             toast.error("Select Color and Size")
             return
         };
+
+        if (quantity === 0) {
+            toast.error("Add Quantity");
+            return;
+        }
 
         const newVariation = {
             color: selectedColor,
@@ -145,7 +123,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
             return [...prev, newVariation];
         });
 
-        setQuantity(1);
+        setQuantity(0);
     };
 
     const calculateTotals = () => {
@@ -167,10 +145,16 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     };
 
     const totalQuantity = variations.reduce((total, variation) => total + variation.quantity, 0);
-    const unitPrice = product.productPrices?.find(price => totalQuantity >= price.minQty && (totalQuantity <= price.maxQty || !price.maxQty))?.pricePerPiece || 0;
+    const unitPrice = product?.productPrices?.find(price => totalQuantity >= price.minQty && (totalQuantity <= price.maxQty || !price.maxQty))?.pricePerPiece || 0;
+
+    const handleRemoveVariation = (index: number) => {
+        const updatedVariations = variations.filter((_, i) => i !== index);
+        setVariations(updatedVariations);
+    };
+
 
     const handleAddToBag = async () => {
-        if(Object.entries(variations)?.length === 0){
+        if (Object.entries(variations)?.length === 0) {
             toast.warn("Add Variations");
         }
         const payload = {
@@ -185,11 +169,17 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
         }
 
         try {
-            const response = await addToCart({payload, token});
+            const response = await addToCart({ payload, token });
             const responseBody = response?.data;
-            if(responseBody?.status){
+            if (responseBody?.status) {
                 toast.success(responseBody?.message)
-                setIsAddedToBag(true);
+                setSelectedColor(undefined);
+                setSelectedSize(undefined);
+                setQuantity(0);
+                setOverallQuantity(0);
+                setPricePerPiece(0);
+                setVariations([]);
+                setOpenVariationTable(false)
             }
         } catch (error: any) {
             console.error(error)
@@ -197,17 +187,28 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     };
 
     const handleGoToBag = () => {
-        setSelectedColor(undefined);
-        setSelectedSize(undefined);
-        setQuantity(0);
-        setOverallQuantity(0);
-        setPricePerPiece(0);
+        navigate("/bag")
     }
 
     return (
-        <Drawer anchor="right" open={isOpen} onClose={onClose} PaperProps={{ sx: { width: '50%' } }}>
+        <Drawer
+            BackdropProps={{
+                sx: { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+            }}
+            anchor="right"
+            open={isOpen}
+            onClose={onClose}
+            PaperProps={{
+                sx: {
+                    width: isMobile ? '100%' : isTablet ? '75%' : '50%',
+                    maxWidth: '600px',
+                    height: '100%',
+                    padding: isMobile ? 2 : 4,
+                }
+            }}
+        >
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <Box p={4} sx={{ flexGrow: 1, overflowY: 'auto' }} >
+                <Box sx={{ flexGrow: 1, overflowY: 'auto' }} >
 
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                         <p className='text-sm 2xl:text-[1rem] font-bold'>Select variations and quantity</p>
@@ -256,7 +257,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                                                     </p>
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                                                    <Box display="flex" alignItems="center" justifyContent="space-evenly" gap={1}>
                                                         <IconButton
                                                             onClick={() => handleQuantityChange(index, variation.quantity - 1)}
                                                             disabled={variation.quantity <= 1}
@@ -264,12 +265,25 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                                                         >
                                                             <RemoveIcon fontSize="small" />
                                                         </IconButton>
+
                                                         <p className='text-sm 2xl:text-[1rem]'>{variation.quantity}</p>
+
                                                         <IconButton
                                                             onClick={() => handleQuantityChange(index, variation.quantity + 1)}
                                                             size="small"
                                                         >
                                                             <AddIcon fontSize="small" />
+                                                        </IconButton>
+
+
+                                                        <IconButton
+                                                            size="small"
+                                                            sx={{
+                                                                color: "#ff0000"
+                                                            }}
+                                                            onClick={() => handleRemoveVariation(index)}
+                                                        >
+                                                            <RemoveCircleIcon />
                                                         </IconButton>
                                                     </Box>
                                                 </TableCell>
@@ -279,7 +293,21 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                                 </Table>
                             </TableContainer>
 
-                            {variations.length === 0 && <p className='text-center p-2'>No variations added.</p>}
+                            {variations.length === 0 && (
+                                <div className='flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg shadow-sm'>
+                                    <p className='text-center text-gray-600 text-lg font-medium mb-4'>
+                                        No variations added yet.
+                                    </p>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        className="transition-all duration-300 ease-in-out transform shadow-lg !bg-black !text-white"
+                                        onClick={() => setOpenVariationTable(false)} 
+                                    >
+                                        Select New Variants
+                                    </Button>
+                                </div>
+                            )}
                         </>
                     ) : (
                         <>
@@ -376,7 +404,17 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
             <Box sx={{ position: 'sticky', bottom: 0, backgroundColor: 'white', p: 2 }}>
                 <Box sx={{ display: "flex", gap: 1, flexDirection: "column" }}>
                     <Grid container justifyContent="space-between">
-                        <Typography variant="body2" className='underline cursor-pointer' onClick={() => setOpenVariationTable(!openVariationTable)}>Items Subtotal ({variations?.length} variations and {totalItems} items)</Typography>
+                        <Typography
+                            variant="body2"
+                            className={`underline cursor-pointer flex items-center gap-1 ${Object.entries(variations)?.length > 0 ? "text-blue-400" : "text-black"}`}
+                            onClick={() => setOpenVariationTable(!openVariationTable)}
+                        >
+                            Items Subtotal ({variations?.length} variations and {totalItems} items)
+
+                            {Object.entries(variations)?.length > 0 && (
+                                <span className="animate-waving inline-block">»»</span>
+                            )}
+                        </Typography>
                     </Grid>
                     <Grid container justifyContent="space-between">
                         <Typography variant="body2">Total Amount</Typography>
@@ -384,20 +422,41 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                     </Grid>
                 </Box>
 
-                <Grid container spacing={1} sx={{ mt: 4 }}>
-                    {isAddedToBag ? (
-                        <Grid item xs={12}>
-                            <Button  variant="outlined" fullWidth className='!bg-black !text-white' onClick={handleGoToBag}>
-                                Go To Bag
-                            </Button>
-                        </Grid>
-                    ) : (
-                        <Grid item xs={12}>
-                            <Button disabled={Object.entries(variations)?.length === 0} variant="contained" className='!bg-black !text-white' fullWidth onClick={handleAddToBag}>
-                                Add To Bag
-                            </Button>
-                        </Grid>
-                    )}
+                <Grid container spacing={2} sx={{ mt: 4 }}>
+                    <Grid item xs={6}>
+                        <Button
+                            disabled={Object.entries(variations)?.length === 0}
+                            variant="contained"
+                            className={`${Object.entries(variations)?.length === 0
+                                ? "!bg-white !text-black !border !border-black"
+                                : "!bg-black !text-white"
+                                }`}
+                            fullWidth
+                            onClick={handleAddToBag}
+                            sx={{
+                                border: '1px solid',
+                                borderColor: Object.entries(variations)?.length === 0 ? 'black' : 'transparent',
+                            }}
+                        >
+                            Add To Bag
+                        </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            className="!bg-black !text-white"
+                            onClick={handleGoToBag}
+                            sx={{
+                                border: '1px solid black',
+                                '&:hover': {
+                                    border: '1px solid white',
+                                },
+                            }}
+                        >
+                            Go To Bag
+                        </Button>
+                    </Grid>
                 </Grid>
             </Box>
         </Drawer>

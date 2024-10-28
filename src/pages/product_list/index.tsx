@@ -5,18 +5,16 @@ import ProductGrid from "./ProductGrid";
 import { ProductViewEnum } from "../../utilities/enum";
 import { IProduct, IProductView } from "../../types/products";
 import ProductLargeView from "./ProductLargeView";
-import { useLocation, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import useFetchProducts from "../../hooks/useFetchProducts";
 import { useLazyFetchProductsQuery } from "../../rtk-query/productApiSlice";
 
 const ProductList: React.FC = () => {
-  const { categoryKey } = useParams<{ categoryKey: string }>();
   const [currentView, setCurrentView] = useState(ProductViewEnum.LARGE);
   const [opacity, setOpacity] = useState(1);
   const [lastScrollTop, setLastScrollTop] = useState(0);
-  const { productData } = useSelector((state: RootState) => state.products);
+
   const location = useLocation();
   const { categoryId, subCategoryId } = location?.state;
 
@@ -89,12 +87,12 @@ const ProductList: React.FC = () => {
 
   return (
     <BasicLayout>
-      <div className="mt-[10rem] fixed w-full" style={{ opacity }}>
+      <div className="mt-[6rem] lg:mt-[10rem] fixed w-full" style={{ opacity }}>
         <ProductFilter currentView={currentView} onFilterChange={handleFilterChange} />
       </div>
 
-      <div className="mt-[12rem]">
-        {currentView === ProductViewEnum.LARGE ? <ProductLargeView /> : <ProductGrid products={products!} currentView={currentView} />}
+      <div className="">
+        {currentView === ProductViewEnum.LARGE ? <ProductLargeView products={products!} /> : <ProductGrid products={products!} currentView={currentView} />}
       </div>
     </BasicLayout>
   );

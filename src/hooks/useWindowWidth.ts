@@ -11,7 +11,7 @@ const useWindowWidth = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const isMobileView = windowWidth <= 768;
+    const isMobileView = windowWidth <= 1024;
 
     return { windowWidth, isMobileView };
 };

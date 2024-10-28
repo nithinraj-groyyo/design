@@ -5,6 +5,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { Divider } from "@mui/material";
+import { jwtDecode } from "jwt-decode";
 
 const menuItems = [
   {
@@ -15,16 +16,16 @@ const menuItems = [
     title: "Accounts",
     subItems: [
       { title: "Profile", route: "/account/profile" },
-      // { title: "Addresses", route: "/account/address" },
+      { title: "Addresses", route: "/account/address" },
       { title: "Change Password", route: "/account/changePassword" },
     ],
   },
-  // {
-  //   title: "Orders",
-  //   subItems: [
-  //     { title: "Orders & Returns", route: "/account/orders-returns" },
-  //   ],
-  // },
+  {
+    title: "Orders",
+    subItems: [
+      { title: "Orders", route: "/account/orders" },
+    ],
+  },
   
 ];
 
@@ -36,7 +37,7 @@ const adminMenuItems = [
   {
     title: "Website Info",
     subItems: [
-      { title: "About us", route: "/account/web-info/about-us" },
+      // { title: "About us", route: "/account/web-info/about-us" },
       { title: "Teams", route: "/account/web-info/teams" },
       { title: "Services", route: "/account/web-info/services" },
       { title: "FAQ", route: "/account/web-info/faq" },
@@ -71,8 +72,8 @@ const adminMenuItems = [
   {
     title: "Site Settings",
     subItems: [
-      { title: "Brands", route: "/account/brands" },
-      { title: "Add Brands", route: "/account/add-brands" },
+      // { title: "Brands", route: "/account/brands" },
+      // { title: "Add Brands", route: "/account/add-brands" },
       { title: "Manage Categories", route: "/account/manage-categories" },
       { title: "Manage Subscriptions", route: "/account/manage-subscriptions" },
     ],
@@ -82,7 +83,11 @@ const adminMenuItems = [
 const AccountPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = JSON.parse(localStorage.getItem("isAdmin") as string === "undefined" ? "false": localStorage.getItem("isAdmin") as string);
+
+  const token = JSON.parse(localStorage.getItem("authToken") as string);
+  const decodedToken: any = jwtDecode(token);
+  const isAdmin = decodedToken?.isAdmin;
+  console.log(decodedToken, "decodedToken")
 
   const handleSelectedList = (selectedRoute: string) => {
     navigate(selectedRoute);
@@ -136,7 +141,7 @@ const AccountPage = () => {
             ))}
 
             {/* {user && user.role === "Admin" && */}
-            {
+            {isAdmin &&
               adminMenuItems.map((menuItem, index) => (
                 <React.Fragment key={index}>
                   <ListItem>

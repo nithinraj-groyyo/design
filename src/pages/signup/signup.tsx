@@ -12,6 +12,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useUpdateLocalWishlistMutation } from '../../rtk-query/wishlistApiSlice';
 import { useDispatch } from 'react-redux';
 import { setWishlistItems } from '../../redux/wishlistSlice';
+import { setToken } from '../../redux/userSlice';
 
 const Signup = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
@@ -48,6 +49,7 @@ const Signup = () => {
         const response = await signUp(newData).unwrap();
         if(response?.status && response?.httpStatusCode === 201){
           toast.success(response?.message);
+          dispatch(setToken({token: response?.data?.access_token}));
           localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
           localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin));
 
@@ -100,7 +102,7 @@ const Signup = () => {
           style={{
             background: "linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(153, 153, 153, 0.3) 198.83%)"
           }}
-          className="w-[30rem] rounded p-4 flex flex-col gap-4"
+          className="w-[25rem] xl:w-[30rem] rounded p-4 flex flex-col gap-4"
         >
           <div>Create your account</div>
           <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   FormControl,
@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
-import { toast } from "react-toastify";
 import { SelectChangeEvent } from "@mui/material";
 
 const VisuallyHiddenInput = styled("input")({
@@ -27,11 +26,15 @@ export const ContactUsForm = () => {
     name: "",
     email: "",
     contactPreference: "",
-    countryId: "",
+    phone: "",  
     subject: "",
     message: "",
   });
   const [file, setFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleInputChange = (
     event:
@@ -48,10 +51,11 @@ export const ContactUsForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
   };
 
   return (
-    <div className="md:w-[65%] bg-white shadow-lg px-10 py-16 rounded-r-xl transition duration-300 hover:shadow-2xl">
+    <div className="bg-white shadow-lg p-6 rounded-lg transition duration-300 hover:shadow-xl">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex flex-col gap-4 md:flex-row md:gap-8">
           <TextField
@@ -89,13 +93,14 @@ export const ContactUsForm = () => {
             >
               <MenuItem value="">Select Preference</MenuItem>
               <MenuItem value="email">Email</MenuItem>
+              <MenuItem value="phone">Phone</MenuItem>
             </Select>
           </FormControl>
 
           <TextField
             label="Phone Number"
             name="phone"
-            value={formValues.email}
+            value={formValues.phone}
             onChange={handleInputChange}
             required
             fullWidth

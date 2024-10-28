@@ -27,8 +27,8 @@ export interface IAddressRequest {
     userId: string;
     addressName: string;
     addressType: string;
-    streetAddress1: string;
-    streetAddress2?: string;
+    streetAddress: string;
+    // streetAddress2?: string;
     phone: string;
     landmark?: string;
     city: string;
@@ -38,22 +38,14 @@ export interface IAddressRequest {
 
 export interface IAddressResponse {
     id: number;
-    userId: number;
-    addressName: string;
-    addressType: string;
-    streetAddress1: string;
-    streetAddress2: string;
-    phone: string;
-    landmark: string;
+    street: string;
     city: string;
     state: string;
-    emailId: string;
+    postalCode: string;
     country: string;
-    zip: number;
-    isActive: boolean;
-    flag: boolean;
-    createdDate: string;
-    createdBy: string;
-    modifiedDate: string | null;
-    modifiedBy: string | null;
-  }
+    addressType: "Home" | "Work"; 
+    isDefault: boolean;
+    name: string;
+    phoneNumber: string;
+    landMark: string;
+}

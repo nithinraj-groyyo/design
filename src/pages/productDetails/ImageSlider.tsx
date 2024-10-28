@@ -2,23 +2,20 @@ import React, { useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import { getImagesFromUrl } from "../../utilities/helper";
 import { IProduct } from "../../types/products";
 
 interface IImageSliderProps {
-  product: IProduct
+  product: IProduct;
 }
 
-const ImageSlider = ({product}:IImageSliderProps) => {
+const ImageSlider = ({ product }: IImageSliderProps) => {
   const [nav1, setNav1] = useState<Slider | null>(null);
   const [nav2, setNav2] = useState<Slider | null>(null);
 
   return (
     <div className="flex-1">
       <div className="flex">
-    
+        {/* Main Slider */}
         <div className="flex-shrink-0 w-[80%]">
           <Slider
             asNavFor={nav2 ?? undefined}
@@ -27,21 +24,22 @@ const ImageSlider = ({product}:IImageSliderProps) => {
             slidesToScroll={1}
             arrows={false}
             vertical={true}
-            className="product-img"
           >
             {product?.productImages?.map((img, index) => (
-              <div key={index}>
-                <img
-                  src={img?.signedUrl}
-                  alt={`Product ${index}`}
-                  className="w-full h-full object-cover"
-                />
+              <div key={index} className="w-full">
+                <div className="relative" style={{ paddingBottom: '133.33%' /* 12:9 aspect ratio */ }}>
+                  <img
+                    src={img?.signedUrl}
+                    alt={`Product ${index}`}
+                    className="absolute top-0 left-0 w-full h-full object-cover"
+                  />
+                </div>
               </div>
             ))}
           </Slider>
         </div>
 
-        
+        {/* Thumbnail Slider */}
         <div className="w-[20%]">
           <Slider
             asNavFor={nav1 ?? undefined}
@@ -53,15 +51,16 @@ const ImageSlider = ({product}:IImageSliderProps) => {
             dots={false}
             focusOnSelect={true}
             centerPadding="0px"
-            // className="product-img-nav h-[47rem]"
           >
             {product?.productImages?.map((img, index) => (
-              <div key={index}>
-                <img
-                   src={img?.signedUrl}
-                  alt={`Thumbnail ${index}`}
-                  className="w-full h-[5rem] object-cover"
-                />
+              <div key={index} className="w-full">
+                <div className="relative" style={{ paddingBottom: '111%' /* 12:9 aspect ratio */ }}>
+                  <img
+                    src={img?.signedUrl}
+                    alt={`Thumbnail ${index}`}
+                    className="absolute top-0 left-0 w-full h-full object-cover"
+                  />
+                </div>
               </div>
             ))}
           </Slider>

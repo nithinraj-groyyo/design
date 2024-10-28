@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import "./App.css"
 import Home from "./pages/home";
 import ProductList from "./pages/product_list";
 import ProductDetails from "./pages/productDetails";
@@ -9,7 +10,7 @@ import Signup from "./pages/signup/signup";
 import { ContactUs } from "./pages/contactUs";
 import AccountPage from "./pages/account";
 import Address from "./pages/account/profile/Address";
-import Orders from "./pages/account/Orders";
+import Orders from "./pages/account/orders/Orders";
 import Profile from "./pages/account/profile/Profile";
 import ChangePassword from "./pages/account/profile/ChangePassword";
 import NotFoundPage from "./pages/NotFoundPage";

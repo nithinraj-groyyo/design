@@ -1,6 +1,7 @@
 import React from "react";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import { useNavigate } from "react-router-dom";
 
 interface WishlistCardProps {
   id: number;
@@ -17,20 +18,26 @@ const WishlistCard: React.FC<WishlistCardProps> = ({
   price,
   onRemove,
 }) => {
+  const navigate = useNavigate();
+
+  const navgateToProductDetail = () => {
+    navigate(`/product-details/${id}`)
+  }
+  
   return (
-    <div className="relative bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl">
+    <div className="relative bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl" onClick={navgateToProductDetail}>
       <img
         src={imageUrl}
         alt={name}
-        className="w-full h-56 object-cover"
+        className="w-full h-48 md:h-56 object-cover"
       />
       <div className="p-4">
-        <p className="  text-gray-800 truncate">
+        <p className="text-sm md:text-base text-gray-800 truncate">
           {name}
         </p>
-        <div className="uppercase font-semibold text-xs">
-            <span><CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} /></span>
-            <span>{price}</span>
+        <div className="flex items-center space-x-1 uppercase font-semibold text-xs">
+          <CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} />
+          <span>{price}</span>
         </div>
       </div>
       <button

@@ -15,6 +15,7 @@ import { IProduct } from '../../types/products';
 import ProductColor from './ProductColor';
 import ProductSize from './ProductSize';
 import ProductDrawer from './ProductDrawer';
+import MobileProductDetails from './MobileProductDetails';
 
 const ProductDetails = () => {
     const { productId } = useParams<{ productId: string }>();
@@ -25,7 +26,7 @@ const ProductDetails = () => {
     const [product, setProduct] = useState<IProduct>();
     const [totalAmount, setTotalAmount] = useState<number>(0);
 
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false); // Drawer state
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     useEffect(() => {
         if (productId) {
@@ -63,10 +64,6 @@ const ProductDetails = () => {
         setExpanded(!expanded);
     };
 
-    const handleDrawerToggle = () => {
-        setIsDrawerOpen(!isDrawerOpen);
-    };
-
     const handleOpenDrawer = () => {
         setIsDrawerOpen(true);
     }
@@ -74,10 +71,10 @@ const ProductDetails = () => {
     const handleCloseDrawer = () => {
         setIsDrawerOpen(false);
     }
-
+console.log(isMobileView, "isMobileView")
     return (
         <BasicLayout showFooter={isMobileView ? false : true}>
-            <div className="flex mt-[12rem] flex-col gap-6">
+            <div className="flex mt-[5rem] lg:mt-[12rem] flex-col gap-6">
                 <div className="hidden lg:grid grid-cols-3 ">
                     <div className="flex flex-col p-4 gap-4 justify-end items-start">
                         <div className="min-w-full">
@@ -92,40 +89,35 @@ const ProductDetails = () => {
                             {product && <ProductInfo product={product} />}
                             <div className="w-full my-2">
                                 <ProductPricing product={product!} />
-                                <ProductColor product={product!} openDrawer={handleOpenDrawer}  />
+                                <ProductColor product={product!} openDrawer={handleOpenDrawer} />
                                 <ProductSize product={product!} openDrawer={handleOpenDrawer} />
                             </div>
-                            <AddToBagButton totalAmount={totalAmount} />
+                            <AddToBagButton totalAmount={totalAmount} openDrawer={handleOpenDrawer} />
                         </div>
                     </div>
                 </div>
 
-                <Drawer
-                    anchor="right"
-                    open={isDrawerOpen}
-                    onClose={handleDrawerToggle}
-                    PaperProps={{
-                        sx: { width: '50vw' },
-                    }}
-                >
-                    <ProductDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} product={product!} />
-                </Drawer>
 
-                <div className="hidden lg:flex flex-col gap-4 ">
+                <ProductDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} product={product!} />
+
+                <div className="hidden lg:flex flex-col gap-4 my-2">
                     <Typography className="text-[#2D2D2A] text-sm tracking-widest px-4">YOU MAY ALSO LIKE</Typography>
-                    <div className="grid grid-cols-6">
+                    <div className="grid grid-cols-6 gap-2 mx-1">
                         {products?.data &&
                             products?.data?.slice(0, 6).map((product: any) => {
                                 return (
                                     <ProductCard
                                         key={product?.id}
-                                        className="border border-black !rounded-none"
                                         product={product}
+                                        className='!rounded-lg shadow-md'
                                     />
                                 );
                             })}
                     </div>
                 </div>
+            </div>
+            <div className='lg:hidden'>
+                <MobileProductDetails />
             </div>
         </BasicLayout>
     );

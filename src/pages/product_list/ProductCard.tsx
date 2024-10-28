@@ -24,7 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const {wishlistTriggered, items} = useSelector((state: RootState) => state.wishlist)
+  const { wishlistTriggered, items } = useSelector((state: RootState) => state.wishlist)
 
   const localWishList = JSON.parse(localStorage.getItem("localWishList") || '[]');
 
@@ -32,55 +32,55 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
   const [removeWishList] = useRemoveWishListMutation();
 
   useEffect(() => {
-   if(product){
-    if (!userId) {
-      setIsInWishlist(localWishList.includes(product?.id));
-    }else{
-      const itemIds: number[] = items?.map((item) => item?.id)
-      setIsInWishlist(itemIds?.includes(product?.id));
+    if (product) {
+      if (!userId) {
+        setIsInWishlist(localWishList.includes(product?.id));
+      } else {
+        const itemIds: number[] = items?.map((item) => item?.id)
+        setIsInWishlist(itemIds?.includes(product?.id));
+      }
     }
-   }
   }, [product, localWishList, wishlistTriggered, items]);
 
   const navigateToProductDetails = () => {
     navigate(`/product-details/${product?.id}`);
   };
 
-  const handleWishlistToggle = async () => {    
+  const handleWishlistToggle = async () => {
     const toggleWishlistState = (isInWishlist: boolean) => {
       setIsInWishlist(!isInWishlist);
       dispatch(setWishListTriggered(!wishlistTriggered));
     };
-      
+
     if (!userId && product) {
-      if (isInWishlist) {        
+      if (isInWishlist) {
         dispatch(removeFromLocalWishlist({ productId: product?.id }));
-      } else {        
+      } else {
         dispatch(setLocalWishlistItems({ productId: product?.id }));
-      }      toggleWishlistState(isInWishlist);  
+      } toggleWishlistState(isInWishlist);
       return;
     }
-      
+
     if (userId && product) {
       try {
-        if (isInWishlist) {          
+        if (isInWishlist) {
           await removeWishList({ productId: product?.id, token });
-        } else {          
+        } else {
           await addToWishlist({ productId: product?.id, token });
-        }        toggleWishlistState(isInWishlist);  
+        } toggleWishlistState(isInWishlist);
       } catch (error) {
-        console.error('Error toggling wishlist:', error);        
+        console.error('Error toggling wishlist:', error);
       }
     }
   };
-  
 
-  
+
+
   return (
     <Card className={className}>
       <CardMedia
         component="img"
-        image={(product?.productImages.find(image => image.isThumbnail === true))?.signedUrl}
+        image={(product?.productImages.find(image => image.isThumbnail))?.signedUrl}
         alt={product?.name}
         className="cursor-pointer"
         sx={{ objectFit: 'cover', aspectRatio: '1' }}
@@ -91,13 +91,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
           {/* Desktop view  */}
           <CardContent className='hidden lg:block'>
             <Box display="flex" justifyContent="space-between" alignItems="start">
-              <Typography component="div" className="uppercase font-light text-xs">
-                {product?.name}
-              </Typography>
+            <Typography
+              component="div"
+              className="uppercase font-light text-xs truncate"
+              sx={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {product?.name}
+            </Typography>
 
-                <IconButton aria-label="add to wishlist" onClick={handleWishlistToggle}>
-                  {isInWishlist ? <FavoriteIcon sx={{ color: 'red' }} /> : <FavoriteBorderIcon />}
-                </IconButton>
+              <IconButton aria-label="add to wishlist" onClick={handleWishlistToggle}>
+                {isInWishlist ? <FavoriteIcon sx={{ color: 'red' }} /> : <FavoriteBorderIcon />}
+              </IconButton>
 
             </Box>
             <Typography component="div" className="uppercase font-light text-xs">
@@ -108,19 +116,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ showDetails = true, className
 
           {/* Mobile view  */}
           <div className='lg:hidden px-2 py-1'>
-            <div className='flex justify-between items-center'>
-              <div className="uppercase font-light text-xs">
-                <span><CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} /></span>
-                <span>{product?.productPrices[0]?.pricePerPiece}</span>
-              </div>
+            <div className='flex flex-col'>
+              <p className="uppercase font-light text-sm truncate">
+                {product?.name}
+              </p>
+              <div className='flex justify-between items-center'>
+                <div className="uppercase font-light text-xs">
+                  <span><CurrencyRupeeIcon sx={{ fontSize: 'inherit' }} /></span>
+                  <span>{product?.productPrices[0]?.pricePerPiece}</span>
+                </div>
                 <IconButton aria-label="add to wishlist" onClick={handleWishlistToggle}>
                   {isInWishlist ? <FavoriteIcon sx={{ color: 'red' }} /> : <FavoriteBorderIcon />}
                 </IconButton>
+              </div>
             </div>
           </div>
         </>
       )}
-      
+
     </Card>
   );
 };

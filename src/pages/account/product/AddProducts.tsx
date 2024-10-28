@@ -123,6 +123,8 @@ const AddProducts = () => {
     categoryId: selectedCategory?.id!,
     pageIndex: 0,
     pageSize: 10,
+  },{
+    skip: !selectedCategory?.id, 
   });
 
   const { data: sizes, isLoading: isSizesLoading } = useGetAllSizesQuery({});
@@ -533,7 +535,7 @@ const AddProducts = () => {
 
                     <TextField
                       fullWidth
-                      label="Upload File (Preferred size: 1:1 aspect-ratio, Ex: 300*300)"
+                      label="Upload File"
                       value={img.fileName || ""}
                       className="cursor-pointer"
                       InputProps={{
@@ -571,7 +573,7 @@ const AddProducts = () => {
                   <FormGroup>
                     <StyledFormControlLabel
                       control={<Checkbox checked={img.isThumbnail} onChange={() => handleCheckboxIsThumbnail(img.id)} color="primary" />}
-                      label="Is Cover"
+                      label="Is Thumbnail"
                     />
                   </FormGroup>
 

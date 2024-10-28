@@ -17,11 +17,11 @@ const userApiSlice = apiSlice.injectEndpoints({
             })
         }),
         getUserProfile: builder.query({
-            query: () => ({
+            query: ({authToken}:{authToken: string | undefined}) => ({
                 url: `${userUrl}/profile`,
                 headers: {
 					'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${authToken ?? token}`
 				},
             }),
             providesTags: ["UserProfile"],

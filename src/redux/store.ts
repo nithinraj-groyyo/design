@@ -7,6 +7,8 @@ import productSizeSlice from "./productSizeSlice";
 import cartSlice from "./cartSlice";
 import shoppingBagSlice from "./shoppingBagSlice";
 import wishlistSlice from "./wishlistSlice";
+import bagSlice from "./bagSlice";
+import userSlice from "./userSlice";
 import apiSlice from '../rtk-query/apiSlice';
 
 export const store = configureStore({
@@ -17,7 +19,9 @@ export const store = configureStore({
     productSize: productSizeSlice,
     cart: cartSlice,
     shoppingBag: shoppingBagSlice,
-    wishlist: wishlistSlice
+    wishlist: wishlistSlice,
+    bag: bagSlice,
+    user: userSlice
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
     serializableCheck: false 

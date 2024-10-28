@@ -3,52 +3,23 @@ import BasicLayout from "../../layouts/BasicLayout";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import ClientsLogosSlider from "./ClientsLogoSlider";
-import {MISC} from '../../utilities/enum'
-// import NewsSection from "./NewsSection";
-// import NewsSection from "./NewsSection";
+import { MISC } from "../../utilities/enum";
 
 const AboutPage = () => {
-  // const aboutDetails = [
-  //   {
-  //     title: "LAUNCHED IN",
-  //     value: "2021",
-  //   },
-  //   {
-  //     title: "TEAM",
-  //     value: "100+",
-  //   },
-  //   {
-  //     title: "FACTORIES",
-  //     value: "360+",
-  //   },
-  //   {
-  //     title: "BRANDS",
-  //     value: "110+",
-  //   },
-  // ];
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [])
+  }, []);
 
   return (
     <BasicLayout>
-      <div className="mt-[10rem]" style={{ fontFamily: "Poppins" }}>
-        <div
-          className="flex flex-col gap-8 py-4"
-          style={{ background: "linear-gradient(0deg, #f9f9f9, transparent)" }}
-        >
-          <div
-            className="text-center font-bold tracking-wide text-4xl"
-            style={{ fontFamily: "Poppins" }}
-          >
+      <div className="mt-[5rem] lg:mt-[10rem] font-poppins">
+        <div className="flex flex-col gap-8 py-4 bg-gradient-to-b from-[#f9f9f9] to-transparent">          
+          <div className="text-center font-bold tracking-wide text-2xl md:text-4xl">
             {MISC.ABOUT_US}
           </div>
-          <div className="text-center w-full flex justify-center">
-            <div
-              className="w-[75%]  tracking-wider text-justify"
-              // style={{ fontFamily: "'Space Mono', monospace" }}
-            >
+          
+          <div className="text-center w-full flex justify-center px-4 md:px-0">
+            <div className="w-full md:w-[75%] tracking-wider text-justify text-sm md:text-base">
               Founded in 2021 and based in Gurgaon, Groyyo Design Studio is a
               one-stop solution for fashion and lifestyle design needs. Blending
               creativity with innovation, the studio crafts unique,
@@ -62,6 +33,7 @@ const AboutPage = () => {
               style, and craftsmanship to elevate any brand.
             </div>
           </div>
+          
           <div className="text-center mb-8 mt-4">
             <Link to={"/services"}>
               <Button
@@ -71,7 +43,8 @@ const AboutPage = () => {
                   borderColor: "black",
                   backgroundColor: "black",
                   padding: "1rem",
-                  minWidth: "15rem",
+                  minWidth: "12rem",
+                  fontSize: "0.875rem",
                   "&:hover": {
                     backgroundColor: "transparent",
                     borderColor: "black",
@@ -79,38 +52,16 @@ const AboutPage = () => {
                   },
                 }}
               >
-                
                 {MISC.Go_to_our_Services}
               </Button>
             </Link>
           </div>
-          {/* <div className="flex text-center w-full gap-6 justify-center my-4">
-            {aboutDetails.map((aboutDetail, aboutDetailKey) => {
-              return (
-                <>
-                  <div className="flex flex-col gap-4 border border-none px-[3.5rem] py-[2.5rem] rounded-xl shadow-lg bg-white">
-                    <div className="font-semibold">{aboutDetail?.title}</div>
-                    <div
-                      className="text-7xl"
-                      style={{ fontFamily: "'Space Mono', monospace" }}
-                    >
-                      {aboutDetail?.value}
-                    </div>
-                  </div>
-                </>
-              );
-            })}
-          </div> */}
         </div>
         
-
-        <ClientsLogosSlider/>
-
-        {/* <NewsSection /> */}
+        <ClientsLogosSlider />
       </div>
     </BasicLayout>
   );
 };
 
 export default AboutPage;
-

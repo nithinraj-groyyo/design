@@ -110,5 +110,6 @@ export const {
   useLazyLoadAllCategoriesWithSubCategoriesQuery,
   useLoadCategoriesWithPaginationQuery,
   useLoadSubCategoriesWithIdQuery,
+  useLazyLoadSubCategoriesWithIdQuery,
   useUpdateCategoryMutation
 } = categoriesApiSlice;
