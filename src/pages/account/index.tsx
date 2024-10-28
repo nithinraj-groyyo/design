@@ -5,6 +5,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import { Divider } from "@mui/material";
+import { jwtDecode } from "jwt-decode";
 
 const menuItems = [
   {
@@ -19,12 +20,12 @@ const menuItems = [
       { title: "Change Password", route: "/account/changePassword" },
     ],
   },
-  // {
-  //   title: "Orders",
-  //   subItems: [
-  //     { title: "Orders & Returns", route: "/account/orders-returns" },
-  //   ],
-  // },
+  {
+    title: "Orders",
+    subItems: [
+      { title: "Orders", route: "/account/orders" },
+    ],
+  },
   
 ];
 
@@ -82,7 +83,11 @@ const adminMenuItems = [
 const AccountPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = JSON.parse(localStorage.getItem("isAdmin") as string === "undefined" ? "false": localStorage.getItem("isAdmin") as string);
+
+  const token = JSON.parse(localStorage.getItem("authToken") as string);
+  const decodedToken: any = jwtDecode(token);
+  const isAdmin = decodedToken?.isAdmin;
+  console.log(decodedToken, "decodedToken")
 
   const handleSelectedList = (selectedRoute: string) => {
     navigate(selectedRoute);
@@ -136,7 +141,7 @@ const AccountPage = () => {
             ))}
 
             {/* {user && user.role === "Admin" && */}
-            {
+            {isAdmin &&
               adminMenuItems.map((menuItem, index) => (
                 <React.Fragment key={index}>
                   <ListItem>

@@ -33,6 +33,7 @@ import { useRemoveCartMutation } from "../../rtk-query/cartApiSlice";
 import { toast } from "react-toastify";
 import { useGetAddressesQuery, useUpdateDefaultAddressMutation } from "../../rtk-query/addressApiSlice";
 import { useCreateOrderCheckoutMutation } from "../../rtk-query/orderApiSlice";
+import CheckoutButton from "../../components/CheckoutButton";
 
 const ShoppingBag = () => {
     const navigate = useNavigate();
@@ -42,7 +43,7 @@ const ShoppingBag = () => {
     const { cart } = useSelector(
         (state: RootState) => state.bag
     );
-
+console.log("cart", cart);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [openRemovalDialog, setOpenRemovalDialog] = useState(false);
     const [openAddressSelectionModal, setOpenAddressSelectionModal] = useState(false);
@@ -117,7 +118,8 @@ const ShoppingBag = () => {
                 phoneNumber: defaultAddress?.phoneNumber
             }
             const response = await createOrderCheckout({ payload, token }).unwrap();
-            if (response?.success) {
+            console.log(response, "response order")
+            if (response?.status) {
                 toast.success(response?.message);
                 handleOrderSuccess()
             }
@@ -135,11 +137,13 @@ const ShoppingBag = () => {
 
     const handleOrderSuccess = () => {
         setOpenThanksDialog(true);
+        
     };
 
     const handleConfirmThanks = () => {
         handleThanksClose();
         navigate('/');
+        window.location.reload();
     };
 
     const renderEmptyCart = () => (
@@ -168,7 +172,8 @@ const ShoppingBag = () => {
             // dispatch(removeFromCart(cart?.cartId))
         }
     }
-    console.log(addresses, "addressses")
+    console.log(addresses?.data
+        ?.filter((address) => address?.isDefault).length, "addressses")
     return (
         <BasicLayout>
             <section className="cart-section flex justify-center items-start min-h-screen mt-[12rem]">
@@ -202,9 +207,14 @@ const ShoppingBag = () => {
                                             </div>
                                         ))
                                 }
-                                {/* <button className="px-4 py-2 bg-black text-white font-semibold">
-                                    ADD ADDRESS
-                                </button> */}
+                                {
+                                    !addresses?.data?.filter((address) => address?.isDefault).length && (
+                                        <button className="px-4 py-2 bg-black text-white font-semibold" onClick={() => navigate("/account/address")}>
+                                        ADD ADDRESS
+                                    </button>
+                                    )
+                                }
+                               
                             </div>
                         )}
 
@@ -355,6 +365,7 @@ const ShoppingBag = () => {
                                                 <Dialog
                                                     hideBackdrop
                                                     open={openThanksDialog}
+
                                                     onClose={handleThanksClose}
                                                     aria-labelledby="alert-dialog-title"
                                                     aria-describedby="alert-dialog-description"

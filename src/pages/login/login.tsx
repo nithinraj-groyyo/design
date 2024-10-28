@@ -19,6 +19,7 @@ import { jwtDecode } from "jwt-decode";
 import { useUpdateLocalWishlistMutation } from "../../rtk-query/wishlistApiSlice";
 import { useDispatch } from "react-redux";
 import { setWishlistItems } from "../../redux/wishlistSlice";
+import { setToken } from "../../redux/userSlice";
 
 const Login = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
@@ -70,6 +71,7 @@ const Login = () => {
 
         if(response?.status && response?.httpStatusCode === 200){
           toast.success(response?.message);
+          dispatch(setToken({token: response?.data?.access_token}));
           localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
           localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin));
 

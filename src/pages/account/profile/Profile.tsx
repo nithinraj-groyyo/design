@@ -6,6 +6,8 @@ import { useLazyGetUserProfileQuery } from "../../../rtk-query/userApiSlice";
 import { toast } from "react-toastify";
 import AccountSettingsLayout from "../../../layouts/AccountSettingsLayout";
 import ProfileMobileSection from "./ProfileMobileSection";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/store";
 
 const Profile = () => {
   const [editProfileModal, setEditProfileModal] = useState(false);
@@ -16,10 +18,12 @@ const Profile = () => {
     setEditProfileModal(true);
   };
 
+  const { authToken } = useSelector((state: RootState) => state.user);
+
   useEffect(() => {
     async function getUserData() {
       try {
-        const response = await getUserProfile({}).unwrap();
+        const response = await getUserProfile({authToken}).unwrap();
         if (response?.status) {
           setProfileData(response?.data);
         }

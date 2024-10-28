@@ -108,7 +108,7 @@ const VariantsTable = ({setIsDrawerOpen}: IVariantsTableProps) => {
                                 <TableCell align="center">
                                     <p className='text-sm 2xl:text-[1rem]'>
                                         <CurrencyRupeeIcon sx={{ fontSize: "inherit" }} />
-                                        {selectedCart?.price?.toFixed(2)}
+                                        {selectedCart?.unitPrice?.toFixed(2)}
                                     </p>
                                 </TableCell>
                                 <TableCell align="center">
@@ -148,7 +148,6 @@ const VariantsTable = ({setIsDrawerOpen}: IVariantsTableProps) => {
             </TableContainer>
             </Box>
 
-            {/* Sticky footer */}
             <Box sx={{ position: 'sticky', bottom: 0, width: "100%", backgroundColor: 'white', p: 2, boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)' }}>
                 <Box sx={{ display: "flex", gap: 1, flexDirection: "column" }}>
                     <Grid container justifyContent="space-between">

@@ -11,6 +11,8 @@ const ProfileMobileSection = () => {
   const [getUserProfile, { isLoading }] = useLazyGetUserProfileQuery({});
   const [profileData, setProfileData] = useState<IUserProfile | undefined>();
 
+  const token = JSON.parse(localStorage.getItem('authToken') as string);
+
   const editClickHandler = () => {
     setEditProfileModal(true);
   };
@@ -18,7 +20,7 @@ const ProfileMobileSection = () => {
   useEffect(() => {
     async function getUserData() {
       try {
-        const response = await getUserProfile({}).unwrap();
+        const response = await getUserProfile({authToken: token}).unwrap();
         if (response?.status) {
           setProfileData(response?.data);
         }

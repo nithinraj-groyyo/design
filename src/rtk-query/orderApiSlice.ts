@@ -13,10 +13,20 @@ const orderApiSlice = apiSlice.injectEndpoints({
                 },
                 body: payload
             })
+        }),
+        fetchOrderList: builder.query({
+            query: ({ token }:{token: string}) => ({
+                url:`${orderUrl}/list`,
+                method: "GET",
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
         })
     })
 });
 
 export const {
-    useCreateOrderCheckoutMutation
+    useCreateOrderCheckoutMutation,
+    useFetchOrderListQuery
 } = orderApiSlice
