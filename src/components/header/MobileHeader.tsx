@@ -28,6 +28,10 @@ const MobileHeader = () => {
         navigate("/wishlist")
       }
 
+      const navigateToBag = () => {
+        navigate("/bag")
+      }
+
   return (
     <div className='flex justify-between items-center fixed w-full mb-3 px-3 py-10 text-black z-30 h-[3rem] bg-white shadow-sm'>
         <IconButton onClick={handleDrawerOpen}>
@@ -46,7 +50,9 @@ const MobileHeader = () => {
             <div onClick={navigateToWishList}>
                 <CustomizedWishlist />
             </div>
-            <CustomizedShoppingBadges />
+            <div onClick={navigateToBag}>
+                <CustomizedShoppingBadges />
+            </div>
         </div>
         <MenuDrawer open={drawerOpen} onClose={handleDrawerClose} setIsAccountOpened={setIsAccountOpened} isAccountOpened={isAccountOpened} />
     </div>

@@ -23,7 +23,7 @@ export default function CustomizedShoppingBadges() {
   const userId = JSON.parse(localStorage.getItem("userId") as string);
 
   const {cart} = useSelector((state: RootState)=> state.bag);
-console.log("cart", cart)
+
   React.useEffect(() => {
     async function loadCartList() {
       try {
