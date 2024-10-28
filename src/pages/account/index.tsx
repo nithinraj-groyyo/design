@@ -95,8 +95,8 @@ const AccountPage = () => {
 
   return (
     <BasicLayout showFooter={false}>
-      <div className="flex mt-[10rem]" style={{ height: "calc(100vh - 10rem)" }}>
-        <div className="flex-[1] overflow-y-auto" style={{ height: "100%" }}>
+      <div className="flex mt-[5rem] lg:mt-[10rem] " style={{ height: "calc(100vh - 10rem)" }}>
+        <div className="flex-[1] overflow-y-auto xxs:hidden lg:block" style={{ height: "100%" }}>
           <List>
             {menuItems.map((menuItem, index) => (
               <React.Fragment key={index}>
