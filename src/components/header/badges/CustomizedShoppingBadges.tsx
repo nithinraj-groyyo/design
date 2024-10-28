@@ -43,7 +43,7 @@ export default function CustomizedShoppingBadges() {
     }
   
   
-    if (!Boolean(cart?.cartId) && Boolean(token)) {
+    if (Boolean(token)) {
       loadCartList();
     }
   }, [cart?.cartId, token, dispatch]);

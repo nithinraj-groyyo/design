@@ -25,6 +25,7 @@ import {
     RadioGroup,
     FormControlLabel,
     Radio,
+    CircularProgress,
 } from "@mui/material";
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import CloseIcon from '@mui/icons-material/Close';
@@ -34,6 +35,8 @@ import { toast } from "react-toastify";
 import { useGetAddressesQuery, useUpdateDefaultAddressMutation } from "../../rtk-query/addressApiSlice";
 import { useCreateOrderCheckoutMutation } from "../../rtk-query/orderApiSlice";
 import CheckoutButton from "../../components/CheckoutButton";
+import { useAddToWishListMutation } from "../../rtk-query/wishlistApiSlice";
+import { setWishListTriggered } from "../../redux/wishlistSlice";
 
 const ShoppingBag = () => {
     const navigate = useNavigate();
@@ -43,7 +46,9 @@ const ShoppingBag = () => {
     const { cart } = useSelector(
         (state: RootState) => state.bag
     );
-console.log("cart", cart);
+
+    const { wishlistTriggered } = useSelector((state: RootState) => state.wishlist)
+
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [openRemovalDialog, setOpenRemovalDialog] = useState(false);
     const [openAddressSelectionModal, setOpenAddressSelectionModal] = useState(false);
@@ -52,9 +57,14 @@ console.log("cart", cart);
 
     const { data: addresses } = useGetAddressesQuery({ token });
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     const [removeCart] = useRemoveCartMutation();
+    const [addToWishlist] = useAddToWishListMutation();
     const [updateDefaultAddress] = useUpdateDefaultAddressMutation();
-    const [createOrderCheckout] = useCreateOrderCheckoutMutation();
+    const [createOrderCheckout, {isLoading: isCheckoutLoading}] = useCreateOrderCheckoutMutation();
 
     const handleOpenAddressesModal = () => {
         setOpenAddressSelectionModal(true);
@@ -106,6 +116,10 @@ console.log("cart", cart);
     const handleDrawer = (bag: BagItem) => {
         dispatch(setSelectedCart(bag));
         setIsDrawerOpen(true);
+    }
+
+    const handleBuyLater = (productId: number) => {
+        handleConfirmRemove(productId);
     }
 
     const handleCheckout = async () => {
@@ -169,11 +183,11 @@ console.log("cart", cart);
         if (response?.status) {
             toast.success(response?.message);
             window.location.reload();
-            // dispatch(removeFromCart(cart?.cartId))
+            // await addToWishlist({ productId, token });
+            // dispatch(setWishListTriggered(!wishlistTriggered));
         }
     }
-    console.log(addresses?.data
-        ?.filter((address) => address?.isDefault).length, "addressses")
+
     return (
         <BasicLayout>
             <section className="cart-section flex justify-center items-start min-h-screen mt-[12rem]">
@@ -302,12 +316,12 @@ console.log("cart", cart);
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-4">
-                                                    <button
+                                                    {/* <button
                                                         className="text-sm text-[#646463]"
-                                                        onClick={() => dispatch(moveToSavedForLater(bag.id))}
+                                                        onClick={() => handleBuyLater(bag.product.id)}
                                                     >
                                                         Buy Later
-                                                    </button>
+                                                    </button> */}
                                                     <button
                                                         className="text-sm text-red-500"
                                                         onClick={handleClickOpen}
@@ -453,8 +467,8 @@ console.log("cart", cart);
                                 </span>
                             </div>
 
-                            <button className="w-full bg-black text-white font-semibold py-2" onClick={handleCheckout}>
-                                Checkout
+                            <button disabled={cart?.data?.length===0 || isCheckoutLoading} className={`w-full bg-black text-white font-semibold py-2 ${(cart?.data?.length===0 || isCheckoutLoading) ? "cursor-not-allowed": "cursor-pointer"}`} onClick={handleCheckout}>
+                                {isCheckoutLoading ? <CircularProgress /> : "Checkout"}
                             </button>
                         </div>
                     </div>
