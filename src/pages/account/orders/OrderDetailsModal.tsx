@@ -14,29 +14,54 @@ import {
   TableRow,
   Typography,
   Paper,
+  Divider,
 } from '@mui/material';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 
 interface OrderDetailsModalProps {
   open: boolean;
   handleClose: () => void;
-  order: any; // Adjust type as per your actual data structure
+  order: any; 
 }
 
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, handleClose, order }) => {
+    console.log(order, "order")
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>Order Details - #{order?.id}</DialogTitle>
       <DialogContent>
+        
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h6">Order Information</Typography>
+          <Typography variant="body2">Order Status: <strong>{order?.status}</strong></Typography>
+          <Typography variant="body2">Order Date: {new Date(order?.createdAt).toLocaleDateString()}</Typography>
+          <Typography variant="body2">Customer: {order?.user?.contactName}</Typography>
+          <Typography variant="body2">Contact Number: {order?.user?.contactNumber}</Typography>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h6">Shipping Address</Typography>
+          <Typography variant="body2">
+            {order?.address?.name}, {order?.address?.phoneNumber}
+          </Typography>
+          <Typography variant="body2">
+            {order?.address?.street}, {order?.address?.landMark}, {order?.address?.city}, {order?.address?.state}, {order?.address?.postalCode}, {order?.address?.country}
+          </Typography>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
         <Box sx={{ mb: 2 }}>
           <Typography variant="h6">Cart Summary</Typography>
-          <Typography variant="body2" color="textSecondary">
-            Total Items: {order?.cart?.cartItems?.length}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2">Total Items: {order?.cart?.cartItems?.length}</Typography>
+          <Typography variant="body2">
             Total Price: <CurrencyRupeeIcon fontSize="small" /> {order?.cart?.price}
           </Typography>
         </Box>
+
+        <Divider sx={{ my: 2 }} />
 
         <TableContainer component={Paper}>
           <Table>
@@ -49,24 +74,38 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, handleClose
               </TableRow>
             </TableHead>
             <TableBody>
-              {order?.cart?.cartItems?.map((item: any) => (
-                <TableRow key={item.product.id}>
-                  <TableCell>{item.product.name}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
-                  <TableCell>
-                    <CurrencyRupeeIcon fontSize="small" />
-                    {item.product.unitPrice}
-                  </TableCell>
-                  <TableCell>
-                    <CurrencyRupeeIcon fontSize="small" />
-                    {item.quantity * item.product.unitPrice}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {order?.cart?.cartItems?.map((item: any) => {
+                function getPriceForQuantity(quantity: number) {
+                    const range = item?.product?.productPrices?.find(
+                        (range: any) => quantity >= range.minQty && quantity <= range.maxQty
+                    );
+                    
+                    return range ? range.pricePerPiece : null; 
+                }
+                const unitPrice = getPriceForQuantity(item?.quantity)
+                return (
+                    <TableRow key={item.product.id}>
+                      <TableCell>
+                        <Typography variant="subtitle2">{item.product.name}</Typography>
+                        <Typography variant="body2" color="textSecondary">{item.product.description}</Typography>
+                      </TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>
+                        <CurrencyRupeeIcon fontSize="small" />
+                        {unitPrice || "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        <CurrencyRupeeIcon fontSize="small" />
+                        {item.quantity * (unitPrice || 0)}
+                      </TableCell>
+                    </TableRow>
+                  )
+              })}
             </TableBody>
           </Table>
         </TableContainer>
       </DialogContent>
+
       <DialogActions>
         <Button onClick={handleClose} color="primary">
           Close
