@@ -13,6 +13,7 @@ import { useUpdateLocalWishlistMutation } from '../../rtk-query/wishlistApiSlice
 import { useDispatch } from 'react-redux';
 import { setWishlistItems } from '../../redux/wishlistSlice';
 import { setToken } from '../../redux/userSlice';
+import { platform } from 'os';
 
 const Signup = () => {
   const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
@@ -27,23 +28,34 @@ const Signup = () => {
 
   const formik = useFormik({
     initialValues: {
+      name:"",
+      phoneNo:0,
       email: "",
-      password: ""
+      // password: ""
     },
     validationSchema: Yup.object({
+      name: Yup.string().required("Name is Required"),
+      phoneNo: Yup.number().required("Phone Number is Required"),
       email: Yup.string().email("Invalid email address").required("Email is Required"),
-      password: Yup.string()
-      .required("Password is Required")
-      .min(8, "Password must be at least 8 characters")
-      .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
-      .matches(/[a-z]/, "Password must contain at least one lowercase letter.")
-      .matches(/[0-9]/, "Password must contain at least one number.")
-      .matches(/[@$!%*?&#]/, "Password must contain at least one special character.")
+      // password: Yup.string()
+      // .required("Password is Required")
+      // .min(8, "Password must be at least 8 characters")
+      // .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
+      // .matches(/[a-z]/, "Password must contain at least one lowercase letter.")
+      // .matches(/[0-9]/, "Password must contain at least one number.")
+      // .matches(/[@$!%*?&#]/, "Password must contain at least one special character.")
     }),
     onSubmit: async (values, { resetForm }) => {
       const newData = {
+        name: values?.name,
+        phoneNo: values?.phoneNo,
         email: values?.email,
-        password: values?.password,
+        // password: values?.password,
+        organization: values?.name,
+        platform:"Web",
+        verticalRequired:[
+          3
+        ]
       };
       try {
         const response = await signUp(newData).unwrap();
@@ -77,15 +89,15 @@ const Signup = () => {
     // window.location.href = url + "/users/auth/google?state=SIGN_UP";
   };
 
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  // const handleClickShowPassword = () => {
+  //   setShowPassword(!showPassword);
+  // };
 
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
+  // const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault();
+  // };
 
   return (
     <BasicLayout  showFooter={false}>
@@ -108,6 +120,34 @@ const Signup = () => {
           <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
             <div>
               <TextField
+                id="name"
+                name="name"
+                label="Name"
+                variant="outlined"
+                fullWidth
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.name && Boolean(formik.errors.name)}
+                helperText={formik.touched.name && formik.errors.name}
+              />
+            </div>
+            <div>
+              <TextField
+                id="phoneNo"
+                name="phoneNo"
+                label="Phone Number"
+                variant="outlined"
+                fullWidth
+                value={formik.values.phoneNo}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.phoneNo && Boolean(formik.errors.phoneNo)}
+                helperText={formik.touched.phoneNo && formik.errors.phoneNo}
+              />
+            </div>
+            <div>
+              <TextField
                 id="email"
                 name="email"
                 label="Email"
@@ -120,7 +160,7 @@ const Signup = () => {
                 helperText={formik.touched.email && formik.errors.email}
               />
             </div>
-            <div>
+            {/* <div>
               <TextField
                 id="password"
                 name="password"
@@ -148,7 +188,7 @@ const Signup = () => {
                   ),
                 }}
               />
-            </div>
+            </div> */}
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-[2rem]">
                 <Button

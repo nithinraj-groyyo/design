@@ -5,13 +5,13 @@ const authUrl = "auth";
 const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         signUp: builder.mutation({
-            query: ({email, password}: {email:string, password: string}) => ({
+            query: ({name, phoneNo, email,organization, platform, verticalRequired}: {name:string, phoneNo:number,email:string, organization:string, platform: string, verticalRequired: any}) => ({
                 url: `${authUrl}/signup`,
                 headers: {
 					'Content-type': 'application/json',
 				},
 				method: 'POST',
-                body: {email, password}
+                body: {name, phoneNo, email, organization, platform, verticalRequired}
             })
         }),
         signIn: builder.mutation({
