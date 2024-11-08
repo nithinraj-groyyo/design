@@ -33,6 +33,7 @@ import ForgotPassword from "./pages/forgotPassword";
 import useAuth from "./hooks/useAuth";
 import ManageCategories from "./pages/account/siteSetting/ManageCategories";
 import ManageSubscriptions from "./pages/account/siteSetting/ManageSubscriptions";
+import CataloguePage from "./pages/CataloguePage/CataloguePage";
 
 const App = () => {
   const isAuthenticated = useAuth();
@@ -65,6 +66,7 @@ const App = () => {
       <Route path="/services" element={<ServicePage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/team" element={<TeamsPage />} />
+      <Route path="/catalogue" element={<CataloguePage />} />
 
       <Route path="account" element={<AccountPage />}>
         <Route path="address" element={<Address />} />

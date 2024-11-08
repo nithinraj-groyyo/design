@@ -75,6 +75,28 @@ const NavigationBar = () => {
         <li>
           <Button
             component={Link}
+            to="/catalogue"
+            sx={{
+              color: isActive("/catalogue") ? "#ee572f" : "black",
+              backgroundColor: "transparent",
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+            }}
+          >
+            <motion.span
+              className="whitespace-nowrap"
+              initial={{ scale: 1 }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              Catalogue
+            </motion.span>
+          </Button>
+        </li>
+        {/* <li>
+          <Button
+            component={Link}
             to="/team"
             sx={{
               color: isActive("/team") ? "#ee572f" : "black",
@@ -93,7 +115,7 @@ const NavigationBar = () => {
               Team
             </motion.span>
           </Button>
-        </li>
+        </li> */}
         <li>
           <Button
             aria-controls={open ? "categories-menu" : undefined}
