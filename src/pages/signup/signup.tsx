@@ -29,18 +29,18 @@ const Signup = () => {
   const formik = useFormik({
     initialValues: {
       name:"",
-      phoneNo:0,
+      phoneNo:null,
       email: "",
       // password: ""
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Name is Required"),
-      phoneNo: Yup.number().required("Phone Number is Required"),
+      phoneNo: Yup.number().nullable().required("Phone Number is Required"),
       email: Yup.string().email("Invalid email address").required("Email is Required"),
       // password: Yup.string()
       // .required("Password is Required")
       // .min(8, "Password must be at least 8 characters")
-      // .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
+      // .matches(/[A-Z]/, "Passw ord must contain at least one uppercase letter.")
       // .matches(/[a-z]/, "Password must contain at least one lowercase letter.")
       // .matches(/[0-9]/, "Password must contain at least one number.")
       // .matches(/[@$!%*?&#]/, "Password must contain at least one special character.")
@@ -58,7 +58,7 @@ const Signup = () => {
         ]
       };
       try {
-        const response = await signUp(newData).unwrap();
+        const response = await signUp(newData as any).unwrap();
         if(response?.status && response?.httpStatusCode === 201){
           toast.success(response?.message);
           dispatch(setToken({token: response?.data?.access_token}));
