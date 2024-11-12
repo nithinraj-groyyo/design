@@ -2,7 +2,7 @@ import { Button, Divider, Skeleton } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import EditProfile from "./EditProfile";
 import { IUserProfile } from "../../../types/users";
-import { useLazyGetUserProfileQuery } from "../../../rtk-query/userApiSlice";
+import { useLazyGetUserProfileQuery } from "../../../rtk-query/profileApiSlice";
 import { toast } from "react-toastify";
 import AccountSettingsLayout from "../../../layouts/AccountSettingsLayout";
 import ProfileMobileSection from "./ProfileMobileSection";

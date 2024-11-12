@@ -1,45 +1,41 @@
-import apiSlice from "./apiSlice";
+import userApiSlice from "./userApiSlice";
 
-const authUrl = "auth";
+const authUrl = "/login"
 
-const userApiSlice = apiSlice.injectEndpoints({
+const authApiSlice = userApiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        signUp: builder.mutation({
-            query: ({name, phoneNo, email,organization, platform, verticalRequired}: {name:string, phoneNo:number,email:string, organization:string, platform: string, verticalRequired: any}) => ({
-                url: `${authUrl}/signup`,
-                headers: {
-					'Content-type': 'application/json',
-				},
-				method: 'POST',
-                body: {name, phoneNo, email, organization, platform, verticalRequired}
-            })
+      signUp: builder.mutation({
+        query: ({ name, mobileNo, email, organization, platform, verticalRequired }) => ({
+          url: `${authUrl}/signup`,
+          headers: {
+            'Content-type': 'application/json',
+          },
+          method: 'POST',
+          body: { name, mobileNo, email, organization, platform, verticalRequired },
         }),
-        signIn: builder.mutation({
-            query: ({email, password}: {email:string, password: string}) => ({
-                url: `${authUrl}/login`,
-                headers: {
-					'Content-type': 'application/json',
-				},
-				method: 'POST',
-                body: {email, password}
-            })
+      }),
+      generateOtp: builder.query({
+        query: ({ email, platform }) => ({
+          url: `${authUrl}/generate-otp`,
+          method: 'GET',
+          params: { email, platform },
         }),
-        forgotPassword: builder.mutation({
-            query: ({ email }: { email: string }) => ({
-                url: `${authUrl}/forgotPassword`,
-                headers: {
-                    'Content-type': 'application/json',
-                },
-                method: 'POST',
-                body: { email },
-            }),
+      }),
+      verifyOtpLogin: builder.mutation({
+        query: ({ mobileNo, email, otpCode, fcmToken, deviceId, platform }) => ({
+          url: `${authUrl}/login`,
+          headers: {
+            'Content-type': 'application/json',
+          },
+          method: 'POST',
+          body: { mobileNo, email, otpCode, fcmToken, deviceId, platform },
         }),
-    })
-});
-
-
-export const {
+      }),
+    }),
+  });
+  
+  export const  {
     useSignUpMutation,
-    useSignInMutation,
-    useForgotPasswordMutation,
-} = userApiSlice;
+    useLazyGenerateOtpQuery,
+    useVerifyOtpLoginMutation
+  } = authApiSlice;
