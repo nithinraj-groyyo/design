@@ -1,98 +1,111 @@
-import HTMLFlipBook from 'react-pageflip';
+import { useState } from 'react';
+import { Card, CardMedia, CardContent, Typography, Select, MenuItem, FormControl, InputLabel, Grid } from '@mui/material';
+import BasicLayout from '../../layouts/BasicLayout';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+// Dummy data
+const catalogues = [
+  { id: 1, name: 'Catalogue 1', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'T-Shirts' },
+  { id: 2, name: 'Catalogue 2', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'Shirts' },
+  { id: 3, name: 'Catalogue 3', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Women', subcategory: 'Dresses' },
+  // Add more dummy catalogues as needed
+];
+
+const categories = ['All', 'Men', 'Women', 'Kids'];
+const subcategories = ['All', 'T-Shirts', 'Shirts', 'Dresses', 'Pants'];
 
 const CataloguePage = () => {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedSubcategory, setSelectedSubcategory] = useState('All');
+
+  // Filtered catalogues based on selected category and subcategory
+  const filteredCatalogues = catalogues.filter((catalogue) => {
+    return (
+      (selectedCategory === 'All' || catalogue.category === selectedCategory) &&
+      (selectedSubcategory === 'All' || catalogue.subcategory === selectedSubcategory)
+    );
+  });
 
   return (
-    <div>
-      <div
-        className="flex justify-center items-center p-8 h-screen"
-        style={{
-          backgroundImage: "url('https://cdn.wallpapersafari.com/59/72/T1XU6L.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        {/* Outer wrapper to fix positioning */}
-        <div className="relative" style={{ position: 'relative', overflow: 'visible' }}>
-          <HTMLFlipBook
-          style={{}}
-            startZIndex={1}
-            width={800}        
-            height={1000}      
-            minWidth={500}    
-            maxWidth={1000}   
-            minHeight={500}    
-            maxHeight={1400}
-            size="stretch"        
-            drawShadow={false}
-            flippingTime={1000}
-            usePortrait={false}   
-            startPage={0}
-            autoSize={true}
-            maxShadowOpacity={0.5}
-            showCover={true}      
-            mobileScrollSupport={true}
-            clickEventForward={true}
-            useMouseEvents={true}
-            swipeDistance={30}
-            showPageCorners={true}
-            disableFlipByClick={false}
-            className="flipbook"
-          >
-            {/* Cover Page */}
-            <div className="page flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 to-purple-100 p-8">
-              <h1 className="text-5xl font-serif font-bold text-gray-900">FASHION</h1>
-              <p className="mt-2 text-center text-gray-700 text-lg font-sans">Click to view in fullscreen</p>
-              <img src="/images/products/pic5.png" alt="Fashion cover" className="mt-4 w-full min-w-full max-h-[300px] object-contain" />
-            </div>
+    <BasicLayout>
+      <div className="p-16 mt-[10rem] h-screen bg-gray-100">
 
-            {/* About Us Page */}
-            <div className="page bg-gradient-to-tr from-blue-50 to-indigo-100 p-8">
-              <h2 className="text-3xl font-serif font-semibold text-gray-800">About Us</h2>
-              <p className="text-base mt-4 text-gray-700 font-sans">
-                We offer a range of solutions for illustrated book publishers to produce digital website content, online manuals, and more.
-              </p>
-              <p className="text-sm mt-4 italic text-gray-600">"Empowering digital storytelling"</p>
-              <img src="/images/products/pic4.png" alt="About us page" className="mt-4 w-full min-w-full max-h-[300px] object-contain" />
-            </div>
+        {/* Animated Filters Section */}
+        <motion.div
+          className="flex gap-6 mb-10"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={selectedCategory}
+              label="Category"
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-white rounded-lg shadow-lg"
+            >
+              {categories.map((category) => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-            {/* Product Categories Page */}
-            <div className="page bg-gradient-to-br from-green-50 to-teal-100 p-8">
-              <h2 className="text-3xl font-serif font-semibold text-gray-800">Product Categories</h2>
-              <ul className="list-disc pl-5 mt-4 text-lg text-gray-700 font-sans space-y-2">
-                <li>Women's Clothing</li>
-                <li>Men's Fashion</li>
-                <li>Accessories</li>
-              </ul>
-              <img src="/images/products/pic3.png" alt="Product categories" className="mt-4 w-full min-w-full max-h-[300px] object-contain" />
-            </div>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel>Subcategory</InputLabel>
+            <Select
+              value={selectedSubcategory}
+              label="Subcategory"
+              onChange={(e) => setSelectedSubcategory(e.target.value)}
+              className="bg-white rounded-lg shadow-lg"
+            >
+              {subcategories.map((subcategory) => (
+                <MenuItem key={subcategory} value={subcategory}>
+                  {subcategory}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </motion.div>
 
-            {/* Featured Products Page */}
-            <div className="page bg-gradient-to-r from-yellow-50 to-orange-100 p-8">
-              <h2 className="text-3xl font-serif font-semibold text-gray-800">Featured Products</h2>
-              <p className="text-base mt-4 text-gray-700 font-sans">
-                Discover our most popular and trending products.
-              </p>
-              <img src="/images/products/pic2.png" alt="Featured products" className="mt-4 w-full min-w-full max-h-[300px] object-contain" />
-            </div>
-
-            {/* Best Sellers Page */}
-            <div className="page bg-gradient-to-bl from-red-50 to-pink-100 p-8">
-              <h2 className="text-3xl font-serif font-semibold text-gray-800">Best Sellers</h2>
-              <p className="text-base mt-4 text-gray-700 font-sans">Our top-selling products, loved by customers worldwide.</p>
-              <img src="/images/products/pic1.png" alt="Best sellers" className="mt-4 w-full min-w-full max-h-[300px] object-contain" />
-            </div>
-
-            {/* Closing Page */}
-            <div className="page flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 p-8">
-              <h2 className="text-4xl font-serif font-bold text-gray-800">Thank You!</h2>
-              <p className="text-center mt-4 text-gray-700 text-lg font-sans">We hope you enjoyed our catalogue. Visit our website for more!</p>
-              <img src="/images/products/pic3.png" alt="Thank you page" className="mt-4 w-full min-w-full max-h-[300px] object-contain" />
-            </div>
-          </HTMLFlipBook>
-        </div>
+        {/* Catalogue Cards with Animation */}
+        <Grid container spacing={4}>
+          {filteredCatalogues.map((catalogue) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
+              <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                >
+                  <Card
+                    className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden"
+                    style={{ backgroundColor: '#fff' }}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="200"
+                      image={catalogue.thumbnail}
+                      alt={catalogue.name}
+                      className="object-cover"
+                    />
+                    <CardContent className="p-4">
+                      <Typography variant="h6" component="div" className="text-gray-800 font-semibold">
+                        {catalogue.name}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </Link>
+            </Grid>
+          ))}
+        </Grid>
       </div>
-    </div>
+    </BasicLayout>
   );
 };
 

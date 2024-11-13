@@ -34,6 +34,7 @@ import useAuth from "./hooks/useAuth";
 import ManageCategories from "./pages/account/siteSetting/ManageCategories";
 import ManageSubscriptions from "./pages/account/siteSetting/ManageSubscriptions";
 import CataloguePage from "./pages/CataloguePage/CataloguePage";
+import CatalougePageDetails from "./pages/CataloguePage/CatalougePageDetails";
 
 const App = () => {
   const isAuthenticated = useAuth();
@@ -67,6 +68,7 @@ const App = () => {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/team" element={<TeamsPage />} />
       <Route path="/catalogue" element={<CataloguePage />} />
+      <Route path="/catalogue/:catalogueId" element={<CatalougePageDetails />} />
 
       <Route path="account" element={<AccountPage />}>
         <Route path="address" element={<Address />} />
