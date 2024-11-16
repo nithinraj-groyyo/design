@@ -4,12 +4,10 @@ import BasicLayout from '../../layouts/BasicLayout';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-// Dummy data
 const catalogues = [
   { id: 1, name: 'Catalogue 1', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'T-Shirts' },
   { id: 2, name: 'Catalogue 2', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'Shirts' },
   { id: 3, name: 'Catalogue 3', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Women', subcategory: 'Dresses' },
-  // Add more dummy catalogues as needed
 ];
 
 const categories = ['All', 'Men', 'Women', 'Kids'];
@@ -19,7 +17,6 @@ const CataloguePage = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedSubcategory, setSelectedSubcategory] = useState('All');
 
-  // Filtered catalogues based on selected category and subcategory
   const filteredCatalogues = catalogues.filter((catalogue) => {
     return (
       (selectedCategory === 'All' || catalogue.category === selectedCategory) &&
@@ -29,11 +26,10 @@ const CataloguePage = () => {
 
   return (
     <BasicLayout>
-      <div className="p-16 mt-[10rem] h-screen bg-gray-100">
+      <div className="p-4 sm:p-8 md:p-16 mt-[5rem] md:mt-[10rem] bg-gray-100 min-h-screen">
 
-        {/* Animated Filters Section */}
         <motion.div
-          className="flex gap-6 mb-10"
+          className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -71,8 +67,7 @@ const CataloguePage = () => {
           </FormControl>
         </motion.div>
 
-        {/* Catalogue Cards with Animation */}
-        <Grid container spacing={4}>
+        <Grid container spacing={3}>
           {filteredCatalogues.map((catalogue) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
               <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
