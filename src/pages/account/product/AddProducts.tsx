@@ -55,6 +55,13 @@ interface ImageData {
   imageUrl: string;
 }
 
+interface QuantitiesData {
+  id: number;
+  color: string;
+  size: string;
+  stockQuantity: number;
+}
+
 interface PriceListData {
   id: number;
   minQty: string;
@@ -132,6 +139,7 @@ const AddProducts = () => {
 
   const { data: colors, isLoading: isColorsLoading } = useGetAllColorsQuery({});
   const colorOptions = colors?.data;
+  console.log(colors,"vermaa")
 
   useEffect(() => {
     if (selectedCategory) {
@@ -260,6 +268,9 @@ const AddProducts = () => {
   const handleInputChange = (id: number, field: keyof PriceListData, value: string) => {
     setPriceList((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   };
+  const handleInputQuantityChange = (id: number, field: keyof QuantitiesData, value: string) => {
+    setPriceList((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
+  };
 
   const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedStatus(event.target.value);
@@ -379,29 +390,29 @@ const AddProducts = () => {
     },
   });
 
-  const handleSizeClose = () => {
-    setSizeOpen(false);
-    setSizeOptionsState([]);
-  };
+  // const handleSizeClose = () => {
+  //   setSizeOpen(false);
+  //   setSizeOptionsState([]);
+  // };
 
-  const handleSizeOpen = () => {
-    setSizeOpen(true);
-    setSizeOptionsState(sizeOptions);
-  };
+  // const handleSizeOpen = () => {
+  //   setSizeOpen(true);
+  //   setSizeOptionsState(sizeOptions);
+  // };
 
-  const sizeOptionsArray = Object.values(sizeOptionsState);
+  const sizeOptionsArray = sizeOptions ? Object.values(sizeOptions) : [];
 
-  const handleColorClose = () => {
-    setColorOpen(false);
-    setColorOptionsState([]);
-  };
+  // const handleColorClose = () => {
+  //   setColorOpen(false);
+  //   setColorOptionsState([]);
+  // };
 
-  const handleColorOpen = () => {
-    setColorOpen(true);
-    setColorOptionsState(colorOptions);
-  };
+  // const handleColorOpen = () => {
+  //   setColorOpen(true);
+  //   setColorOptionsState(colorOptions);
+  // };
 
-  const colorOptionsArray = Object.values(colorOptionsState);
+  const colorOptionsArray = colorOptions ? Object.values(colorOptions) : [];
 
   return (
     <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg">
@@ -592,11 +603,14 @@ const AddProducts = () => {
                 </IconButton>
               </div>
             </Card>
+
+
+
             <Card className="p-4 flex flex-col gap-4">
               <div className="font-bold">Attributes</div>
               <div className="flex ">
                 <div className="flex-[2] flex flex-col gap-8 ">
-                  <Autocomplete
+                  {/* <Autocomplete
                     multiple
                     open={sizeOpen}
                     onOpen={handleSizeOpen}
@@ -709,7 +723,99 @@ const AddProducts = () => {
                         }}
                       />
                     )}
-                  />
+                  /> */}
+
+                  <div className="flex-[5] px-2">
+                    <div className="font-bold">Available Quantities</div>
+                    <TableContainer>
+                      <Table sx={{ border: "none" }}>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>
+                              <Typography className="!font-bold !text-sm">Color</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography className="!font-bold !text-sm">Size</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography className="!font-bold !text-sm">Stock Quantity</Typography>
+                            </TableCell>
+                            <TableCell></TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {priceList.map((row, index) => (
+                            <TableRow key={row?.id} sx={{ borderBottom: "none" }}>
+                              <TableCell>
+                                <Select
+                                  value={row?.maxQty || ""}
+                                  onChange={(e) => handleInputQuantityChange(row?.id, "color", e.target.value)}
+                                  fullWidth
+                                  displayEmpty
+                                  variant="outlined"
+                                >
+                                  <MenuItem value="" disabled>
+                                    Select Color
+                                  </MenuItem>
+                                  {colorOptionsArray.map((color: any) => (
+                                    <MenuItem key={color.id} value={color.id}>
+                                      {color.name}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </TableCell>
+                                <TableCell>
+                                  <Select
+                                    value={row?.maxQty || ""}
+                                    onChange={(e) => handleInputQuantityChange(row?.id, "size", e.target.value)}
+                                    fullWidth
+                                    displayEmpty
+                                    variant="outlined"
+                                  >
+                                    <MenuItem value="" disabled>
+                                      Select Size
+                                    </MenuItem>
+                                    {sizeOptionsArray.map((size: any) => (
+                                      <MenuItem key={size.id} value={size.id}>
+                                        {size.name}
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
+                                </TableCell>
+
+                                <TableCell>
+                                  <TextField
+                                    type="number"
+                                    fullWidth
+                                    variant="outlined"
+                                    placeholder="0"
+                                    value={row?.pricePerPiece}
+                                    onChange={(e) => handleInputChange(row?.id, "pricePerPiece", e.target.value)}
+                                    inputProps={{ min: 0 }}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex gap-4">
+                                    {priceList?.length > 1 && (
+                                      <IconButton color="error" onClick={() => handleDeleteRow(row?.id)}>
+                                        <DeleteIcon />
+                                      </IconButton>
+                                    )}
+                                    {index === priceList?.length - 1 && (
+                                      <IconButton color="primary" onClick={handleAddRow}>
+                                        <AddBoxIcon />
+                                      </IconButton>
+                                    )}
+                                  </div>
+                                </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </div>
+
+
 
                   <div className="flex-[5] px-2">
                     <div className="font-bold">Product Pricing :</div>
@@ -788,6 +894,9 @@ const AddProducts = () => {
                 </div>
               </div>
             </Card>
+
+
+
             <div className="flex justify-between mt-4">
               <Button variant="outlined" className="!text-red-500 !border-red-500 w-32">
                 Cancel
