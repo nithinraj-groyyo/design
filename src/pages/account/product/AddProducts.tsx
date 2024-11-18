@@ -139,7 +139,7 @@ const AddProducts = () => {
 
   const { data: colors, isLoading: isColorsLoading } = useGetAllColorsQuery({});
   const colorOptions = colors?.data;
-  console.log(colors,"vermaa")
+  console.log(colors, "vermaa")
 
   useEffect(() => {
     if (selectedCategory) {
@@ -749,7 +749,13 @@ const AddProducts = () => {
                               <TableCell>
                                 <Select
                                   value={row?.maxQty || ""}
-                                  onChange={(e) => handleInputQuantityChange(row?.id, "color", e.target.value)}
+                                  onChange={(e) => {
+                                    if (e.target.value === "addColor") {
+                                      setIsColorModalOpen(true);
+                                    } else {
+                                      handleInputQuantityChange(row?.id, "color", e.target.value);
+                                    }
+                                  }}
                                   fullWidth
                                   displayEmpty
                                   variant="outlined"
@@ -762,52 +768,66 @@ const AddProducts = () => {
                                       {color.name}
                                     </MenuItem>
                                   ))}
+                                  <MenuItem value="addColor" className="!font-bold">
+                                    Add more color...
+                                  </MenuItem>
                                 </Select>
                               </TableCell>
-                                <TableCell>
-                                  <Select
-                                    value={row?.maxQty || ""}
-                                    onChange={(e) => handleInputQuantityChange(row?.id, "size", e.target.value)}
-                                    fullWidth
-                                    displayEmpty
-                                    variant="outlined"
-                                  >
-                                    <MenuItem value="" disabled>
-                                      Select Size
-                                    </MenuItem>
-                                    {sizeOptionsArray.map((size: any) => (
-                                      <MenuItem key={size.id} value={size.id}>
-                                        {size.name}
-                                      </MenuItem>
-                                    ))}
-                                  </Select>
-                                </TableCell>
 
-                                <TableCell>
-                                  <TextField
-                                    type="number"
-                                    fullWidth
-                                    variant="outlined"
-                                    placeholder="0"
-                                    value={row?.pricePerPiece}
-                                    onChange={(e) => handleInputChange(row?.id, "pricePerPiece", e.target.value)}
-                                    inputProps={{ min: 0 }}
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <div className="flex gap-4">
-                                    {priceList?.length > 1 && (
-                                      <IconButton color="error" onClick={() => handleDeleteRow(row?.id)}>
-                                        <DeleteIcon />
-                                      </IconButton>
-                                    )}
-                                    {index === priceList?.length - 1 && (
-                                      <IconButton color="primary" onClick={handleAddRow}>
-                                        <AddBoxIcon />
-                                      </IconButton>
-                                    )}
-                                  </div>
-                                </TableCell>
+                              <TableCell>
+                                <Select
+                                  value={row?.maxQty || ""}
+                                  onChange={(e) => {
+                                    if (e.target.value === "addSize") {
+                                      setIsSizeModalOpen(true);
+                                    } else {
+                                      handleInputQuantityChange(row?.id, "size", e.target.value);
+                                    }
+                                  }}
+                                  fullWidth
+                                  displayEmpty
+                                  variant="outlined"
+                                >
+                                  <MenuItem value="" disabled>
+                                    Select Size
+                                  </MenuItem>
+                                  {sizeOptionsArray.map((size: any) => (
+                                    <MenuItem key={size.id} value={size.id}>
+                                      {size.name}
+                                    </MenuItem>
+                                  ))}
+                                  <MenuItem value="addSize" className="!font-bold">
+                                    Add New Size...
+                                  </MenuItem>
+                                </Select>
+                              </TableCell>
+
+
+                              <TableCell>
+                                <TextField
+                                  type="number"
+                                  fullWidth
+                                  variant="outlined"
+                                  placeholder="0"
+                                  value={row?.pricePerPiece}
+                                  onChange={(e) => handleInputChange(row?.id, "pricePerPiece", e.target.value)}
+                                  inputProps={{ min: 0 }}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex gap-4">
+                                  {priceList?.length > 1 && (
+                                    <IconButton color="error" onClick={() => handleDeleteRow(row?.id)}>
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  )}
+                                  {index === priceList?.length - 1 && (
+                                    <IconButton color="primary" onClick={handleAddRow}>
+                                      <AddBoxIcon />
+                                    </IconButton>
+                                  )}
+                                </div>
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -972,32 +992,62 @@ const AddProducts = () => {
       <Dialog open={isSizeModalOpen} onClose={() => setIsSizeModalOpen(false)}>
         <DialogTitle>Add New Size</DialogTitle>
         <DialogContent>
-          <TextField autoFocus margin="dense" label="New Size" type="text" fullWidth value={newSize} onChange={(e) => setNewSize(e.target.value)} />
+          <TextField
+            autoFocus
+            margin="dense"
+            label="New Size"
+            type="text"
+            fullWidth
+            value={newSize}
+            onChange={(e) => setNewSize(e.target.value)}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsSizeModalOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleAddSize} color="primary">
+          <Button
+            onClick={() => {
+              handleAddSize();
+              setIsSizeModalOpen(false);
+            }}
+            color="primary"
+          >
             Add
           </Button>
         </DialogActions>
       </Dialog>
 
+
       <Dialog open={isColorModalOpen} onClose={() => setIsColorModalOpen(false)}>
         <DialogTitle>Add New Color</DialogTitle>
         <DialogContent>
-          <TextField autoFocus margin="dense" label="New Color" type="text" fullWidth value={newColor} onChange={(e) => setNewSize(e.target.value)} />
+          <TextField
+            autoFocus
+            margin="dense"
+            label="New Color"
+            type="text"
+            fullWidth
+            value={newColor}
+            onChange={(e) => setNewColor(e.target.value)}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsColorModalOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleAddColor} color="primary">
+          <Button
+            onClick={() => {
+              handleAddColor();
+              setIsColorModalOpen(false);
+            }}
+            color="primary"
+          >
             Add
           </Button>
         </DialogActions>
       </Dialog>
+
     </form>
   );
 };
