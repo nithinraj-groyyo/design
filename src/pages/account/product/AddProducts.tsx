@@ -19,11 +19,7 @@ import {
   TableCell,
   Typography,
   TableBody,
-  FormLabel,
-  RadioGroup,
-  Radio,
   Divider,
-  Autocomplete,
   CircularProgress,
   Dialog,
   DialogContent,
@@ -39,7 +35,6 @@ import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
-import { setError } from "../../../redux/shoppingBagSlice";
 import { useAddProductMutation, useGetAllColorsQuery, useGetAllSizesQuery } from "../../../rtk-query/productApiSlice";
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 import MagnifyProductImage from "./MagnifyProductImage";
@@ -55,18 +50,18 @@ interface ImageData {
   imageUrl: string;
 }
 
-interface QuantitiesData {
-  id: number;
-  color: string;
-  size: string;
-  stockQuantity: number;
-}
-
 interface PriceListData {
   id: number;
   minQty: string;
   maxQty: string;
   pricePerPiece: string;
+}
+
+interface InventoryListData {
+  id: number;
+  color: { id: number, name: string };
+  size: { id: number, name: string };
+  stockQty: number;
 }
 
 interface FormData {
@@ -76,8 +71,6 @@ interface FormData {
   otherCategory: string;
   category: string;
   description: string;
-  colors: string;
-  sizes: string;
   status: boolean;
   leftTopHeader: string;
   leftTopContent: string;
@@ -100,10 +93,6 @@ interface ICategory {
 }
 
 const AddProducts = () => {
-  const [sizeOpen, setSizeOpen] = React.useState(false);
-  const [colorOpen, setColorOpen] = React.useState(false);
-  const [colorOptionsState, setColorOptionsState] = React.useState<Array<{ id: number; name: string }>>([]);
-  const [sizeOptionsState, setSizeOptionsState] = React.useState<Array<{ id: number; name: string }>>([]);
 
   const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
   const [newSize, setNewSize] = useState("");
@@ -116,12 +105,13 @@ const AddProducts = () => {
   const [priceList, setPriceList] = useState<PriceListData[]>([{ id: 1, minQty: "", maxQty: "", pricePerPiece: "" }]);
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
+  const [inventoryList, setInventoryList] = useState<InventoryListData[]>([{ id: 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
 
   const [uploadSingleFile] = useUploadSingleFileMutation();
 
   const [addProduct] = useAddProductMutation();
 
-  const { data: categories, isLoading: isCategoriesLoading, isError } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
+  const { data: categories, isLoading: isCategoriesLoading } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
   const {
     data: subCategories,
     refetch,
@@ -134,12 +124,11 @@ const AddProducts = () => {
     skip: !selectedCategory?.id,
   });
 
-  const { data: sizes, isLoading: isSizesLoading } = useGetAllSizesQuery({});
+  const { data: sizes } = useGetAllSizesQuery({});
   const sizeOptions = sizes?.data;
 
-  const { data: colors, isLoading: isColorsLoading } = useGetAllColorsQuery({});
+  const { data: colors } = useGetAllColorsQuery({});
   const colorOptions = colors?.data;
-  console.log(colors, "vermaa")
 
   useEffect(() => {
     if (selectedCategory) {
@@ -247,9 +236,15 @@ const AddProducts = () => {
   const handleAddRow = () => {
     setPriceList((prevRows) => [...prevRows, { id: prevRows.length + 1, minQty: "", maxQty: "", pricePerPiece: "" }]);
   };
+  const handleAddInventoryRow = () => {
+    setInventoryList((prevRows) => [...prevRows, { id: prevRows.length + 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
+  };
 
   const handleDeleteRow = (id: number) => {
     setPriceList((prevRows) => prevRows.filter((row) => row.id !== id));
+  };
+  const handleDeleteInvenetoryRow = (id: number) => {
+    setInventoryList((prevRows) => prevRows.filter((row) => row.id !== id));
   };
 
   const handleAddSize = () => {
@@ -268,13 +263,29 @@ const AddProducts = () => {
   const handleInputChange = (id: number, field: keyof PriceListData, value: string) => {
     setPriceList((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   };
-  const handleInputQuantityChange = (id: number, field: keyof QuantitiesData, value: string) => {
-    setPriceList((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
+
+  const handleInventoryData = (
+    id: number,
+    field: keyof InventoryListData,
+    value: string | number | { id: number; name: string }
+  ) => {
+    setInventoryList((prevRows) =>
+      prevRows.map((row) =>
+        row.id === id
+          ? {
+            ...row,
+            [field]:
+              typeof value === "object" && value !== null
+                ? { id: value.id, name: value.name }
+                : value,
+          }
+          : row
+      )
+    );
   };
 
-  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedStatus(event.target.value);
-  };
+
+
 
   const formik = useFormik<FormData>({
     initialValues: {
@@ -284,8 +295,8 @@ const AddProducts = () => {
       otherCategory: "",
       category: "",
       description: "",
-      colors: "",
-      sizes: "",
+      // colors: "",
+      // sizes: "",
       status: true,
       leftTopHeader: "",
       leftTopContent: "",
@@ -302,14 +313,6 @@ const AddProducts = () => {
       leftTopContent: Yup.string().required("Field is required"),
       leftBottomHeader: Yup.string().required("Field is required"),
       leftBottomContent: Yup.string().required("Field is required"),
-      sizes: Yup.array()
-        .of(Yup.string().required("Each size must be a string"))
-        .min(1, "At least one size is required")
-        .required("Sizes are required"),
-      colors: Yup.array()
-        .of(Yup.string().required("Each color must be a string"))
-        .min(1, "At least one color is required")
-        .required("Colors are required"),
     }),
     onSubmit: async (values) => {
       if (imgList?.filter((x) => x.side.trim() === "" || (x.file == null && x.fileName === "" && x.isDeleted === false)).length > 0) {
@@ -318,21 +321,6 @@ const AddProducts = () => {
         if (priceList?.filter((x) => +x.pricePerPiece === 0).length > 0) {
           toast.error("Please enter quantity range and price!");
         } else {
-          const payload = {
-            productName: values?.productName,
-            styleName: values?.styleName,
-            otherCategory: values?.otherCategory,
-            category: values?.category,
-            description: values?.description,
-            colors: values?.colors,
-            sizes: values?.sizes,
-            status: values?.status,
-            leftTopHeader: values?.leftTopHeader,
-            leftTopContent: values?.leftTopContent,
-            leftBottomHeader: values?.leftBottomHeader,
-            leftBottomContent: values?.leftBottomContent,
-            isPublic: selectedStatus
-          };
 
           const convertPriceList = priceList?.map((price) => {
             return {
@@ -358,20 +346,25 @@ const AddProducts = () => {
           const finalImages = hasInvalidFileId ? undefined : images;
 
           const requestBody = {
-            name: payload.productName,
-            description: payload.description,
-            styleName: payload.styleName,
-            categoryId: +payload.category,
-            subCategoryId: +payload.otherCategory,
-            productColorIds: values?.colors,
-            productSizeIds: values?.sizes,
+            name: values?.productName,
+            description: values.description,
+            styleName: values?.styleName,
+            categoryId: +values.category,
+            subCategoryId: +values.otherCategory,
             productPrices: convertPriceList,
             productImages: finalImages,
             leftTopHeader: values?.leftTopHeader,
             leftTopContent: values?.leftTopContent,
             leftBottomHeader: values?.leftBottomHeader,
             leftBottomContent: values?.leftBottomContent,
-            isPublic: selectedStatus === "enabled" ? true : false
+            isPublic: selectedStatus === "enabled" ? true : false,
+            inventory: inventoryList?.map((inventoryValue) => {
+              return {
+                "sizeId": inventoryValue.size.id,
+                "colorId": inventoryValue.color.id,
+                "availableQty": +inventoryValue.stockQty
+              }
+            })
           };
 
           try {
@@ -383,34 +376,14 @@ const AddProducts = () => {
             }
           } catch (error: any) {
             console.error(error)
-            toast.error(error?.error ?? "Error while Updatin g product")
+            toast.error(error?.error ?? "Error while Creating product")
           }
         }
       }
     },
   });
 
-  // const handleSizeClose = () => {
-  //   setSizeOpen(false);
-  //   setSizeOptionsState([]);
-  // };
-
-  // const handleSizeOpen = () => {
-  //   setSizeOpen(true);
-  //   setSizeOptionsState(sizeOptions);
-  // };
-
   const sizeOptionsArray = sizeOptions ? Object.values(sizeOptions) : [];
-
-  // const handleColorClose = () => {
-  //   setColorOpen(false);
-  //   setColorOptionsState([]);
-  // };
-
-  // const handleColorOpen = () => {
-  //   setColorOpen(true);
-  //   setColorOptionsState(colorOptions);
-  // };
 
   const colorOptionsArray = colorOptions ? Object.values(colorOptions) : [];
 
@@ -610,121 +583,6 @@ const AddProducts = () => {
               <div className="font-bold">Attributes</div>
               <div className="flex ">
                 <div className="flex-[2] flex flex-col gap-8 ">
-                  {/* <Autocomplete
-                    multiple
-                    open={sizeOpen}
-                    onOpen={handleSizeOpen}
-                    onClose={handleSizeClose}
-                    options={sizeOptionsArray}
-                    loading={isSizesLoading}
-                    getOptionLabel={(option) => option.name}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    onChange={(event, newValue) => {
-                      const selectedSizeIds = newValue.map((size) => size.id);
-                      formik.setFieldValue("sizes", selectedSizeIds);
-                    }}
-                    renderOption={(props, option) => {
-                      const index = sizeOptionsArray.findIndex((opt) => opt.id === option.id);
-
-                      return (
-                        <React.Fragment key={option.id || index}>
-                          <li {...props} key={`option-${option.id || index}`}>
-                            {option.name}
-                          </li>
-                          {index === sizeOptionsArray?.length - 1 && (
-                            <div key="add-new-size-button" className="w-full flex justify-center items-center">
-                              <Button
-                                onClick={() => {
-                                  setIsSizeModalOpen(true);
-                                }}
-                              >
-                                Add New Size
-                              </Button>
-                            </div>
-                          )}
-                        </React.Fragment>
-                      );
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Sizes"
-                        fullWidth
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.sizes && Boolean(formik.errors.sizes)}
-                        helperText={formik.touched.sizes && formik.errors.sizes}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <React.Fragment>
-                              {isSizesLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                              {params.InputProps.endAdornment}
-                            </React.Fragment>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
-
-                  <Autocomplete
-                    multiple
-                    open={colorOpen}
-                    onOpen={handleColorOpen}
-                    onClose={handleColorClose}
-                    options={colorOptionsArray}
-                    loading={isColorsLoading}
-                    value={colorOptions?.filter((color: any) => formik.values.colors.includes(color?.id as never)) || []}
-                    getOptionLabel={(option) => option.name}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    onChange={(event, newValue) => {
-                      const selectedColorIds = newValue.map((size) => size.id);
-                      formik.setFieldValue("colors", selectedColorIds);
-                    }}
-                    renderOption={(props, option) => {
-                      const index = colorOptionsArray.findIndex((opt) => opt.id === option.id);
-
-                      return (
-                        <React.Fragment key={option.id || index}>
-                          <div>
-                            <li {...props} key={`option-${option.id || index}`}>
-                              {option.name || option}
-                            </li>
-                          </div>
-                          {index === colorOptionsArray?.length - 1 && (
-                            <div key="add-new-color-button" className="w-full flex justify-center items-center">
-                              <Button
-                                onClick={() => {
-                                  setIsColorModalOpen(true);
-                                }}
-                              >
-                                Add New Color
-                              </Button>
-                            </div>
-                          )}
-                        </React.Fragment>
-                      );
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Colors"
-                        fullWidth
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.colors && Boolean(formik.errors.colors)}
-                        helperText={formik.touched.colors && formik.errors.colors}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <React.Fragment>
-                              {isColorsLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                              {params.InputProps.endAdornment}
-                            </React.Fragment>
-                          ),
-                        }}
-                      />
-                    )}
-                  /> */}
-
                   <div className="flex-[5] px-2">
                     <div className="font-bold">Available Quantities</div>
                     <TableContainer>
@@ -744,23 +602,30 @@ const AddProducts = () => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {priceList.map((row, index) => (
+                          {inventoryList.map((row, index) => (
                             <TableRow key={row?.id} sx={{ borderBottom: "none" }}>
                               <TableCell>
                                 <Select
-                                  value={row?.maxQty || ""}
+                                  value={row?.color?.id || ""}
                                   onChange={(e) => {
                                     if (e.target.value === "addColor") {
                                       setIsColorModalOpen(true);
                                     } else {
-                                      handleInputQuantityChange(row?.id, "color", e.target.value);
+                                      // handleInputQuantityChange(row?.id, "color", e.target.value);
+                                      const selectedColor: any = colorOptionsArray.find(
+                                        (color: any) => color.id === Number(e.target.value)
+                                      );
+                                      if (selectedColor) {
+                                        handleInventoryData(row.id, "color", selectedColor);
+                                      }
                                     }
                                   }}
-                                  fullWidth
+                                  // fullWidth
+                                  className="min-w-[12rem]"
                                   displayEmpty
                                   variant="outlined"
                                 >
-                                  <MenuItem value="" disabled>
+                                  <MenuItem value="-1" disabled>
                                     Select Color
                                   </MenuItem>
                                   {colorOptionsArray.map((color: any) => (
@@ -776,19 +641,25 @@ const AddProducts = () => {
 
                               <TableCell>
                                 <Select
-                                  value={row?.maxQty || ""}
+                                  value={row?.size?.id || ""}
                                   onChange={(e) => {
                                     if (e.target.value === "addSize") {
                                       setIsSizeModalOpen(true);
                                     } else {
-                                      handleInputQuantityChange(row?.id, "size", e.target.value);
+                                      const selectedSize: any = sizeOptionsArray.find(
+                                        (size: any) => size.id === Number(e.target.value)
+                                      );
+                                      if (selectedSize) {
+                                        handleInventoryData(row.id, "size", selectedSize);
+                                      }
                                     }
                                   }}
-                                  fullWidth
+                                  // fullWidth
+                                  className="min-w-[12rem]"
                                   displayEmpty
                                   variant="outlined"
                                 >
-                                  <MenuItem value="" disabled>
+                                  <MenuItem value="-1" disabled>
                                     Select Size
                                   </MenuItem>
                                   {sizeOptionsArray.map((size: any) => (
@@ -809,20 +680,20 @@ const AddProducts = () => {
                                   fullWidth
                                   variant="outlined"
                                   placeholder="0"
-                                  value={row?.pricePerPiece}
-                                  onChange={(e) => handleInputChange(row?.id, "pricePerPiece", e.target.value)}
+                                  value={row?.stockQty}
+                                  onChange={(e) => handleInventoryData(row?.id, "stockQty", e.target.value)}
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-4">
-                                  {priceList?.length > 1 && (
-                                    <IconButton color="error" onClick={() => handleDeleteRow(row?.id)}>
+                                  {inventoryList?.length > 1 && (
+                                    <IconButton color="error" onClick={() => handleDeleteInvenetoryRow(row?.id)}>
                                       <DeleteIcon />
                                     </IconButton>
                                   )}
-                                  {index === priceList?.length - 1 && (
-                                    <IconButton color="primary" onClick={handleAddRow}>
+                                  {index === inventoryList?.length - 1 && (
+                                    <IconButton color="primary" onClick={handleAddInventoryRow}>
                                       <AddBoxIcon />
                                     </IconButton>
                                   )}
@@ -834,8 +705,6 @@ const AddProducts = () => {
                       </Table>
                     </TableContainer>
                   </div>
-
-
 
                   <div className="flex-[5] px-2">
                     <div className="font-bold">Product Pricing :</div>
@@ -928,18 +797,6 @@ const AddProducts = () => {
           </div>
           <div className="flex-[1]">
             <Card className="p-4 flex flex-col gap-4">
-              {/* <div className="font-bold">Product Status</div>
-
-              <FormControl component="fieldset">
-                <FormLabel component="legend">
-                  <p className="font-bold text-sm">Status</p>
-                </FormLabel>
-                <RadioGroup aria-label="status" name="status" value={selectedStatus} onChange={handleStatusChange}>
-                  <FormControlLabel value="enabled" control={<Radio />} label="Enabled" />
-                  <FormControlLabel value="disabled" control={<Radio />} label="Disabled" />
-                </RadioGroup>
-              </FormControl>
-              <Divider /> */}
               <div className="font-bold">Left Top Section</div>
               <div className="font-bold">Left Top Section</div>
               <TextField
