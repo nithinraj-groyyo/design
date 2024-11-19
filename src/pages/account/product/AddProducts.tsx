@@ -35,7 +35,7 @@ import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
-import { useAddProductMutation, useGetAllColorsQuery, useGetAllSizesQuery } from "../../../rtk-query/productApiSlice";
+import { useAddProductMutation, useGetAllColorsQuery, useGetAllSizesQuery, useAddNewColorMutation, useAddNewSizeMutation, } from "../../../rtk-query/productApiSlice";
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 import MagnifyProductImage from "./MagnifyProductImage";
 import { useNavigate } from "react-router-dom";
@@ -130,6 +130,9 @@ const AddProducts = () => {
   const { data: colors } = useGetAllColorsQuery({});
   const colorOptions = colors?.data;
 
+  const [addNewSize] = useAddNewSizeMutation();
+  const [addNewColor] = useAddNewColorMutation();
+
   useEffect(() => {
     if (selectedCategory) {
       refetch();
@@ -148,6 +151,40 @@ const AddProducts = () => {
   const handleSubCategoryChange = (e: any) => {
     const selectedSubCategoryId = e.target.value;
     formik.setFieldValue("otherCategory", selectedSubCategoryId);
+  };
+
+  const handleAddSize = async () => {
+    if (newSize) {
+      try {
+        const response = await addNewSize({ size: newSize });
+        const responseBody = response?.data;
+        if (responseBody?.status && responseBody?.httpStatusCode === 201) {
+          toast.success(`New Size "${newSize}" created successfully`);
+          setNewSize("");
+          setIsSizeModalOpen(false);
+        }
+      } catch (error: any) {
+        console.error(error);
+        toast.error(error?.message ?? "Error while creating New Size");
+      }
+    }
+  };
+
+  const handleAddColor = async () => {
+    if (newColor) {
+      try {
+        const response = await addNewColor({ color: newColor });
+        const responseBody = response?.data;
+        if (responseBody?.status && responseBody?.httpStatusCode === 201) {
+          toast.success(`New Color "${responseBody?.data?.name}" created successfully`);
+          setNewColor("");
+          setIsColorModalOpen(false);
+        }
+      } catch (error: any) {
+        console.error(error);
+        toast.error(error?.message ?? "Error while creating New Color");
+      }
+    }
   };
 
   const handleFileUpload = (id: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -247,18 +284,6 @@ const AddProducts = () => {
     setInventoryList((prevRows) => prevRows.filter((row) => row.id !== id));
   };
 
-  const handleAddSize = () => {
-    if (newSize) {
-      setNewSize("");
-      setIsSizeModalOpen(false);
-    }
-  };
-  const handleAddColor = () => {
-    if (newSize) {
-      setNewColor("");
-      setIsColorModalOpen(false);
-    }
-  };
 
   const handleInputChange = (id: number, field: keyof PriceListData, value: string) => {
     setPriceList((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
@@ -295,8 +320,6 @@ const AddProducts = () => {
       otherCategory: "",
       category: "",
       description: "",
-      // colors: "",
-      // sizes: "",
       status: true,
       leftTopHeader: "",
       leftTopContent: "",
