@@ -47,7 +47,7 @@ const AddCatalogue = () => {
 
   useEffect(() => {
     if (selectedCategory) {
-      refetch?.(); // Safely call refetch if query has been initialized
+      refetch?.();
     }
   }, [selectedCategory, refetch]);
 
@@ -57,12 +57,36 @@ const AddCatalogue = () => {
         name: '',
         category: '',
         subCategory: '',
+        minQty: '',
+        noOfFreePages: '',
         isPremium: false,
         description: '',
         media: null,
       }}
       onSubmit={(values) => {
-        console.log('Form Data:', values);
+        const formData = new FormData();
+        formData.append('name', values.name);
+        formData.append('minQty', values.minQty);
+        formData.append('description', values.description);
+        formData.append('isPublic', values.isPremium ? 'true' : 'false');
+        formData.append('categoryId', values.category);
+        formData.append('subCategoryId', values.subCategory);
+        formData.append('noOfFreePages', values.noOfFreePages);
+        if (values.media) {
+          formData.append('file', values.media);
+        }
+
+        fetch('http://localhost:3000/catalogue/add', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('Success:', data);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
       }}
     >
       {({ values, handleChange, setFieldValue }) => (
@@ -74,54 +98,66 @@ const AddCatalogue = () => {
               <Field
                 name="name"
                 render={({ field }: any) => (
-                  <TextField
-                    {...field}
-                    label="Name"
-                    fullWidth
-                    required
-                  />
+                  <TextField {...field} label="Name" fullWidth required />
                 )}
               />
 
-              <div className='w-full flex gap-6'>
-              <FormControl fullWidth>
-                <InputLabel>Category</InputLabel>
-                <Select
-                  name="category"
-                  value={values.category}
-                  label="Category"
-                  onChange={(e) => handleCategoryChange(setFieldValue, +e.target.value)}
-                  required
-                >
-                  <MenuItem value="">--Select--</MenuItem>
-                  {categoriesListArray.map((cat) => (
-                    <MenuItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel>Subcategory</InputLabel>
-                <Select
-                  name="subCategory"
-                  label="Sub Category"
-                  value={values.subCategory}
-                  onChange={handleChange}
-                  required
-                >
-                  <MenuItem value="">--Select--</MenuItem>
-                  {subCategories &&
-                    subCategories.map((subCat: any) => (
-                      <MenuItem key={subCat.id} value={subCat.id}>
-                        {subCat.name}
+              {/* Category and Subcategory Fields */}
+              <div className="w-full flex gap-6">
+                <FormControl fullWidth>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    name="category"
+                    value={values.category}
+                    label="Category"
+                    onChange={(e) => handleCategoryChange(setFieldValue, +e.target.value)}
+                    required
+                  >
+                    <MenuItem value="">--Select--</MenuItem>
+                    {categoriesListArray.map((cat) => (
+                      <MenuItem key={cat.id} value={cat.id}>
+                        {cat.name}
                       </MenuItem>
                     ))}
-                </Select>
-              </FormControl>
+                  </Select>
+                </FormControl>
+
+                <FormControl fullWidth>
+                  <InputLabel>Subcategory</InputLabel>
+                  <Select
+                    name="subCategory"
+                    label="Sub Category"
+                    value={values.subCategory}
+                    onChange={handleChange}
+                    required
+                  >
+                    <MenuItem value="">--Select--</MenuItem>
+                    {subCategories &&
+                      subCategories.map((subCat: any) => (
+                        <MenuItem key={subCat.id} value={subCat.id}>
+                          {subCat.name}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
               </div>
-              
+            <div className='flex gap-6'>
+                {/* Min Quantity Field */}
+                <Field
+                    name="minQty"
+                    render={({ field }: any) => (
+                    <TextField {...field} label="Minimum Quantity" fullWidth required type="number" />
+                    )}
+                />
+
+                {/* No of Free Pages Field */}
+                <Field
+                    name="noOfFreePages"
+                    render={({ field }: any) => (
+                    <TextField {...field} label="Number of Free Pages" fullWidth required type="number" />
+                    )}
+                />
+            </div>
 
               {/* Premium Checkbox */}
               <FormControlLabel
@@ -158,7 +194,7 @@ const AddCatalogue = () => {
                 <input
                   id="upload-media"
                   type="file"
-                  accept=".png,.jpeg,.jpg,.webp"
+                  accept=".png,.jpeg,.jpg,.webp,.pdf"
                   onChange={(e: any) => setFieldValue('media', e.target.files[0])}
                 />
                 {values.media && (
