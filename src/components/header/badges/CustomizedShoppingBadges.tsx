@@ -26,19 +26,21 @@ export default function CustomizedShoppingBadges() {
 
   React.useEffect(() => {
     async function loadCartList() {
-      try {
-        const response = await fetchCartList({ token }).unwrap();
-        if (response?.status) {
-          dispatch(
-            setCartItems({
-              data: response?.data?.data,
-              totalPrice: response?.data?.totalPrice,
-              cartId: response?.data?.cartId,
-            })
-          );
+      if(token) {
+        try {
+          const response = await fetchCartList({ token }).unwrap();
+          if (response?.status) {
+            dispatch(
+              setCartItems({
+                data: response?.data?.data,
+                totalPrice: response?.data?.totalPrice,
+                cartId: response?.data?.cartId,
+              })
+            );
+          }
+        } catch (error) {
+          console.error("Failed to load cart list", error);
         }
-      } catch (error) {
-        console.error("Failed to load cart list", error);
       }
     }
   

@@ -1,148 +1,107 @@
 import {
   Button,
   CircularProgress,
-  IconButton,
-  InputAdornment,
   Modal,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { useState } from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import BasicLayout from "../../layouts/BasicLayout";
-import { useForgotPasswordMutation } from "../../rtk-query/authApiSlice";
-import { useSignInMutation } from "../../rtk-query/authApiSlice";
-import { jwtDecode } from "jwt-decode";
-import { useUpdateLocalWishlistMutation } from "../../rtk-query/wishlistApiSlice";
+import {  useLazyGenerateOtpQuery, useVerifyOtpLoginMutation } from "../../rtk-query/authApiSlice";
 import { useDispatch } from "react-redux";
-import { setWishlistItems } from "../../redux/wishlistSlice";
 import { setToken } from "../../redux/userSlice";
+import { setWishlistItems } from "../../redux/wishlistSlice";
+import { useUpdateLocalWishlistMutation } from "../../rtk-query/wishlistApiSlice";
 
 const Login = () => {
-  const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [apiData, setApiData] = useState();
+  const [otp, setOtp] = useState("");
+  const [isVerifyLoading, setIsVerifyLoading] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [signIn, { isLoading }] = useSignInMutation();
-  const [forgotPassword] = useForgotPasswordMutation();
+
+  const [ generateOtp, {isLoading} ] = useLazyGenerateOtpQuery();
+  const [verifyOtpLogin] = useVerifyOtpLoginMutation();
+  const [updateLocalWishlist] = useUpdateLocalWishlistMutation();
+
+  const formik = useFormik({
+    initialValues: { email: "" },
+    validationSchema: Yup.object({
+      email: Yup.string().email("Invalid email address").required("Email is Required"),
+    }),
+    onSubmit: async (values) => {
+      try {
+        const response = await generateOtp({ email: formik.values.email, platform: "GROYYO_DESIGN" }).unwrap();
+
+        console.log(response, "signin");
+
+        toast.success("OTP sent to your email!");
+        setIsModalOpen(true)
+        // modalToggleHandler();
+      } catch (error:any) {
+        console.log(error, "error")
+        toast.error("Failed to send OTP", error);
+      }
+    },
+  });
 
   const modalToggleHandler = () => {
     setIsModalOpen(!isModalOpen);
   };
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
-
-  const [updateLocalWishlist] = useUpdateLocalWishlistMutation()
-
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validationSchema: Yup.object({
-      email: Yup.string().email("Invalid email address").required("Email is Required"),
-      password: Yup.string()
-        .required("Password is Required")
-        .min(8, "Password must be at least 8 characters")
-        .matches(/[A-Z]/, "Password must contain at least one uppercase letter.")
-        .matches(/[a-z]/, "Password must contain at least one lowercase letter.")
-        .matches(/[0-9]/, "Password must contain at least one number.")
-        .matches(/[@$!%*?&#]/, "Password must contain at least one special character."),
-    }),
-    onSubmit: async (values, { resetForm }) => {
-      try {
-        const newData = {
-          email: values.email,
-          password: values.password,
-        };
-
-        const response = await signIn(newData).unwrap();
-
-        if(response?.status && response?.httpStatusCode === 200){
-          toast.success(response?.message);
-          dispatch(setToken({token: response?.data?.access_token}));
-          localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
-          localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin));
-
-          const decodedToken: any = jwtDecode(response?.data?.access_token);
-          localStorage.setItem('userId', JSON.stringify(decodedToken?.id));
-
-          const productIds = JSON.parse(localStorage.getItem("localWishList") as string);
-          await updateLocalWishlist({token: response?.data?.access_token, payload: productIds})?.then((res) => {
-            const response = res?.data;
-            dispatch(setWishlistItems(response?.data?.count));
-            localStorage.removeItem("localWishList")
-          })
-
-          resetForm(); 
-          navigate("/")
-        }else if(response?.statusCode === 400){
-          toast.error(response?.message)
-        }
-      } catch (error: any) {
-        console.log(error)
-        toast.error("Login failed: " + error?.response?.data?.message);
-      }
-    },
-  });
-
-  const handleSendEmail = async (email: string) => {
+  const handleVerifyOtp = async () => {
+    setIsVerifyLoading(true);
     try {
-      const response = await forgotPassword({ email }).unwrap();
-      setApiData(response);
-      toast.success("Reset link sent to your email!");
-  
-      modalToggleHandler();
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to send reset link");
+      const response: any = await verifyOtpLogin({
+        email: formik.values.email, otpCode: otp, platform: "GROYYO_DESIGN",
+        mobileNo: "",
+        fcmToken: "",
+        deviceId: ""
+      }).unwrap();
+      if (response?.status) {
+        toast.success("Login successful!");
+        dispatch(setToken({ token: response?.result?.token }));
+        localStorage.setItem("authToken", JSON.stringify(response?.result?.token));
+        localStorage.setItem('isAdmin', JSON.stringify(response?.result?.role?.name === "ADMIN"));
+
+        const productIds = JSON.parse(localStorage.getItem("localWishList") as string);
+        await updateLocalWishlist({ token: response?.result?.token, payload: productIds }).then((res) => {
+          dispatch(setWishlistItems(res?.data?.count));
+          localStorage.removeItem("localWishList");
+        });
+
+        navigate("/");
+      } else {
+        toast.error("OTP verification failed");
+      }
+    } catch (error) {
+      toast.error("OTP verification failed");
+    } finally {
+      setIsVerifyLoading(false);
     }
   };
-  
 
-  const resetFormik = useFormik({
-    initialValues: { resetEmail: "" },
-    validationSchema: Yup.object({
-      resetEmail: Yup.string().email("Invalid email address").required("Email is Required"),
-    }),
-    onSubmit: (values) => {
-      handleSendEmail(values.resetEmail);
-    },
-  });
+
 
   return (
     <BasicLayout showFooter={false}>
       <div className="flex relative min-h-screen opacity-65 bg-white">
         <div className="xxs:hidden lg:flex w-full flex-1 min-w-[40%] h-screen">
-          <img
-            className="object-cover w-full h-full"
-            src="/images/auth/login_img_1.jpeg"
-            alt="login_bg1"
-          />
+          <img className="object-cover w-full h-full" src="/images/auth/login_img_1.jpeg" alt="login_bg1" />
         </div>
         <div className="w-full lg:mt-0 flex-2 h-screen">
-          <img
-            className="object-cover w-full h-full"
-            src="/images/auth/login_img_2.jpeg"
-            alt="login_bg2"
-          />
+          <img className="object-cover w-full h-full" src="/images/auth/login_img_2.jpeg" alt="login_bg2" />
         </div>
       </div>
       <div className="fixed inset-0 flex items-center justify-center">
         <div
           style={{
-            background:
-              "linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(153, 153, 153, 0.3) 198.83%)",
+            background: "linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(153, 153, 153, 0.3) 198.83%)",
           }}
           className="w-[25rem] xl:w-[30rem] rounded p-4 flex flex-col gap-4"
         >
@@ -153,6 +112,7 @@ const Login = () => {
               name="email"
               label="Email"
               variant="outlined"
+              autoFocus
               fullWidth
               value={formik.values.email}
               onChange={formik.handleChange}
@@ -160,114 +120,49 @@ const Login = () => {
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
             />
-            <TextField
-              id="password"
-              name="password"
-              label="Password"
-              variant="outlined"
-              type={showPassword ? "text" : "password"}
-              fullWidth
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.password && Boolean(formik.errors.password)}
-              helperText={formik.touched.password && formik.errors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
             <Button
               type="submit"
               variant="contained"
               className="w-[100%] h-[3.5rem] !bg-black !text-white rounded"
               disabled={isLoading}
             >
-              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Log in"}
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : "Generate OTP"}
             </Button>
-            <div className="w-full text-right text-xs flex justify-between">
-              <div
-                className="whitespace-nowrap cursor-pointer underline font-semibold"
-                onClick={modalToggleHandler}
-              >
-                Forgot Password
-              </div>
-              <div>
-                Don't have an account?{" "}
-                <Link to={"/signup"}>
-                  <span className="underline font-semibold">Sign up</span>
-                </Link>
-              </div>
-              {/* <div className="text-[#2D2D2A] font-light text-[1rem] text-center">or</div>
-                <Button
-                  onClick={handleGoogleAuth}
-                  variant="contained"
-                  className="w-[100%] h-[3.5rem] !bg-black !text-white rounded"
-                  disabled={isGoogleAuthLoading}
-                >
-                  {isGoogleAuthLoading ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    <>
-                      <span className="mr-4">
-                        <GoogleIcon />
-                      </span>
-                      <p>Log In with Google</p>
-                    </>
-                  )}
-                </Button> */}
-            </div>
           </form>
-        </div>
+          <Typography variant="body2" className="w-full text-right">
+              New user?{" "}
+              <Link to={"/signup"}>
+                <span className="underline font-semibold">Sign up</span>
+              </Link>
+            </Typography>        </div>
       </div>
+
       <Modal open={isModalOpen} onClose={modalToggleHandler}>
         <div className="flex items-center justify-center min-h-screen">
-          <div className="flex flex-col gap-8 bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 className="text-3xl font-semibold">Forgot your password</h2>
-            <p className="text-gray-600 text-sm">
-              Please enter the email address you'd like your password reset information sent to.
-            </p>
-            <form onSubmit={resetFormik.handleSubmit} className="flex flex-col gap-4">
-              <TextField
-                id="reset-email"
-                name="resetEmail"
-                label="Enter email address"
-                variant="outlined"
-                placeholder="Your email address"
-                fullWidth
-                value={resetFormik.values.resetEmail}
-                onChange={resetFormik.handleChange}
-                onBlur={resetFormik.handleBlur}
-                error={resetFormik.touched.resetEmail && Boolean(resetFormik.errors.resetEmail)}
-                helperText={resetFormik.touched.resetEmail && resetFormik.errors.resetEmail}
-                className="p-2"
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                className="!bg-black !text-white rounded-lg"
-                disabled={isLoading}
-              >
-                Request reset link
-              </Button>
-              <Button
-                variant="text"
-                className="!text-black text-sm"
-                onClick={modalToggleHandler}
-              >
-                Back to Login
-              </Button>
-            </form>
+          <div className="p-8 bg-white rounded-lg shadow-lg max-w-lg w-full flex flex-col gap-4">
+            <h2 className="text-2xl font-semibold text-center">Enter OTP</h2>
+            <TextField
+              id="otp"
+              name="otp"
+              label="OTP"
+              variant="outlined"
+              fullWidth
+              autoFocus
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={handleVerifyOtp}
+              disabled={isVerifyLoading || !otp}
+            >
+              {isVerifyLoading ? <CircularProgress size={24} /> : "Verify OTP"}
+            </Button>
+            <Button variant="text" onClick={modalToggleHandler}>
+              Cancel
+            </Button>
           </div>
         </div>
       </Modal>
