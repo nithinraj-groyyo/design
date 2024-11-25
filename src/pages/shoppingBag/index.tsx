@@ -32,7 +32,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import VariantsTable from "./VariantsTable";
 import { useRemoveCartMutation } from "../../rtk-query/cartApiSlice";
 import { toast } from "react-toastify";
-import { useGetAddressesQuery, useUpdateDefaultAddressMutation } from "../../rtk-query/addressApiSlice";
+import { useGetAddressesQuery, useLazyGetAddressesQuery, useUpdateDefaultAddressMutation } from "../../rtk-query/addressApiSlice";
 import { useCreateOrderCheckoutMutation } from "../../rtk-query/orderApiSlice";
 import CheckoutButton from "../../components/CheckoutButton";
 import { useAddToWishListMutation } from "../../rtk-query/wishlistApiSlice";
@@ -55,7 +55,15 @@ const ShoppingBag = () => {
 
     const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
 
-    const { data: addresses } = useGetAddressesQuery({ token });
+    // const { data: addresses } = useGetAddressesQuery({ token });
+    const [addresses, setAddresses] = useState<any>([])
+    const [getAddress] = useLazyGetAddressesQuery();
+
+    useEffect(() => {
+        if(token){
+            getAddress({token})
+        }
+    }, [])
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -68,7 +76,7 @@ const ShoppingBag = () => {
 
     const handleOpenAddressesModal = () => {
         setOpenAddressSelectionModal(true);
-        const defaultAddress = addresses?.data?.find(address => address.isDefault);
+        const defaultAddress: any = addresses?.find((address: any) => address.isDefault);
         if (defaultAddress && defaultAddress?.id) {
             setSelectedAddress(defaultAddress?.id)
         };
@@ -123,7 +131,7 @@ const ShoppingBag = () => {
     }
 
     const handleCheckout = async () => {
-        const defaultAddress = addresses?.data?.find(address => address.isDefault);
+        const defaultAddress: any = addresses?.find((address: any) => address.isDefault);
 
         if (defaultAddress) {
             const payload = {
@@ -196,9 +204,9 @@ const ShoppingBag = () => {
                         {cart.data.length > 0 && (
                             <div className="bg-white p-4 mb-6 shadow-md">
                                 {
-                                    addresses?.data
-                                        ?.filter((address) => address?.isDefault)
-                                        .map((address) => (
+                                    addresses
+                                        ?.filter((address: any) => address?.isDefault)
+                                        .map((address: any) => (
                                             <div key={address.id} className="flex flex-row gap-2 items-center">
                                                 <div className="flex-[3]">
                                                     <div >
@@ -222,7 +230,7 @@ const ShoppingBag = () => {
                                         ))
                                 }
                                 {
-                                    !addresses?.data?.filter((address) => address?.isDefault).length && (
+                                    !addresses?.data?.filter((address: any) => address?.isDefault).length && (
                                         <button className="px-4 py-2 bg-black text-white font-semibold" onClick={() => navigate("/account/address")}>
                                         ADD ADDRESS
                                     </button>
@@ -403,7 +411,7 @@ const ShoppingBag = () => {
                                                     <DialogTitle>Change Address</DialogTitle>
                                                     <DialogContent>
                                                         <RadioGroup value={selectedAddress} onChange={handleAddressChange}>
-                                                            {addresses?.data?.map((address) => (
+                                                            {addresses?.data?.map((address: any) => (
                                                                 <div key={address.id} className="flex flex-row items-start mb-4">
                                                                     <FormControlLabel
                                                                         value={address.id}

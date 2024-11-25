@@ -26,6 +26,7 @@ const OtpModal: React.FC<OtpModalProps> = ({ open, onClose, onSubmit, isLoading 
         <div className="p-8 bg-white rounded-lg shadow-lg max-w-lg w-full flex flex-col gap-4">
           <h2 className="text-2xl font-semibold text-center">Enter OTP</h2>
           <TextField
+            autoFocus
             id="otp"
             label="OTP"
             variant="outlined"

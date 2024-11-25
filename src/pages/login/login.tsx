@@ -3,6 +3,7 @@ import {
   CircularProgress,
   Modal,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
@@ -13,6 +14,8 @@ import BasicLayout from "../../layouts/BasicLayout";
 import {  useLazyGenerateOtpQuery, useVerifyOtpLoginMutation } from "../../rtk-query/authApiSlice";
 import { useDispatch } from "react-redux";
 import { setToken } from "../../redux/userSlice";
+import { setWishlistItems } from "../../redux/wishlistSlice";
+import { useUpdateLocalWishlistMutation } from "../../rtk-query/wishlistApiSlice";
 
 const Login = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,6 +27,7 @@ const Login = () => {
 
   const [ generateOtp, {isLoading} ] = useLazyGenerateOtpQuery();
   const [verifyOtpLogin] = useVerifyOtpLoginMutation();
+  const [updateLocalWishlist] = useUpdateLocalWishlistMutation();
 
   const formik = useFormik({
     initialValues: { email: "" },
@@ -50,14 +54,6 @@ const Login = () => {
     setIsModalOpen(!isModalOpen);
   };
 
-  // const handleClickShowPassword = () => {
-  //   setShowPassword(!showPassword);
-  // };
-
-  // const handleMouseDownPassword = (event:any) => {
-  //   event.preventDefault();
-  // };
-
   const handleVerifyOtp = async () => {
     setIsVerifyLoading(true);
     try {
@@ -67,11 +63,18 @@ const Login = () => {
         fcmToken: "",
         deviceId: ""
       }).unwrap();
-      console.log(response, "otp")
       if (response?.status) {
         toast.success("Login successful!");
         dispatch(setToken({ token: response?.result?.token }));
         localStorage.setItem("authToken", JSON.stringify(response?.result?.token));
+        localStorage.setItem('isAdmin', JSON.stringify(response?.result?.role?.name === "ADMIN"));
+
+        const productIds = JSON.parse(localStorage.getItem("localWishList") as string);
+        await updateLocalWishlist({ token: response?.result?.token, payload: productIds }).then((res) => {
+          dispatch(setWishlistItems(res?.data?.count));
+          localStorage.removeItem("localWishList");
+        });
+
         navigate("/");
       } else {
         toast.error("OTP verification failed");
@@ -109,6 +112,7 @@ const Login = () => {
               name="email"
               label="Email"
               variant="outlined"
+              autoFocus
               fullWidth
               value={formik.values.email}
               onChange={formik.handleChange}
@@ -125,10 +129,14 @@ const Login = () => {
               {isLoading ? <CircularProgress size={24} color="inherit" /> : "Generate OTP"}
             </Button>
           </form>
-        </div>
+          <Typography variant="body2" className="w-full text-right">
+              New user?{" "}
+              <Link to={"/signup"}>
+                <span className="underline font-semibold">Sign up</span>
+              </Link>
+            </Typography>        </div>
       </div>
 
-      {/* OTP Verification Modal */}
       <Modal open={isModalOpen} onClose={modalToggleHandler}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="p-8 bg-white rounded-lg shadow-lg max-w-lg w-full flex flex-col gap-4">
@@ -139,6 +147,7 @@ const Login = () => {
               label="OTP"
               variant="outlined"
               fullWidth
+              autoFocus
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
             />

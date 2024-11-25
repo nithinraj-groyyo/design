@@ -23,7 +23,6 @@ const Signup = () => {
   const [otp, setOtp] = useState('');
   const [signUp, { isLoading }] = useSignUpMutation();
   const [verifyOtpLogin, { isLoading: isOtpLoading }] = useVerifyOtpLoginMutation();
-  // Formik form for the signup fields and validation schema
 
   const formik = useFormik({
     initialValues: {
@@ -47,20 +46,12 @@ const Signup = () => {
       };
       try {
         const response = await signUp(newData).unwrap();
-
-        console.log(response, "signup");
-
         const responseData = response;
 
         if(responseData?.status){
           toast.success("Signup successful! Please verify OTP.");
           setIsOtpModalOpen(true);
         }
-
-        
-        // Generate OTP and open the OTP modal
-        // const response = await generateOtp({ email: formik.values.email, platform: "GROYYO_DESIGN" }).unwrap();
-  
 
       } catch (error: any) {
         console.log(error)
@@ -74,10 +65,7 @@ const Signup = () => {
   const dispatch = useDispatch();
   const [updateLocalWishlist] = useUpdateLocalWishlistMutation();
 
-  
-
-  // Handle OTP verification submission
-  const handleVerifyOtp = async () => {
+    const handleVerifyOtp = async () => {
     try {
       const response: any = await verifyOtpLogin({
         mobileNo: "null",
@@ -90,15 +78,12 @@ const Signup = () => {
       
       if (response?.status) {
         toast.success("OTP Verified Successfully!");
-console.log(response, "response")
-        // Store token and other user info
-        dispatch(setToken({ token: response?.data?.access_token }));
-        localStorage.setItem("authToken", JSON.stringify(response?.data?.access_token));
-        localStorage.setItem('isAdmin', JSON.stringify(response?.data?.isAdmin));
+        dispatch(setToken({ token: response?.result?.token }));
+        localStorage.setItem("authToken", JSON.stringify(response?.result?.token));
+        localStorage.setItem('isAdmin', JSON.stringify(response?.result?.role?.name === "ADMIN"));
         
-        // Update local wishlist
         const productIds = JSON.parse(localStorage.getItem("localWishList") as string);
-        await updateLocalWishlist({ token: response?.data?.access_token, payload: productIds }).then((res) => {
+        await updateLocalWishlist({ token: response?.result?.token, payload: productIds }).then((res) => {
           dispatch(setWishlistItems(res?.data?.count));
           localStorage.removeItem("localWishList");
         });
