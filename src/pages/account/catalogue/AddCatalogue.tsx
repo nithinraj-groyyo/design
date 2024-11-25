@@ -1,8 +1,9 @@
 import { Button, Card, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
+import { useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
 import { Formik, Field, Form } from 'formik';
 import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
+import { useFetchCategoryListQuery } from '../../../rtk-query/catalogueApiSlice';
 
 interface ICategory {
   id: number;
@@ -13,7 +14,8 @@ const AddCatalogue = () => {
   const [categoriesListArray, setCategoriesListArray] = useState<ICategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
-  const { data: categories, isLoading: isCategoriesLoading } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
+  const { data: categories, isLoading: isCategoriesLoading } = useFetchCategoryListQuery(null);
+  console.log(categories,"kes")
 
   const {
     data: subCategories,

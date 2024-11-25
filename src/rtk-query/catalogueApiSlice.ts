@@ -45,6 +45,19 @@ const catalogueApiSlice = apiSlice.injectEndpoints({
                 }
             },
         }),
+
+        fetchSubCategoriesList: builder.query({
+            query: (categoryId: number) => ({
+                url: `${catalogueUrl}/sub-categories/${categoryId}`,
+            }),
+            transformResponse: (response: ResponseDTO<any>) => {
+                if (response.status && response.data) {
+                    return response.data;
+                } else {
+                    throw new Error(response.errorReason || "Failed to fetch subcategories");
+                }
+            },
+        }),
     }),
 });
 
@@ -52,4 +65,5 @@ export const {
     useAddCatalogueMutation,
     useFetchCategoryListQuery,
     useFetchCatalogueByIdQuery,
+    useFetchSubCategoriesListQuery, 
 } = catalogueApiSlice;
