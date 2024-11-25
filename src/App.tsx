@@ -36,6 +36,7 @@ import ManageSubscriptions from "./pages/account/siteSetting/ManageSubscriptions
 import CataloguePage from "./pages/CataloguePage/CataloguePage";
 import CatalougePageDetails from "./pages/CataloguePage/CatalougePageDetails";
 import AddCatalogue from "./pages/account/catalogue/AddCatalogue";
+import AdminCatalogueList from "./pages/account/catalogue/AdminCatalogueList";
 
 const App = () => {
   const isAuthenticated = useAuth();
@@ -99,6 +100,10 @@ const App = () => {
         
         <Route path="add-catalogue" element={<AdminRoutes/>}>
           <Route path="" element={<AddCatalogue />} />
+        </Route>
+
+        <Route path="catalogue-list" element={<AdminRoutes/>}>
+          <Route path="" element={<AdminCatalogueList />} />
         </Route>
 
         <Route path="edit-product/:productId" element={<AdminRoutes />}>

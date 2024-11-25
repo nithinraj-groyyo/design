@@ -2,6 +2,7 @@ import { Button, Card, Checkbox, FormControl, FormControlLabel, InputLabel, Menu
 import React, { useEffect, useState } from 'react';
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
 import { Formik, Field, Form } from 'formik';
+import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
 
 interface ICategory {
   id: number;
@@ -52,7 +53,10 @@ const AddCatalogue = () => {
   }, [selectedCategory, refetch]);
 
   return (
-    <Formik
+    <AccountSettingsLayout>
+            <AccountSettingsLayout.Header title='Add Catalogue'>
+            </AccountSettingsLayout.Header>
+        <Formik
       initialValues={{
         name: '',
         category: '',
@@ -92,7 +96,6 @@ const AddCatalogue = () => {
       {({ values, handleChange, setFieldValue }) => (
         <Form>
           <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
-            <div className="font-bold text-lg">Add Catalogue</div>
             <Card className="p-4 flex flex-col gap-4">
               {/* Name Field */}
               <Field
@@ -213,6 +216,8 @@ const AddCatalogue = () => {
         </Form>
       )}
     </Formik>
+    </AccountSettingsLayout>
+    
   );
 };
 
