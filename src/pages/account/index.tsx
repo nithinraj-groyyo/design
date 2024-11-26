@@ -56,6 +56,7 @@ const adminMenuItems = [
     subItems: [
       { title: "Add Catalogue", route: "/account/add-catalogue" },
       { title: "Catalogue List", route: "/account/catalogue-list" },
+      { title: "Catalogue Categories", route: "/account/manage-catalogue-categories" },
     ],
   },
   // {

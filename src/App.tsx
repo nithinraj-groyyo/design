@@ -37,6 +37,8 @@ import CataloguePage from "./pages/CataloguePage/CataloguePage";
 import CatalougePageDetails from "./pages/CataloguePage/CatalougePageDetails";
 import AddCatalogue from "./pages/account/catalogue/AddCatalogue";
 import AdminCatalogueList from "./pages/account/catalogue/AdminCatalogueList";
+import ManageCatalogueCategories from "./pages/account/catalogue/ManageCatalogueCategories";
+import EditCatalogue from "./pages/account/catalogue/EditCatalogue";
 
 const App = () => {
   const isAuthenticated = useAuth();
@@ -106,6 +108,15 @@ const App = () => {
           <Route path="" element={<AdminCatalogueList />} />
         </Route>
 
+        <Route path="manage-catalogue-categories" element={<AdminRoutes/>}>
+          <Route path="" element={<ManageCatalogueCategories />} />
+        </Route>
+
+        
+        <Route path="edit-catalogue/:catalogueId" element={<AdminRoutes/>}>
+          <Route path="" element={<EditCatalogue />} />
+        </Route>
+        
         <Route path="edit-product/:productId" element={<AdminRoutes />}>
           <Route path="" element={<EditProduct />} />
         </Route>
