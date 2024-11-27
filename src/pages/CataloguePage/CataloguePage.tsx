@@ -34,19 +34,15 @@ const CataloguePage = () => {
   const [catalogues, setCatalogues] = useState<ICatalogue[]>([]);
   const token = JSON.parse(localStorage.getItem("authToken") || 'null');
 
-  // Lazy fetch for catalogues
   const [fetchCatalogues, { data, isLoading: isProductLoading }] = useLazyFetchCatalogueListQuery();
 
-  // Fetch categories list
   const { data: categories } = useFetchCategoryListQuery(token);
   
-  // Fetch subcategories list based on selected category
   const { data: subCategories, refetch } = useFetchSubCategoriesListQuery(
     { categoryId: +selectedCategory || 0, token },
     { skip: !selectedCategory }
   );
 
-  // Load catalogues based on category and subcategory selection
   const loadCatalogues = async () => {
     const response = await fetchCatalogues(token);
     if (response?.data) {
@@ -54,7 +50,6 @@ const CataloguePage = () => {
     }
 };
 
-  // Update categories and subcategories whenever category changes
   useEffect(() => {
     if (categories && Array.isArray(categories)) {
       const formattedCategories = categories.map((cat: Record<string, any>) => ({
@@ -69,16 +64,14 @@ const CataloguePage = () => {
 
   useEffect(() => {
     if (selectedCategory) {
-      refetch?.(); // Refetch subcategories if category changes
+      refetch?.();
     }
   }, [selectedCategory, refetch]);
 
-  // Fetch catalogues when category or subcategory changes
   useEffect(() => {
     loadCatalogues();
   }, [selectedCategory, selectedSubcategory]);
 
-  // Filtering catalogues based on selected filters
   const filteredCatalogues = catalogues.filter((catalogue) => {
     return (
       (selectedCategory === 'All' || catalogue?.category?.id === +selectedCategory) &&
@@ -96,7 +89,6 @@ const CataloguePage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Category Filter */}
           <FormControl fullWidth variant="outlined">
             <InputLabel>Category</InputLabel>
             <Select
@@ -114,7 +106,6 @@ const CataloguePage = () => {
             </Select>
           </FormControl>
 
-          {/* Subcategory Filter */}
           <FormControl fullWidth variant="outlined">
             <InputLabel>Subcategory</InputLabel>
             <Select
@@ -133,7 +124,6 @@ const CataloguePage = () => {
           </FormControl>
         </motion.div>
 
-        {/* Catalogues Display */}
         <Grid container spacing={3}>
           {filteredCatalogues.map((catalogue: any) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
