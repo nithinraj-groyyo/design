@@ -54,7 +54,7 @@ const FlipBook = forwardRef((props: any, ref) => {
             ) : (
                 // Desktop View
                 <HTMLFlipBook
-                    key={isPortrait}
+                    // key={isPortrait}
                     style={{}}
                     ref={ref}
                     startZIndex={1}

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowForwardIos } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import FlipBook from './FlipBook';
 
 const catalogues = [
@@ -35,6 +35,15 @@ const CatalougePageDetails = () => {
         setTotalPage(pageImages?.length);
     }, [])
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
+    const navigate = useNavigate(); 
+
+    const handleNavigation = () => {
+        navigate('/rfq');
+    };
 
     useEffect(() => {
         console.log(currentPage === totalPage - 1, currentPage , totalPage - 1)
@@ -142,6 +151,7 @@ const CatalougePageDetails = () => {
                                 className="px-6 py-3 rounded-lg bg-[#ee572f] text-black font-semibold shadow-md focus:outline-none min-w-[10rem]"
                                 whileHover={{ scale: 1.1 }}
                                 transition={{ type: 'spring', stiffness: 300 }}
+                                onClick={handleNavigation}
                             >
                                 RFQ
                             </motion.button>

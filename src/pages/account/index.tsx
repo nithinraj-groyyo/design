@@ -59,6 +59,14 @@ const adminMenuItems = [
       { title: "Catalogue Categories", route: "/account/manage-catalogue-categories" },
     ],
   },
+  {
+    title: "RFQ",
+    subItems: [
+      // { title: "Add RFQ", route: "/account/add-rfq" },
+      { title: "RFQ List", route: "/account/rfq-list" },
+      // { title: "Catalogue Categories", route: "/account/manage-catalogue-categories" },
+    ],
+  },
   // {
   //   title: "Blog",
   //   subItems: [
