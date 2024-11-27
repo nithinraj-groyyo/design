@@ -1,16 +1,51 @@
-import { Button, Card, CardContent, CardMedia, Grid, Typography } from '@mui/material';
-import HTMLFlipBook from 'react-pageflip';
+import { Card, CardContent, CardMedia,Typography } from '@mui/material';
 import BasicLayout from '../../layouts/BasicLayout';
 import { motion } from 'framer-motion';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowForwardIos } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import FlipBook from './FlipBook';
+
+const catalogues = [
+    { id: 1, name: 'Catalogue 1', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'T-Shirts' },
+    { id: 2, name: 'Catalogue 2', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'Shirts' },
+    { id: 3, name: 'Catalogue 3', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Women', subcategory: 'Dresses' },
+    { id: 1, name: 'Catalogue 1', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'T-Shirts' },
+    { id: 2, name: 'Catalogue 2', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'Shirts' },
+    { id: 3, name: 'Catalogue 3', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Women', subcategory: 'Dresses' },
+];
+
+const pageImages = [
+    { src: '/images/catalouges/catalouge1/image1.jpg', alt: 'Fashion cover' },
+    { src: '/images/catalouges/catalouge1/image2.jpg', alt: 'About us page' },
+    { src: '/images/catalouges/catalouge1/image3.jpg', alt: 'Product categories' },
+    { src: '/images/catalouges/catalouge1/image4.jpg', alt: 'Featured products' },
+    { src: '/images/catalouges/catalouge1/image5.jpg', alt: 'Best sellers' },
+];
 
 const CatalougePageDetails = () => {
     const flipBookRef = useRef<any>(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
+    const [isPotraitMode, setIsPotraitMode] = useState(false)
+
+    useEffect(() => {
+        setTotalPage(pageImages?.length);
+    }, [])
+
+
+    useEffect(() => {
+        console.log(currentPage === totalPage - 1, currentPage , totalPage - 1)
+        setIsPotraitMode(currentPage === totalPage - 1)
+
+    }, [currentPage, totalPage]);
+
+    useEffect(() => {
+        console.log("isMobile:", isMobile, "isPotraitMode:", isPotraitMode);
+    }, [isMobile, isPotraitMode]);
+    
 
     const onFlip = (e: any) => {
         setCurrentPage(e.data);
@@ -27,19 +62,24 @@ const CatalougePageDetails = () => {
         }
     };
 
-    const catalogues = [
-        { id: 1, name: 'Catalogue 1', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'T-Shirts' },
-        { id: 2, name: 'Catalogue 2', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'Shirts' },
-        { id: 3, name: 'Catalogue 3', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Women', subcategory: 'Dresses' },
-        { id: 1, name: 'Catalogue 1', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'T-Shirts' },
-        { id: 2, name: 'Catalogue 2', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'Shirts' },
-        { id: 3, name: 'Catalogue 3', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Women', subcategory: 'Dresses' },
-    ]
+    useEffect(() => {
+        const updateScreenOrientation = () => {
+            const isPortrait = window.innerHeight > window.innerWidth;
+            setIsMobile(window.innerWidth <= 768); 
+            setIsPotraitMode(isPortrait); 
+        };
+    
+        updateScreenOrientation();
+    
+        window.addEventListener("resize", updateScreenOrientation);
+        return () => {
+            window.removeEventListener("resize", updateScreenOrientation);
+        };
+    }, []);
+
     return (
         <BasicLayout>
             <div className="relative flex flex-col gap-8 justify-center items-center p-8 h-screen overflow-hidden mt-[5rem]">
-
-                {/* Animated title */}
                 <div className='flex justify-around w-full mt-10'>
                     <motion.div
                         className="text-3xl font-semibold text-[#fff] flex items-center"
@@ -68,88 +108,49 @@ const CatalougePageDetails = () => {
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 1, ease: 'easeInOut' }}
                 >
-                    <HTMLFlipBook
-                        style={{}}
+                    <FlipBook
                         ref={flipBookRef}
-                        startZIndex={1}
-                        width={960}
-                        height={540}
-                        minWidth={700}
-                        maxWidth={1200}
-                        minHeight={400}
-                        maxHeight={675}
-                        size="stretch"
-                        drawShadow={true}
-                        flippingTime={1000}
-                        usePortrait={currentPage===0 || currentPage=== totalPage-1 ? true : false}
-                        startPage={0}
-                        autoSize={true}
-                        maxShadowOpacity={0.5}
-                        showCover={true}
-                        mobileScrollSupport={true}
-                        clickEventForward={true}
-                        useMouseEvents={true}
-                        swipeDistance={30}
-                        showPageCorners={true}
-                        disableFlipByClick={false}
-                        className="flipbook"
+                        pageImages={pageImages}
+                        isPortrait={isMobile || isPotraitMode}
                         onFlip={onFlip}
-                    >
-                        <div className="page">
-                            <img src="/images/catalouges/catalouge1/image1.jpg" alt="Fashion cover" className="w-full h-full object-cover" />
-                        </div>
-                        <div className="page">
-                            <img src="/images/catalouges/catalouge1/image2.jpg" alt="About us page" className="w-full h-full object-cover" />
-                        </div>
-                        <div className="page">
-                            <img src="/images/catalouges/catalouge1/image3.jpg" alt="Product categories" className="w-full h-full object-cover" />
-                        </div>
-                        <div className="page">
-                            <img src="/images/catalouges/catalouge1/image4.jpg" alt="Featured products" className="w-full h-full object-cover" />
-                        </div>
-                        <div className="page">
-                            <img src="/images/catalouges/catalouge1/image5.jpg" alt="Best sellers" className="w-full h-full object-cover" />
-                        </div>
-                    </HTMLFlipBook>
+                        isMobile={isMobile}
+                    />
                     <div className='flex flex-col gap-4'>
-                    <div className="text-center text-white mt-4">
-                        Click or swipe to flip pages!
+                        <div className="text-center text-white mt-4">
+                            Click or swipe to flip pages!
+                        </div>
+                        <div className="flex gap-4 items-center justify-center">
+                            <motion.button
+                                onClick={() => flipBookRef.current && flipBookRef.current.pageFlip().flipPrev()}
+                                className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ type: 'spring', stiffness: 300 }}
+                            >
+                                <ArrowBackIosIcon />
+                            </motion.button>
+                            <motion.button
+                                onClick={() => flipBookRef.current && flipBookRef.current.pageFlip().flipNext()}
+                                className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ type: 'spring', stiffness: 300 }}
+                            >
+                                <ArrowForwardIos />
+                            </motion.button>
+                        </div>
+                        <div className="flex justify-center">
+                            <motion.button
+                                className="px-6 py-3 rounded-lg bg-[#ee572f] text-black font-semibold shadow-md focus:outline-none min-w-[10rem]"
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ type: 'spring', stiffness: 300 }}
+                            >
+                                RFQ
+                            </motion.button>
+                        </div>
                     </div>
-                    {/* Navigation Buttons */}
-                    <div className="flex gap-4 items-center justify-center">
-                        <motion.button
-                            onClick={() => flipBookRef.current && flipBookRef.current.pageFlip().flipPrev()}
-                            className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ type: 'spring', stiffness: 300 }}
-                        >
-                            <ArrowBackIosIcon />
-                        </motion.button>
-                        <motion.button
-                            onClick={() => flipBookRef.current && flipBookRef.current.pageFlip().flipNext()}
-                            className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ type: 'spring', stiffness: 300 }}
-                        >
-                            <ArrowForwardIos />
-                        </motion.button>
-                    </div>
-                    <div className="flex justify-center">
-                        <motion.button
-                            className="px-6 py-3 rounded-lg bg-[#ee572f] text-black font-semibold shadow-md focus:outline-none min-w-[10rem]"
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ type: 'spring', stiffness: 300 }}
-                        >
-                            RFQ
-                        </motion.button>
-                    </div>
-                    </div>
-                    
                 </motion.div>
             </div>
             <div className="flex flex-col gap-6 my-6 p-12">
                 <div className="text-xl font-semibold text-gray-800">YOU MAY ALSO LIKE</div>
-
                 <div className="flex gap-6 overflow-x-auto py-4">
                     {catalogues.map((catalogue) => (
                         <Link to={`/catalogue/${catalogue.id}`} key={catalogue.id} style={{ textDecoration: 'none' }}>
@@ -172,6 +173,9 @@ const CatalougePageDetails = () => {
                                         <Typography variant="h6" component="div" className="text-gray-800 font-semibold">
                                             {catalogue.name}
                                         </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                            {catalogue.category} - {catalogue.subcategory}
+                                        </Typography>
                                     </CardContent>
                                 </Card>
                             </motion.div>
@@ -181,6 +185,6 @@ const CatalougePageDetails = () => {
             </div>
         </BasicLayout>
     );
-}
+};
 
 export default CatalougePageDetails;
