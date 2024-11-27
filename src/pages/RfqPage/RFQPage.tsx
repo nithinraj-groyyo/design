@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import BasicLayout from '../../layouts/BasicLayout'
-import { Box, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Tab, Tabs } from '@mui/material'
 import AddRFQ from './AddRFQ'
 import UserRFQList from './UserRFQList'
 import { useLocation } from 'react-router-dom'
@@ -31,7 +31,6 @@ const RFQPage = () => {
   return (
     <BasicLayout>
       <div className="w-full mt-[10rem] p-6 sm:p-8 md:p-10 bg-gray-50 flex flex-col md:flex-row justify-center space-y-8 md:space-y-0 md:space-x-8 rounded-lg shadow-lg">
-        {/* Left Section */}
         <div className="md:w-[35%]  p-6 rounded-lg text-white">
           <div className="mb-4 bg-[#1E201E] rounded-lg">
             <img
@@ -42,7 +41,6 @@ const RFQPage = () => {
           </div>
         </div>
         
-        {/* Right Section */}
         <div className="md:w-[65%] bg-white p-4 sm:p-6 rounded-lg shadow-lg">
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs 

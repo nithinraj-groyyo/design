@@ -1,7 +1,6 @@
 import React from 'react';
 import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, IconButton } from '@mui/material';
 import { useGetUserRFQListQuery } from '../../rtk-query/rfqSlice';
-import { Visibility } from '@mui/icons-material';
 
 const UserRFQList = () => {
   const token = JSON.parse(localStorage.getItem("authToken") as string);
@@ -45,7 +44,6 @@ const UserRFQList = () => {
               <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>MOQ</TableCell>
               <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Target Cost</TableCell>
               <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Description</TableCell>
-              {/* <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -56,15 +54,6 @@ const UserRFQList = () => {
                 <TableCell className='!text-center'>{rfq.minOrderQty}</TableCell>
                 <TableCell className='!text-center'>{rfq.targetCost}</TableCell>
                 <TableCell className='!text-center'>{rfq.description}</TableCell>
-                {/* <TableCell>
-                  <IconButton 
-                    color="primary" 
-                    onClick={() => alert('View details or perform an action')} 
-                    sx={{ '&:hover': { backgroundColor: '#e0f7fa' } }}
-                  >
-                    <Visibility />
-                  </IconButton>
-                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>

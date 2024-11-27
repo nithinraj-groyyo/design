@@ -21,7 +21,6 @@ const AdminRFQList = () => {
         return <CircularProgress />;
     }
 
-
     const handleCreateRfq = () => {
         navigate("/add-rfq")
     }
@@ -35,7 +34,6 @@ const AdminRFQList = () => {
             </AccountSettingsLayout.Header>
             <div>
 
-                {/* Table Container */}
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
@@ -69,7 +67,6 @@ const AdminRFQList = () => {
                     </Table>
                 </TableContainer>
 
-                {/* Handle error state */}
                 {isError && (
                     <Typography color="error" align="center">Failed to fetch RFQ list</Typography>
                 )}
