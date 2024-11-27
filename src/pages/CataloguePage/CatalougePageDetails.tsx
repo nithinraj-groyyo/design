@@ -6,15 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowForwardIos } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 import FlipBook from './FlipBook';
+import { useLazyFetchCatalogueListQuery } from '../../rtk-query/catalogueApiSlice';
 
-const catalogues = [
-    { id: 1, name: 'Catalogue 1', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'T-Shirts' },
-    { id: 2, name: 'Catalogue 2', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'Shirts' },
-    { id: 3, name: 'Catalogue 3', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Women', subcategory: 'Dresses' },
-    { id: 1, name: 'Catalogue 1', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'T-Shirts' },
-    { id: 2, name: 'Catalogue 2', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Men', subcategory: 'Shirts' },
-    { id: 3, name: 'Catalogue 3', thumbnail: '/images/catalouges/catalouge1/image1.jpg', category: 'Women', subcategory: 'Dresses' },
-];
 
 const pageImages = [
     { src: '/images/catalouges/catalouge1/image1.jpg', alt: 'Fashion cover' },
@@ -26,11 +19,24 @@ const pageImages = [
 
 const CatalougePageDetails = () => {
     const flipBookRef = useRef<any>(null);
+    const [catalogues, setCatalogues] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
     const [isPotraitMode, setIsPotraitMode] = useState(false)
 
+    const token = JSON.parse(localStorage.getItem("authToken") || 'null');
+
+    const [fetchCatalogues, { data, isLoading: isProductLoading }] = useLazyFetchCatalogueListQuery();
+
+    const loadCatalogues = async () => {
+        const response = await fetchCatalogues(token);
+        if (response?.data) {
+            setCatalogues(response?.data || []);
+            // setPageCount(Math.ceil(response?.data?.total));
+            // setTotalCount(response?.data?.total)
+        }
+    };
     useEffect(() => {
         setTotalPage(pageImages?.length);
     }, [])
@@ -162,8 +168,8 @@ const CatalougePageDetails = () => {
             <div className="flex flex-col gap-6 my-6 p-12">
                 <div className="text-xl font-semibold text-gray-800">YOU MAY ALSO LIKE</div>
                 <div className="flex gap-6 overflow-x-auto py-4">
-                    {catalogues.map((catalogue) => (
-                        <Link to={`/catalogue/${catalogue.id}`} key={catalogue.id} style={{ textDecoration: 'none' }}>
+                    {catalogues.map((catalogue:any) => (
+                        <Link to={`/catalogue/${catalogue}`} key={catalogue} style={{ textDecoration: 'none' }}>
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -176,7 +182,7 @@ const CatalougePageDetails = () => {
                                         component="img"
                                         height="200"
                                         image={catalogue.thumbnail}
-                                        alt={catalogue.name}
+                                        alt={catalogue?.name}
                                         className="object-cover"
                                     />
                                     <CardContent className="p-4">

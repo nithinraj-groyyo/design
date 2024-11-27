@@ -88,14 +88,14 @@ const AddCatalogue = () => {
           formData.append('description', values.description);
           formData.append('isPublic', values.isPublic ? 'true' : 'false');
           formData.append('isActive', values.isActive ? 'true' : 'false');
-          formData.append('categoryId', values.category);
-          formData.append('subCategoryId', values.subCategory);
+          formData.append('category', values.category);
+          formData.append('subCategory', values.subCategory);
           if (values.media) {
             formData.append('file', values.media);
           }
 
           try {
-            await addCatalogue(formData).unwrap();
+            await addCatalogue({formData,token}).unwrap();
             console.log(formData,"verma")
             alert('Catalogue added successfully');
             resetForm();

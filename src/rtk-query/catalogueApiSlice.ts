@@ -6,12 +6,14 @@ const catalogueUrl = "catalogue";
 const catalogueApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         addCatalogue: builder.mutation({
-            query: (formData: FormData) => ({
+            query: ({formData,token}:{formData: FormData, token:string}) => ({
                 url: `${catalogueUrl}/add`,
                 method: "POST",
                 body: formData,
                 providesTags: ["Catalogue"],
-
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             }),
             transformResponse: (response: ResponseDTO<any>) => {
                 if (response.status && response.data) {

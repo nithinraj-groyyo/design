@@ -2,7 +2,7 @@ import React from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { TextField, Button, FormControl, FormHelperText, Checkbox, FormControlLabel, Grid } from '@mui/material';
-import { useAddRFQMutation } from '../../rtk-query/rfqSlics';
+import { useAddRFQMutation } from '../../rtk-query/rfqSlice';
 
 const AddRFQ = () => {
   const [addRFQ, { isLoading }] = useAddRFQMutation();

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Button } from '@mui/material';
-import { useGetRFQListQuery } from '../../../rtk-query/rfqSlics';
+import { useGetRFQListQuery } from '../../../rtk-query/rfqSlice';
 import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,7 +10,6 @@ const AdminRFQList = () => {
     const { data, error, isLoading, isError } = useGetRFQListQuery(token);
 
     const navigate = useNavigate();
-
 
     useEffect(() => {
         if (isError) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, IconButton } from '@mui/material';
-import { useGetUserRFQListQuery } from '../../rtk-query/rfqSlics';
+import { useGetUserRFQListQuery } from '../../rtk-query/rfqSlice';
 import { Visibility } from '@mui/icons-material';
 
 const UserRFQList = () => {
@@ -40,23 +40,23 @@ const UserRFQList = () => {
         <Table>
           <TableHead sx={{ backgroundColor: '#4caf50' }}>
             <TableRow>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Brand Name</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Email</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>MOQ</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Target Cost</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
-              <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
+              <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Brand Name</TableCell>
+              <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Email</TableCell>
+              <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>MOQ</TableCell>
+              <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Target Cost</TableCell>
+              <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Description</TableCell>
+              {/* <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell> */}
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map((rfq: any, index: number) => (
               <TableRow key={index} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                <TableCell>{rfq.brandName}</TableCell>
-                <TableCell>{rfq.email}</TableCell>
-                <TableCell>{rfq.MOQ}</TableCell>
-                <TableCell>{rfq.targetCost}</TableCell>
-                <TableCell>{rfq.status}</TableCell>
-                <TableCell>
+                <TableCell className='!text-center'>{rfq.brandName}</TableCell>
+                <TableCell className='!text-center'>{rfq.email}</TableCell>
+                <TableCell className='!text-center'>{rfq.minOrderQty}</TableCell>
+                <TableCell className='!text-center'>{rfq.targetCost}</TableCell>
+                <TableCell className='!text-center'>{rfq.description}</TableCell>
+                {/* <TableCell>
                   <IconButton 
                     color="primary" 
                     onClick={() => alert('View details or perform an action')} 
@@ -64,7 +64,7 @@ const UserRFQList = () => {
                   >
                     <Visibility />
                   </IconButton>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>
