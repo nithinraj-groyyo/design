@@ -33,6 +33,15 @@ import ForgotPassword from "./pages/forgotPassword";
 import useAuth from "./hooks/useAuth";
 import ManageCategories from "./pages/account/siteSetting/ManageCategories";
 import ManageSubscriptions from "./pages/account/siteSetting/ManageSubscriptions";
+import CataloguePage from "./pages/CataloguePage/CataloguePage";
+import CatalougePageDetails from "./pages/CataloguePage/CatalougePageDetails";
+import AddCatalogue from "./pages/account/catalogue/AddCatalogue";
+import AdminCatalogueList from "./pages/account/catalogue/AdminCatalogueList";
+import ManageCatalogueCategories from "./pages/account/catalogue/ManageCatalogueCategories";
+import EditCatalogue from "./pages/account/catalogue/EditCatalogue";
+import AdminRFQList from "./pages/account/rfq/AdminRFQList";
+import AddRFQ from "./pages/RfqPage/AddRFQ";
+import RFQPage from "./pages/RfqPage/RFQPage";
 
 const App = () => {
   const isAuthenticated = useAuth();
@@ -65,6 +74,10 @@ const App = () => {
       <Route path="/services" element={<ServicePage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/team" element={<TeamsPage />} />
+      <Route path="/catalogue" element={<CataloguePage />} />
+      <Route path="/catalogue/:catalogueId" element={<CatalougePageDetails />} />
+      <Route path="add-rfq" element={<AddRFQ />} />
+      <Route path="rfq" element={<RFQPage />} />
 
       <Route path="account" element={<AccountPage />}>
         <Route path="address" element={<Address />} />
@@ -91,7 +104,29 @@ const App = () => {
         <Route path="add-product" element={<AdminRoutes />}>
           <Route path="" element={<AddProducts />} />
         </Route>
+        
+        <Route path="add-catalogue" element={<AdminRoutes/>}>
+          <Route path="" element={<AddCatalogue />} />
+        </Route>
 
+        <Route path="catalogue-list" element={<AdminRoutes/>}>
+          <Route path="" element={<AdminCatalogueList />} />
+        </Route>
+
+        <Route path="manage-catalogue-categories" element={<AdminRoutes/>}>
+          <Route path="" element={<ManageCatalogueCategories />} />
+        </Route>
+        
+        
+
+        <Route path="rfq-list" element={<AdminRoutes/>}>
+          <Route path="" element={<AdminRFQList />} />
+        </Route>
+
+        <Route path="edit-catalogue/:catalogueId" element={<AdminRoutes/>}>
+          <Route path="" element={<EditCatalogue />} />
+        </Route>
+        
         <Route path="edit-product/:productId" element={<AdminRoutes />}>
           <Route path="" element={<EditProduct />} />
         </Route>
