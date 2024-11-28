@@ -134,7 +134,6 @@ const EditProduct = () => {
       skip: !selectedCategory?.id,
     }
   );
-  console.log("inventoryList", inventoryList)
   const navigate = useNavigate();
 
   const [addNewSize] = useAddNewSizeMutation();
@@ -160,7 +159,6 @@ const EditProduct = () => {
     }
     loadProducts()
   }, [productId]);
-  console.log(product, "veve")
 
   useEffect(() => {
     if (product && categories?.length > 0) {
