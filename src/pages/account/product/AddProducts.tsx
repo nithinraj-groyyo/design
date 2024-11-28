@@ -76,6 +76,7 @@ interface FormData {
   leftTopContent: string;
   leftBottomHeader: string;
   leftBottomContent: string;
+  minQty: number | undefined;
 }
 
 const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
@@ -106,6 +107,7 @@ const AddProducts = () => {
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
   const [inventoryList, setInventoryList] = useState<InventoryListData[]>([{ id: 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
+  // const [userMinQty, setUserMinQty] = useState<number | undefined>(undefined);
 
   const [uploadSingleFile] = useUploadSingleFileMutation();
 
@@ -309,12 +311,10 @@ const AddProducts = () => {
     );
   };
 
-
-
-
   const formik = useFormik<FormData>({
     initialValues: {
       productId: undefined,
+      minQty: undefined,
       productName: "",
       styleName: "",
       otherCategory: "",
@@ -336,6 +336,7 @@ const AddProducts = () => {
       leftTopContent: Yup.string().required("Field is required"),
       leftBottomHeader: Yup.string().required("Field is required"),
       leftBottomContent: Yup.string().required("Field is required"),
+      minQty: Yup.number().required("Min Quantity is required").positive("Must be a positive number"),
     }),
     onSubmit: async (values) => {
       if (imgList?.filter((x) => x.side.trim() === "" || (x.file == null && x.fileName === "" && x.isDeleted === false)).length > 0) {
@@ -381,6 +382,7 @@ const AddProducts = () => {
             leftBottomHeader: values?.leftBottomHeader,
             leftBottomContent: values?.leftBottomContent,
             isPublic: selectedStatus === "enabled" ? true : false,
+            minQty: values.minQty !== undefined ? +values.minQty : null,
             inventory: inventoryList?.map((inventoryValue) => {
               return {
                 "sizeId": inventoryValue.size.id,
@@ -391,6 +393,7 @@ const AddProducts = () => {
           };
 
           try {
+            console.log(requestBody,"defefef")
             const response = await addProduct({ payload: requestBody }).unwrap();
 
             if (response?.status && response?.httpStatusCode === 201) {
@@ -863,6 +866,17 @@ const AddProducts = () => {
                 rows={2}
                 error={formik.touched.leftBottomContent && Boolean(formik.errors.leftBottomContent)}
                 helperText={formik.touched.leftBottomContent && formik.errors.leftBottomContent}
+              />
+              <Divider />
+
+              <div className="font-bold">Minimum Quantity</div>
+
+              <TextField
+                label="Min Quantity"
+                name="minQty"
+                value={formik.values.minQty}
+                onChange={formik.handleChange} 
+                fullWidth
               />
             </Card>
           </div>

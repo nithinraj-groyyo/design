@@ -136,6 +136,7 @@ export interface IInventoryDetails {
     productColorId: number;
     productSizeId: number;
     sizeId: number;
+    id: number;
 }
 
 export interface IProduct {
@@ -156,4 +157,5 @@ export interface IProduct {
     leftBottomHeader: string;
     leftBottomContent: string;
     inventory ?: IInventoryDetails[];
+    minQty?: number;
 }

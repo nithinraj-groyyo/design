@@ -50,7 +50,7 @@ import {
 } from "../../../rtk-query/productApiSlice";
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
-import { IInventoryDetails, IProduct } from "../../../types/products";
+import { IProduct } from "../../../types/products";
 import MagnifyProductImage from "./MagnifyProductImage";
 
 
@@ -100,6 +100,7 @@ interface FormData {
   leftTopContent: string;
   leftBottomHeader: string;
   leftBottomContent: string;
+  minQty: number | undefined;
 }
 
 const EditProduct = () => {
@@ -109,7 +110,7 @@ const EditProduct = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState<{ id: number; name: string } | null>(null);
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
-  const [inventoryList, setInventoryList] = useState<any>([{ id: 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
+  const [inventoryList, setInventoryList] = useState<InventoryListData[]>([]);
   const [imgList, setImgList] = useState<ImageData[]>([
     { id: uuidv1(), side: "", file: null, isThumbnail: true, fileName: "", isDeleted: false, imageUrl: "" },
   ]);
@@ -133,7 +134,7 @@ const EditProduct = () => {
       skip: !selectedCategory?.id,
     }
   );
-
+  console.log("inventoryList", inventoryList)
   const navigate = useNavigate();
 
   const [addNewSize] = useAddNewSizeMutation();
@@ -159,6 +160,7 @@ const EditProduct = () => {
     }
     loadProducts()
   }, [productId]);
+  console.log(product, "veve")
 
   useEffect(() => {
     if (product && categories?.length > 0) {
@@ -170,8 +172,9 @@ const EditProduct = () => {
       formik.setFieldValue("leftTopContent", product?.leftTopContent);
       formik.setFieldValue("leftBottomHeader", product?.leftBottomHeader);
       formik.setFieldValue("leftBottomContent", product?.leftBottomContent);
+      formik.setFieldValue("minQty", product?.minQty);
 
-      setSelectedStatus(product?.isPublic ? "enabled":"disabled");
+      setSelectedStatus(product?.isPublic ? "enabled" : "disabled");
 
       const loadedCategory = categories?.find((cat: any) => cat.id === product?.category);
       if (loadedCategory) {
@@ -193,27 +196,30 @@ const EditProduct = () => {
       formik.setFieldValue("colors", initialColorIds);
 
       const initialPricings =
-        product?.productPrices?.map((price: any) => {
-          return {
-            id: price.id,
-            minQty: price.minQty?.toString(),
-            maxQty: price.maxQty?.toString(),
-            pricePerPiece: price.pricePerPiece?.toString(),
-          };
-        }) || [];
+        product?.productPrices && product?.productPrices.length > 0
+          ? product?.productPrices.map((price: any) => {
+            return {
+              id: price.id,
+              minQty: price.minQty?.toString(),
+              maxQty: price.maxQty?.toString(),
+              pricePerPiece: price.pricePerPiece?.toString(),
+            };
+          })
+          : [{ id: 1, minQty: "", maxQty: "", pricePerPiece: "" }];
+
       setPriceList(initialPricings);
 
+
       const initialInventory =
-        product?.inventory?.map((invent: any) => {
+        (product?.inventory && product?.inventory?.length > 0) ? product?.inventory?.map((invent: any) => {
           return {
-            id: invent.id,
-            sizeId: invent.sizeId,
-            availableQty: invent.availableQty,
-            colorId: invent.colorId,
-            productColorId: invent.productColorId,
-            productSizeId: invent.productSizeId
+            id: invent?.id,
+            color: { id: invent?.colorId, name: "" },
+            size: { id: invent?.sizeId, name: "" },
+            stockQty: invent?.availableQty,
+
           };
-        }) || [];
+        }) : [{ id: 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }];
       setInventoryList(initialInventory);
 
       const initialImageList = product?.productImages?.map((price: any) => {
@@ -329,8 +335,8 @@ const EditProduct = () => {
     field: keyof InventoryListData,
     value: string | number | { id: number; name: string }
   ) => {
-    setInventoryList((prevRows:any) =>
-      prevRows.map((row:any) =>
+    setInventoryList((prevRows: any) =>
+      prevRows.map((row: any) =>
         row.id === id
           ? {
             ...row,
@@ -345,13 +351,11 @@ const EditProduct = () => {
   };
 
   const handleDeleteInvenetoryRow = (id: number) => {
-    setInventoryList((prevRows:any) => prevRows.filter((row:any) => row.id !== id));
+    setInventoryList((prevRows: any) => prevRows.filter((row: any) => row.id !== id));
   };
   const handleAddInventoryRow = () => {
-    setInventoryList((prevRows:any) => [...prevRows, { id: prevRows.length + 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
+    setInventoryList((prevRows: any) => [...prevRows, { id: prevRows.length + 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
   };
-
-
 
   const handleAddRow = () => {
     setPriceList((prevRows) => [...prevRows, { id: uuidv1(), minQty: "", maxQty: "", pricePerPiece: "" }]);
@@ -424,6 +428,7 @@ const EditProduct = () => {
       leftTopContent: "",
       leftBottomHeader: "",
       leftBottomContent: "",
+      minQty: undefined
     },
     validationSchema: Yup.object({
       productName: Yup.string().required("Product Name is required"),
@@ -454,11 +459,11 @@ const EditProduct = () => {
 
 
 
-      const convertInventoryList = inventoryList?.map((inventoryValue:any) => {
+      const convertInventoryList = inventoryList?.map((inventoryValue: any) => {
         return {
-          sizeId: inventoryValue?.sizeId,
-          colorId: inventoryValue?.colorId,
-          availableQty: +inventoryValue?.availableQty
+          sizeId: inventoryValue?.size?.id,
+          colorId: inventoryValue?.color?.id,
+          availableQty: +inventoryValue?.stockQty
         }
       })
 
@@ -493,11 +498,13 @@ const EditProduct = () => {
         leftBottomHeader: values?.leftBottomHeader,
         leftBottomContent: values?.leftBottomContent,
         isPublic: selectedStatus === "enabled" ? true : false,
-        inventory: convertInventoryList
+        inventory: convertInventoryList,
+        minQty: values.minQty !== undefined ? +values.minQty : null
       };
-
+      // console.log("updateProduct", requestBody);
+      // return;
       try {
-        if(productId){
+        if (productId) {
           const response = await updateProduct({ payload: requestBody, productId: +productId }).unwrap();
 
           if (response?.status && response?.httpStatusCode === 200) {
@@ -509,9 +516,6 @@ const EditProduct = () => {
         console.error(error);
         toast.error(error?.error ?? "Error while Updatin g product");
       }
-      // }
-
-      // }
     },
   });
 
@@ -733,11 +737,11 @@ const EditProduct = () => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {inventoryList && inventoryList?.map((row:any, index:any) => (
+                          {inventoryList && inventoryList?.map((row: any, index: any) => (
                             <TableRow key={row?.colorId} sx={{ borderBottom: "none" }}>
                               <TableCell>
                                 <Select
-                                  value={row?.colorId || ""}
+                                  value={row?.color?.id || ""}
                                   onChange={(e) => {
                                     if (e.target.value === "addColor") {
                                       setIsColorModalOpen(true);
@@ -746,7 +750,7 @@ const EditProduct = () => {
                                         (color: any) => color.id === Number(e.target.value)
                                       );
                                       if (selectedColor) {
-                                        handleInventoryData(row.colorId, "color", selectedColor);
+                                        handleInventoryData(row.id, "color", selectedColor);
                                       }
                                     }
                                   }}
@@ -770,7 +774,7 @@ const EditProduct = () => {
 
                               <TableCell>
                                 <Select
-                                  value={row?.sizeId || ""}
+                                  value={row?.size?.id || ""}
                                   onChange={(e) => {
                                     if (e.target.value === "addSize") {
                                       setIsSizeModalOpen(true);
@@ -779,7 +783,7 @@ const EditProduct = () => {
                                         (size: any) => size.id === Number(e.target.value)
                                       );
                                       if (selectedSize) {
-                                        handleInventoryData(row.sizeId, "size", selectedSize);
+                                        handleInventoryData(row.id, "size", selectedSize);
                                       }
                                     }
                                   }}
@@ -809,15 +813,15 @@ const EditProduct = () => {
                                   fullWidth
                                   variant="outlined"
                                   placeholder="0"
-                                  value={row?.availableQty}
-                                  onChange={(e) => handleInventoryData(row?.availableQty, "stockQty", e.target.value)}
+                                  value={row?.stockQty}
+                                  onChange={(e) => handleInventoryData(row?.id, "stockQty", e.target.value)}
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-4">
                                   {inventoryList?.length > 1 && (
-                                    <IconButton color="error" onClick={() => handleDeleteInvenetoryRow(row?.colorId)}>
+                                    <IconButton color="error" onClick={() => handleDeleteInvenetoryRow(row?.id)}>
                                       <DeleteIcon />
                                     </IconButton>
                                   )}
@@ -977,6 +981,19 @@ const EditProduct = () => {
                 rows={2}
                 error={formik.touched.leftBottomContent && Boolean(formik.errors.leftBottomContent)}
                 helperText={formik.touched.leftBottomContent && formik.errors.leftBottomContent}
+              />
+              <Divider />
+
+              <div className="font-bold">Minimum Quantity</div>
+
+              <TextField
+                // label="Min Quantity"
+                name="minQty"
+                value={formik.values.minQty}
+                onChange={formik.handleChange}
+                fullWidth
+                error={formik.touched.minQty && Boolean(formik.errors.minQty)}
+
               />
             </Card>
           </div>
