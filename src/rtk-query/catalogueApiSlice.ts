@@ -149,13 +149,14 @@ const catalogueApiSlice = apiSlice.injectEndpoints({
         }),
 
         updateCatalogue: builder.mutation({
-            query: ({ formData, catalogueId, token }: { formData: FormData; catalogueId: number; token: string }) => ({
+            query: ({ jsonData, catalogueId, token }: { jsonData: Record<string, any>; catalogueId: number; token: string }) => ({
                 url: `${catalogueUrl}/update/${catalogueId}`,
                 method: "PATCH",
                 headers: {
                     Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
                 },
-                body: formData,
+                body: JSON.stringify(jsonData), 
             }),
             transformResponse: (response: ResponseDTO<any>) => {
                 if (response.status && response.data) {
@@ -165,6 +166,7 @@ const catalogueApiSlice = apiSlice.injectEndpoints({
                 }
             },
         }),
+        
     }),
 });
 export const {
