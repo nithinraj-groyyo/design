@@ -88,6 +88,7 @@ export const addressApiSlice = apiSlice.injectEndpoints({
 export const { 
   useAddAddressMutation, 
   useGetAddressesQuery, 
+  useLazyGetAddressesQuery,
   useDeleteAddressMutation, 
   useUpdateDefaultAddressMutation, 
   useUpdateAddressMutation

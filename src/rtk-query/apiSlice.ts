@@ -43,6 +43,7 @@ console.log(result)
 
 export const apiSlice = createApi({
   baseQuery: baseQueryWithErrorHandling,
+  reducerPath: 'api',
   endpoints: () => ({}),
   tagTypes: ["FAQ", "Service", "Category", "CategorySubCategories", "Products", "UserProfile", "Sizes", "Colors", "Team", "Address", "BAG", "RFQ"],
 });
