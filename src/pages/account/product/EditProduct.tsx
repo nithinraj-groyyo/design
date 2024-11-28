@@ -80,6 +80,14 @@ interface PriceListData {
   pricePerPiece: string;
 }
 
+interface InventoryListData {
+  id: number;
+  color: { id: number, name: string };
+  size: { id: number, name: string };
+  stockQty: number;
+}
+
+
 interface FormData {
   productId: number | undefined;
   productName: string;
@@ -87,44 +95,30 @@ interface FormData {
   otherCategory: string;
   category: string;
   description: string;
-  colors: [];
-  sizes: [];
   status: boolean;
   leftTopHeader: string;
   leftTopContent: string;
   leftBottomHeader: string;
   leftBottomContent: string;
+  minQty: number | undefined;
 }
 
 const EditProduct = () => {
   const { productId } = useParams();
-
   const [product, setProduct] = useState<IProduct>()
-
   const [selectedCategory, setSelectedCategory] = useState<{ id: number; name: string } | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] = useState<{ id: number; name: string } | null>(null);
-
-  const [sizeOpen, setSizeOpen] = useState(false);
-  const [colorOpen, setColorOpen] = useState(false);
-  const [colorOptionsState, setColorOptionsState] = useState<Array<{ id: number; name: string }>>([]);
-  const [sizeOptionsState, setSizeOptionsState] = useState<Array<{ id: number; name: string }>>([]);
-
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
-
+  const [inventoryList, setInventoryList] = useState<InventoryListData[]>([]);
   const [imgList, setImgList] = useState<ImageData[]>([
     { id: uuidv1(), side: "", file: null, isThumbnail: true, fileName: "", isDeleted: false, imageUrl: "" },
   ]);
-
   const [priceList, setPriceList] = useState<PriceListData[]>([{ id: 1, minQty: "", maxQty: "", pricePerPiece: "" }]);
-
   const [newSize, setNewSize] = useState("");
   const [newColor, setNewColor] = useState("");
-
   const [selectedStatus, setSelectedStatus] = useState("enabled");
-
   const [uploadSingleFile] = useUploadSingleFileMutation();
-
   const { data: categories, isLoading: isCategoriesLoading } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
   const {
     data: subCategories,
@@ -137,10 +131,9 @@ const EditProduct = () => {
       pageSize: 10,
     },
     {
-      skip: !selectedCategory?.id, 
+      skip: !selectedCategory?.id,
     }
   );
-
   const navigate = useNavigate();
 
   const [addNewSize] = useAddNewSizeMutation();
@@ -157,72 +150,89 @@ const EditProduct = () => {
   const [updateProduct] = useUpdateProductMutation();
 
   useEffect(() => {
-    async function loadProducts () {
-        if(productId){
-            const response = await getProductById({ productId: +productId }).unwrap();
-            const responseData = response?.data;
-            setProduct(responseData); 
-        }
+    async function loadProducts() {
+      if (productId) {
+        const response = await getProductById({ productId: +productId }).unwrap();
+        const responseData = response?.data;
+        setProduct(responseData);
+      }
     }
     loadProducts()
   }, [productId]);
 
   useEffect(() => {
     if (product && categories?.length > 0) {
-        formik.setFieldValue("productId", product?.id);
-        formik.setFieldValue("productName", product?.name);
-        formik.setFieldValue("styleName", product?.styleName);
-        formik.setFieldValue("description", product?.description);
-        formik.setFieldValue("leftTopHeader", product?.leftTopHeader);
-        formik.setFieldValue("leftTopContent", product?.leftTopContent);
-        formik.setFieldValue("leftBottomHeader", product?.leftBottomHeader);
-        formik.setFieldValue("leftBottomContent", product?.leftBottomContent);
-  
-        setSelectedStatus(product?.isPublic ? "enabled":"disabled");
-  
-        const loadedCategory = categories?.find((cat: any) => cat.id === product?.category);
-        if (loadedCategory) {
-          formik.setFieldValue("category", loadedCategory?.id);
-          setSelectedCategory(loadedCategory);
-        }
-  
-        const loadedSubCategory = subCategories?.find((subCat: any) => subCat.id === product?.subCategory);
+      formik.setFieldValue("productId", product?.id);
+      formik.setFieldValue("productName", product?.name);
+      formik.setFieldValue("styleName", product?.styleName);
+      formik.setFieldValue("description", product?.description);
+      formik.setFieldValue("leftTopHeader", product?.leftTopHeader);
+      formik.setFieldValue("leftTopContent", product?.leftTopContent);
+      formik.setFieldValue("leftBottomHeader", product?.leftBottomHeader);
+      formik.setFieldValue("leftBottomContent", product?.leftBottomContent);
+      formik.setFieldValue("minQty", product?.minQty);
 
-        if (loadedSubCategory) {
-          formik.setFieldValue("otherCategory", loadedSubCategory?.id);
-          setSelectedSubCategory(loadedSubCategory!);
-        }
-  
-        const initialSizeIds = product?.sizes?.map((size: any) => size?.id) || [];
-        formik.setFieldValue("sizes", initialSizeIds);
-  
-        const initialColorIds = product?.productColors?.map((size: any) => size?.id) || [];
-        formik.setFieldValue("colors", initialColorIds);
-  
-        const initialPricings =
-          product?.productPrices?.map((price: any) => {
+      setSelectedStatus(product?.isPublic ? "enabled" : "disabled");
+
+      const loadedCategory = categories?.find((cat: any) => cat.id === product?.category);
+      if (loadedCategory) {
+        formik.setFieldValue("category", loadedCategory?.id);
+        setSelectedCategory(loadedCategory);
+      }
+
+      const loadedSubCategory = subCategories?.find((subCat: any) => subCat.id === product?.subCategory);
+
+      if (loadedSubCategory) {
+        formik.setFieldValue("otherCategory", loadedSubCategory?.id);
+        setSelectedSubCategory(loadedSubCategory!);
+      }
+
+      const initialSizeIds = product?.sizes?.map((size: any) => size?.id) || [];
+      formik.setFieldValue("sizes", initialSizeIds);
+
+      const initialColorIds = product?.productColors?.map((size: any) => size?.id) || [];
+      formik.setFieldValue("colors", initialColorIds);
+
+      const initialPricings =
+        product?.productPrices && product?.productPrices.length > 0
+          ? product?.productPrices.map((price: any) => {
             return {
               id: price.id,
               minQty: price.minQty?.toString(),
               maxQty: price.maxQty?.toString(),
               pricePerPiece: price.pricePerPiece?.toString(),
             };
-          }) || [];
-        setPriceList(initialPricings);
-  
-        const initialImageList = product?.productImages?.map((price: any) => {
+          })
+          : [{ id: 1, minQty: "", maxQty: "", pricePerPiece: "" }];
+
+      setPriceList(initialPricings);
+
+
+      const initialInventory =
+        (product?.inventory && product?.inventory?.length > 0) ? product?.inventory?.map((invent: any) => {
           return {
-            id: price?.fileId,
-            side: price?.sideName,
-            file: null,
-            isThumbnail: price?.isThumbnail,
-            fileName: price?.fileName,
-            isDeleted: false,
-            imageUrl: price?.signedUrl,
+            id: invent?.id,
+            color: { id: invent?.colorId, name: "" },
+            size: { id: invent?.sizeId, name: "" },
+            stockQty: invent?.availableQty,
+
           };
-        });
-        setImgList(initialImageList);
-      }
+        }) : [{ id: 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }];
+      setInventoryList(initialInventory);
+
+      const initialImageList = product?.productImages?.map((price: any) => {
+        return {
+          id: price?.fileId,
+          side: price?.sideName,
+          file: null,
+          isThumbnail: price?.isThumbnail,
+          fileName: price?.fileName,
+          isDeleted: false,
+          imageUrl: price?.signedUrl,
+        };
+      });
+      setImgList(initialImageList);
+    }
   }, [product, categories, subCategories, productId])
 
   useEffect(() => {
@@ -241,10 +251,6 @@ const EditProduct = () => {
   const handleSubCategoryChange = (e: any) => {
     const selectedSubCategoryId = e.target.value;
     formik.setFieldValue("otherCategory", selectedSubCategoryId);
-  };
-
-  const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedStatus(event.target.value);
   };
 
   const handleFileUpload = (id: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -297,12 +303,12 @@ const EditProduct = () => {
             prev.map((img) =>
               img.id === id
                 ? {
-                    ...img,
-                    file: file,
-                    fileName: responseData.fileName,
-                    isDeleted: false,
-                    id: fileId,
-                  }
+                  ...img,
+                  file: file,
+                  fileName: responseData.fileName,
+                  isDeleted: false,
+                  id: fileId,
+                }
                 : img
             )
           );
@@ -320,6 +326,33 @@ const EditProduct = () => {
         isThumbnail: item.id === selectedId,
       }))
     );
+  };
+
+  const handleInventoryData = (
+    id: number,
+    field: keyof InventoryListData,
+    value: string | number | { id: number; name: string }
+  ) => {
+    setInventoryList((prevRows: any) =>
+      prevRows.map((row: any) =>
+        row.id === id
+          ? {
+            ...row,
+            [field]:
+              typeof value === "object" && value !== null
+                ? { id: value.id, name: value.name }
+                : value,
+          }
+          : row
+      )
+    );
+  };
+
+  const handleDeleteInvenetoryRow = (id: number) => {
+    setInventoryList((prevRows: any) => prevRows.filter((row: any) => row.id !== id));
+  };
+  const handleAddInventoryRow = () => {
+    setInventoryList((prevRows: any) => [...prevRows, { id: prevRows.length + 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
   };
 
   const handleAddRow = () => {
@@ -342,29 +375,9 @@ const EditProduct = () => {
     setImgList((prev) => prev.filter((img) => img?.id !== id));
   };
 
-  const handleSizeClose = () => {
-    setSizeOpen(false);
-    setSizeOptionsState([]);
-  };
+  const sizeOptionsArray = sizeOptions ? Object.values(sizeOptions) : [];
 
-  const handleSizeOpen = () => {
-    setSizeOpen(true);
-    setSizeOptionsState(sizeOptions);
-  };
-
-  const sizeOptionsArray = Object.values(sizeOptionsState);
-
-  const handleColorClose = () => {
-    setColorOpen(false);
-    setColorOptionsState([]);
-  };
-
-  const handleColorOpen = () => {
-    setColorOpen(true);
-    setColorOptionsState(colorOptions);
-  };
-
-  const colorOptionsArray = Object.values(colorOptionsState);
+  const colorOptionsArray = colorOptions ? Object.values(colorOptions) : [];
 
   const handleAddSize = async () => {
     if (newSize) {
@@ -408,13 +421,12 @@ const EditProduct = () => {
       otherCategory: "",
       category: "",
       description: "",
-      colors: [],
-      sizes: [],
       status: true,
       leftTopHeader: "",
       leftTopContent: "",
       leftBottomHeader: "",
       leftBottomContent: "",
+      minQty: undefined
     },
     validationSchema: Yup.object({
       productName: Yup.string().required("Product Name is required"),
@@ -426,14 +438,6 @@ const EditProduct = () => {
       leftTopContent: Yup.string().required("Field is required"),
       leftBottomHeader: Yup.string().required("Field is required"),
       leftBottomContent: Yup.string().required("Field is required"),
-      sizes: Yup.array()
-        .of(Yup.string().required("Each size must be a string"))
-        .min(1, "At least one size is required")
-        .required("Sizes are required"),
-      colors: Yup.array()
-        .of(Yup.string().required("Each color must be a string"))
-        .min(1, "At least one color is required")
-        .required("Colors are required"),
     }),
     onSubmit: async (values) => {
       // if (imgList?.filter(x => (x.side.trim() == '' || (x.file == null && x.fileName == '') && x.isDeleted == false)).length > 0) {
@@ -450,6 +454,17 @@ const EditProduct = () => {
           pricePerPiece: +price?.pricePerPiece,
         };
       });
+
+
+
+      const convertInventoryList = inventoryList?.map((inventoryValue: any) => {
+        return {
+          sizeId: inventoryValue?.size?.id,
+          colorId: inventoryValue?.color?.id,
+          availableQty: +inventoryValue?.stockQty
+        }
+      })
+
 
       const images = imgList
         ?.map((item) => {
@@ -474,33 +489,31 @@ const EditProduct = () => {
         styleName: values.styleName,
         categoryId: +values.category,
         subCategoryId: +values.otherCategory,
-        productColorIds: values?.colors,
-        productSizeIds: values?.sizes,
         productPrices: convertPriceList,
         productImages: finalImages,
         leftTopHeader: values?.leftTopHeader,
         leftTopContent: values?.leftTopContent,
         leftBottomHeader: values?.leftBottomHeader,
         leftBottomContent: values?.leftBottomContent,
-        isPublic: selectedStatus === "enabled" ? true : false
+        isPublic: selectedStatus === "enabled" ? true : false,
+        inventory: convertInventoryList,
+        minQty: values.minQty !== undefined ? +values.minQty : null
       };
-
+      // console.log("updateProduct", requestBody);
+      // return;
       try {
-        if(productId){
-            const response = await updateProduct({ payload: requestBody, productId: +productId }).unwrap();
+        if (productId) {
+          const response = await updateProduct({ payload: requestBody, productId: +productId }).unwrap();
 
-        if (response?.status && response?.httpStatusCode === 200) {
-          toast.success(response?.message);
-          navigate("/account/product-list", { replace: true });
-        }
+          if (response?.status && response?.httpStatusCode === 200) {
+            toast.success(response?.message);
+            navigate("/account/product-list", { replace: true });
+          }
         }
       } catch (error: any) {
         console.error(error);
         toast.error(error?.error ?? "Error while Updatin g product");
       }
-      // }
-
-      // }
     },
   });
 
@@ -657,11 +670,11 @@ const EditProduct = () => {
                               onChange={handleFileUpload(img.id)}
                             />
                             {!img?.fileName && (
-                                <label htmlFor={`upload-file-${img.id}`}>
-                                    <IconButton color="primary" component="span">
-                                        <UploadIcon />
-                                    </IconButton>
-                                </label>
+                              <label htmlFor={`upload-file-${img.id}`}>
+                                <IconButton color="primary" component="span">
+                                  <UploadIcon />
+                                </IconButton>
+                              </label>
                             )}
                           </InputAdornment>
                         ),
@@ -702,124 +715,127 @@ const EditProduct = () => {
               <div className="font-bold">Attributes</div>
               <div className="flex ">
                 <div className="flex-[2] flex flex-col gap-8 ">
-                  <Autocomplete
-                    multiple
-                    open={sizeOpen}
-                    onClick={(e) => console.log("eee", e)}
-                    onOpen={handleSizeOpen}
-                    onClose={handleSizeClose}
-                    value={sizeOptions?.filter((size: any) => formik.values.sizes.includes(size?.id as never)) || []}
-                    options={sizeOptionsArray || []}
-                    loading={isSizesLoading}
-                    getOptionLabel={(option) => option.name}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    onChange={(event, newValue) => {
-                      const selectedSizeIds = newValue.map((size) => size.id);
-                      formik.setFieldValue("sizes", selectedSizeIds);
-                    }}
-                    renderOption={(props, option) => {
-                      const index = sizeOptionsArray.findIndex((opt) => opt.id === option.id);
 
-                      return (
-                        <React.Fragment key={option.id || index}>
-                          <div>
-                            <li {...props} key={`option-${option.id || index}`}>
-                              {option.name || option}
-                            </li>
-                          </div>
-                          {index === sizeOptionsArray?.length - 1 && (
-                            <div key="add-new-size-button" className="w-full flex justify-center items-center">
-                              <Button
-                                onClick={() => {
-                                  setIsSizeModalOpen(true);
-                                }}
-                              >
-                                Add New Size
-                              </Button>
-                            </div>
-                          )}
-                        </React.Fragment>
-                      );
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Sizes"
-                        fullWidth
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.sizes && Boolean(formik.errors.sizes)}
-                        helperText={formik.touched.sizes && formik.errors.sizes}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <>
-                              {isSizesLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                              {params.InputProps.endAdornment}
-                            </>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
+                  <div className="flex-[5] px-2">
+                    <div className="font-bold">Available Quantities</div>
+                    <TableContainer>
+                      <Table sx={{ border: "none" }}>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>
+                              <Typography className="!font-bold !text-sm">Color</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography className="!font-bold !text-sm">Size</Typography>
+                            </TableCell>
+                            <TableCell>
+                              <Typography className="!font-bold !text-sm">Stock Quantity</Typography>
+                            </TableCell>
+                            <TableCell></TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {inventoryList && inventoryList?.map((row: any, index: any) => (
+                            <TableRow key={row?.colorId} sx={{ borderBottom: "none" }}>
+                              <TableCell>
+                                <Select
+                                  value={row?.color?.id || ""}
+                                  onChange={(e) => {
+                                    if (e.target.value === "addColor") {
+                                      setIsColorModalOpen(true);
+                                    } else {
+                                      const selectedColor: any = colorOptionsArray.find(
+                                        (color: any) => color.id === Number(e.target.value)
+                                      );
+                                      if (selectedColor) {
+                                        handleInventoryData(row.id, "color", selectedColor);
+                                      }
+                                    }
+                                  }}
+                                  className="min-w-[12rem]"
+                                  displayEmpty
+                                  variant="outlined"
+                                >
+                                  <MenuItem value="-1" disabled>
+                                    Select Color
+                                  </MenuItem>
+                                  {colorOptionsArray.map((color: any) => (
+                                    <MenuItem key={color.id} value={color.id}>
+                                      {color.name}
+                                    </MenuItem>
+                                  ))}
+                                  <MenuItem value="addColor" className="!font-bold">
+                                    Add more color...
+                                  </MenuItem>
+                                </Select>
+                              </TableCell>
 
-                  <Autocomplete
-                    multiple
-                    open={colorOpen}
-                    onOpen={handleColorOpen}
-                    onClose={handleColorClose}
-                    options={colorOptionsArray}
-                    loading={isColorsLoading}
-                    value={colorOptions?.filter((color: any) => formik.values.colors.includes(color?.id as never)) || []}
-                    getOptionLabel={(option) => option.name}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    onChange={(event, newValue) => {
-                      const selectedColorIds = newValue.map((size) => size.id);
-                      formik.setFieldValue("colors", selectedColorIds);
-                    }}
-                    renderOption={(props, option) => {
-                      const index = colorOptionsArray.findIndex((opt) => opt.id === option.id);
+                              <TableCell>
+                                <Select
+                                  value={row?.size?.id || ""}
+                                  onChange={(e) => {
+                                    if (e.target.value === "addSize") {
+                                      setIsSizeModalOpen(true);
+                                    } else {
+                                      const selectedSize: any = sizeOptionsArray.find(
+                                        (size: any) => size.id === Number(e.target.value)
+                                      );
+                                      if (selectedSize) {
+                                        handleInventoryData(row.id, "size", selectedSize);
+                                      }
+                                    }
+                                  }}
+                                  // fullWidth
+                                  className="min-w-[12rem]"
+                                  displayEmpty
+                                  variant="outlined"
+                                >
+                                  <MenuItem value="-1" disabled>
+                                    Select Size
+                                  </MenuItem>
+                                  {sizeOptionsArray.map((size: any) => (
+                                    <MenuItem key={size.id} value={size.id}>
+                                      {size.name}
+                                    </MenuItem>
+                                  ))}
+                                  <MenuItem value="addSize" className="!font-bold">
+                                    Add New Size...
+                                  </MenuItem>
+                                </Select>
+                              </TableCell>
 
-                      return (
-                        <React.Fragment key={option.id || index}>
-                          <div>
-                            <li {...props} key={`option-${option.id || index}`}>
-                              {option.name || option}
-                            </li>
-                          </div>
-                          {index === colorOptionsArray?.length - 1 && (
-                            <div key="add-new-color-button" className="w-full flex justify-center items-center">
-                              <Button
-                                onClick={() => {
-                                  setIsColorModalOpen(true);
-                                }}
-                              >
-                                Add New Color
-                              </Button>
-                            </div>
-                          )}
-                        </React.Fragment>
-                      );
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Colors"
-                        fullWidth
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.colors && Boolean(formik.errors.colors)}
-                        helperText={formik.touched.colors && formik.errors.colors}
-                        InputProps={{
-                          ...params.InputProps,
-                          endAdornment: (
-                            <React.Fragment>
-                              {isColorsLoading ? <CircularProgress color="inherit" size={20} /> : null}
-                              {params.InputProps.endAdornment}
-                            </React.Fragment>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
+
+                              <TableCell>
+                                <TextField
+                                  type="number"
+                                  fullWidth
+                                  variant="outlined"
+                                  placeholder="0"
+                                  value={row?.stockQty}
+                                  onChange={(e) => handleInventoryData(row?.id, "stockQty", e.target.value)}
+                                  inputProps={{ min: 0 }}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex gap-4">
+                                  {inventoryList?.length > 1 && (
+                                    <IconButton color="error" onClick={() => handleDeleteInvenetoryRow(row?.id)}>
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  )}
+                                  {index === inventoryList?.length - 1 && (
+                                    <IconButton color="primary" onClick={handleAddInventoryRow}>
+                                      <AddBoxIcon />
+                                    </IconButton>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </div>
 
                   <div className="flex-[5] px-2">
                     <div className="font-bold">Product Pricing :</div>
@@ -963,6 +979,19 @@ const EditProduct = () => {
                 rows={2}
                 error={formik.touched.leftBottomContent && Boolean(formik.errors.leftBottomContent)}
                 helperText={formik.touched.leftBottomContent && formik.errors.leftBottomContent}
+              />
+              <Divider />
+
+              <div className="font-bold">Minimum Quantity</div>
+
+              <TextField
+                // label="Min Quantity"
+                name="minQty"
+                value={formik.values.minQty}
+                onChange={formik.handleChange}
+                fullWidth
+                error={formik.touched.minQty && Boolean(formik.errors.minQty)}
+
               />
             </Card>
           </div>

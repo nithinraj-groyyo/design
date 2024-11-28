@@ -130,6 +130,15 @@ export interface INewProductImage {
     signedUrl: string;
 }
 
+export interface IInventoryDetails {
+    availableQty: number;
+    colorId: number;
+    productColorId: number;
+    productSizeId: number;
+    sizeId: number;
+    id: number;
+}
+
 export interface IProduct {
     id: number;
     name: string;
@@ -147,4 +156,6 @@ export interface IProduct {
     leftTopContent: string;
     leftBottomHeader: string;
     leftBottomContent: string;
+    inventory ?: IInventoryDetails[];
+    minQty?: number;
 }

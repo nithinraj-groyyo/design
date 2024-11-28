@@ -146,7 +146,12 @@ const ProductTable: React.FC = () => {
                       <TableCell style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '15rem' }}>{item.styleName}</TableCell>
                       <TableCell style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>{item.description}</TableCell>
                       <TableCell style={{ minWidth: '7rem' }}>
-                        {/* Render the product image */}
+                        <img
+                          src={item?.productImages[0]?.signedUrl}
+                          alt={item?.productImages[0]?.fileName}
+                          className='object-cover w-24 h-18'
+                        />
+                        
                       </TableCell>
                       <TableCell sx={{ display: "flex", alignItems: "center", justifyContent: "center" }} className='!h-32'>
                         <IconButton
