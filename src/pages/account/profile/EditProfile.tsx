@@ -8,10 +8,10 @@ import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
 import { useUpdateUserProfileMutation } from '../../../rtk-query/profileApiSlice';
 
 const validationSchema = Yup.object({
-  contactName: Yup.string().required('First Name is required'),
+  name: Yup.string().required('First Name is required'),
   email: Yup.string().email('Invalid email address').required('Email is required'),
   gender: Yup.string().required('Gender is required'),
-  contactNumber: Yup.string().required('Contact Number is required'),
+  mobileNo: Yup.string().required('Contact Number is required'),
   profilePhoto: Yup.mixed().optional().nullable(),
 });
 
@@ -26,18 +26,18 @@ const EditProfile = ({ profileData, setProfileData, onClose }: IEditProfileProps
 
   const formik = useFormik({
     initialValues: {
-      contactName: profileData?.contactName || "",
+      contactName: profileData?.name || "",
       email: profileData?.email || "",
       gender: profileData?.gender || "",
-      contactNumber: profileData?.contactNumber || "",
+      contactNumber: profileData?.mobileNo || "",
       // profilePhoto: null as File | null,
     },
     validationSchema,
     onSubmit: async (values) => {
       const payload: IUserDetailsRequest = {
         id: profileData?.id,
-        contactName: values.contactName || null,
-        contactNumber: values.contactNumber || null,
+        name: values?.contactName || null,
+        mobileNo: values?.contactNumber || null,
         gender: values.gender || null,
         email: values.email || "",
         // fileName: values.profilePhoto ? values.profilePhoto?.name : null,

@@ -25,7 +25,7 @@ const Profile = () => {
       try {
         const response = await getUserProfile({authToken}).unwrap();
         if (response?.status) {
-          setProfileData(response?.data);
+          setProfileData(response?.result);
         }
       } catch (error: any) {
         let errorMessage = "An unknown error occurred while fetching user profile.";
@@ -70,7 +70,7 @@ const Profile = () => {
                       {isLoading ? (
                         <Skeleton variant="text" width={150} height={20} />
                       ) : (
-                        <span>{profileData?.contactName || "N/A"}</span>
+                        <span>{profileData?.name || "N/A"}</span>
                       )}
                     </div>
                   </div>
@@ -81,7 +81,7 @@ const Profile = () => {
                       {isLoading ? (
                         <Skeleton variant="text" width={120} height={20} />
                       ) : (
-                        profileData?.contactNumber || "N/A"
+                        profileData?.mobileNo || "N/A"
                       )}
                     </div>
                   </div>
@@ -97,7 +97,7 @@ const Profile = () => {
                     </div>
                   </div>
                   <Divider sx={{ width: "96%", mx: "auto" }} />
-                  <div className="flex ml-8">
+                  {/* <div className="flex ml-8">
                     <div className="w-1/2">Gender</div>
                     <div className="w-1/2">
                       {isLoading ? (
@@ -106,7 +106,7 @@ const Profile = () => {
                         profileData?.gender || "N/A"
                       )}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </AccountSettingsLayout.Body>
             </AccountSettingsLayout>

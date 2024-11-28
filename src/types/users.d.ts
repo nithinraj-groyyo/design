@@ -1,7 +1,7 @@
 export interface IUserProfile {
     id: number;
-    contactName: string | null;
-    contactNumber: string | null;
+    name: string | null;
+    mobileNo: string | null;
     gender: string | null;
     email: string;
     role: Role;
@@ -15,8 +15,8 @@ export interface Role {
 
 export interface IUserDetailsRequest {
     id: number;
-    contactName: string | null;
-    contactNumber: string | null;
+    name: string | null;
+    mobileNo: string | null;
     gender: string | null;
     email: string;
     // fileName: File | string | null;

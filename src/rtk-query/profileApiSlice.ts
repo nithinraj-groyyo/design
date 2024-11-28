@@ -1,9 +1,10 @@
 import apiSlice from "./apiSlice";
+import userApiSlice from "./userApiSlice";
 
 const userUrl = "user";
 const token = JSON.parse(localStorage.getItem('authToken') as string);
 
-const userApiSlice = apiSlice.injectEndpoints({
+const profileApiSlice = userApiSlice.injectEndpoints({
     endpoints: (builder) => ({
         changePassword: builder.mutation({
             query: ({currentPassword, newPassword}: {currentPassword: string, newPassword: string}) => ({
@@ -18,7 +19,7 @@ const userApiSlice = apiSlice.injectEndpoints({
         }),
         getUserProfile: builder.query({
             query: ({authToken}:{authToken: string | undefined}) => ({
-                url: `${userUrl}/profile`,
+                url: `${userUrl}/detail`,
                 headers: {
 					'Content-type': 'application/json',
                     'Authorization': `Bearer ${authToken ?? token}`
@@ -58,4 +59,4 @@ export const {
     useLazyGetUserProfileQuery,
     useUpdateUserProfileMutation,
     useUpdatePasswordMutation
-} = userApiSlice;
+} = profileApiSlice;
