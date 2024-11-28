@@ -39,7 +39,7 @@ export const userApiSlice = createApi({
   baseQuery: baseQueryWithErrorHandling,
   endpoints: () => ({}),
   reducerPath: 'userApi',
-  tagTypes: ["AUTH"],
+  tagTypes: ["AUTH", "UserProfile"],
 });
 
 export default userApiSlice;
