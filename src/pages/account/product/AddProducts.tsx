@@ -393,7 +393,6 @@ const AddProducts = () => {
           };
 
           try {
-            console.log(requestBody,"defefef")
             const response = await addProduct({ payload: requestBody }).unwrap();
 
             if (response?.status && response?.httpStatusCode === 201) {
