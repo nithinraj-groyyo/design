@@ -1,4 +1,3 @@
-
 import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import categoriesSlice from "./categoriesSlice";
@@ -10,10 +9,12 @@ import wishlistSlice from "./wishlistSlice";
 import bagSlice from "./bagSlice";
 import userSlice from "./userSlice";
 import apiSlice from '../rtk-query/apiSlice';
+import userApiSlice from '../rtk-query/userApiSlice';
 
 export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
+    [userApiSlice.reducerPath]: userApiSlice.reducer,
     categories: categoriesSlice,
     products: productsSlice,
     productSize: productSizeSlice,
@@ -23,9 +24,10 @@ export const store = configureStore({
     bag: bagSlice,
     user: userSlice
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    serializableCheck: false 
-  }).concat(apiSlice.middleware)
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware()
+      .concat(apiSlice.middleware) 
+      .concat(userApiSlice.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

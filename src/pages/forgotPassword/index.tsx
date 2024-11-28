@@ -3,7 +3,7 @@ import { Formik, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@mui/material';
-import { useUpdatePasswordMutation } from '../../rtk-query/userApiSlice';
+import { useUpdatePasswordMutation } from '../../rtk-query/profileApiSlice';
 import PasswordField from '../../components/PasswordField';
 import { toast } from 'react-toastify';
 

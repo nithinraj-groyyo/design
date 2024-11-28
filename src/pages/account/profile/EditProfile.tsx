@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { IUserDetailsRequest, IUserProfile } from '../../../types/users';
 import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
-import { useUpdateUserProfileMutation } from '../../../rtk-query/userApiSlice';
+import { useUpdateUserProfileMutation } from '../../../rtk-query/profileApiSlice';
 
 const validationSchema = Yup.object({
   contactName: Yup.string().required('First Name is required'),

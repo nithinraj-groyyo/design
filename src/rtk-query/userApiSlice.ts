@@ -1,61 +1,45 @@
-import apiSlice from "./apiSlice";
+import { createApi, fetchBaseQuery, BaseQueryFn } from "@reduxjs/toolkit/query/react";
+import type { FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { toast } from "react-toastify";
 
-const userUrl = "user";
-const token = JSON.parse(localStorage.getItem('authToken') as string);
+const baseQueryWithErrorHandling: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
+  const baseQuery = fetchBaseQuery({
+    baseUrl: process.env.REACT_APP_USER_SERVICE_API,
+    prepareHeaders: (headers, { getState }) => {
+      return headers;
+    },
+  });
 
-const userApiSlice = apiSlice.injectEndpoints({
-    endpoints: (builder) => ({
-        changePassword: builder.mutation({
-            query: ({currentPassword, newPassword}: {currentPassword: string, newPassword: string}) => ({
-                url: `${userUrl}/change-password`,
-                headers: {
-					'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-				},
-                method: 'POST',
-                body: {currentPassword, newPassword}
-            })
-        }),
-        getUserProfile: builder.query({
-            query: ({authToken}:{authToken: string | undefined}) => ({
-                url: `${userUrl}/profile`,
-                headers: {
-					'Content-type': 'application/json',
-                    'Authorization': `Bearer ${authToken ?? token}`
-				},
-            }),
-            providesTags: ["UserProfile"],
-        }),
-        updateUserProfile: builder.mutation({
-            query: (payload) => ({
-                url: `${userUrl}/update-profile`,
-                method: "PUT",
-                headers: {
-					'Content-type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-				},
-                body: payload
-            }),
-            invalidatesTags: ["UserProfile"]
-        }),
-        updatePassword: builder.mutation({
-            query: ({ token, password }: {token: string, password: string }) => ({
-              url: `/auth/updatePassword`,
-              headers: {
-                "Content-type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              method: "PATCH",
-              body: { password },
-            }),
-          }),
-    }),
+  try {
+    const result: any = await baseQuery(args, api, extraOptions);
+console.log(result)
+    if (result.data) {
+      if (result?.data?.httpStatusCode === 500) {
+        toast.error(result?.data?.errorReason?.message);
+      }
+      if (result?.data?.statusCode === 500) {
+        toast.error(result?.data?.message);
+      }
+      if (result?.data?.statusCode === 401) {
+        toast.error(result?.data?.message);
+      }
+      if (result?.data?.statusCode === 400) {
+        toast.error(result?.data?.message);
+      }
+    }
+    return result;
+  } catch (error) {
+    return {
+      error: { status: "FETCH_ERROR", error: "Something went wrong!" } as FetchBaseQueryError,
+    };
+  }
+};
+
+export const userApiSlice = createApi({
+  baseQuery: baseQueryWithErrorHandling,
+  endpoints: () => ({}),
+  reducerPath: 'userApi',
+  tagTypes: ["AUTH"],
 });
 
-
-export const {
-    useChangePasswordMutation,
-    useLazyGetUserProfileQuery,
-    useUpdateUserProfileMutation,
-    useUpdatePasswordMutation
-} = userApiSlice;
+export default userApiSlice;

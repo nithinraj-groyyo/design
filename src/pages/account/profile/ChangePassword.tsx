@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import { Button } from "@mui/material";
 import { toast } from "react-toastify";
 import PasswordField from "../../../components/PasswordField";
-import { useChangePasswordMutation } from "../../../rtk-query/userApiSlice";
+import { useChangePasswordMutation } from "../../../rtk-query/profileApiSlice";
 
 interface ChangePasswordValues {
   currentPassword: string;

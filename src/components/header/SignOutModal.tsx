@@ -1,5 +1,5 @@
-import React from 'react';
-import { Modal, Box, Typography, Button } from '@mui/material';
+import React from "react";
+import { Modal, Box, Typography, Button } from "@mui/material";
 
 interface SignOutModalProps {
   open: boolean;
@@ -9,41 +9,79 @@ interface SignOutModalProps {
 
 const SignOutModal: React.FC<SignOutModalProps> = ({ open, onClose, onConfirm }) => {
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} closeAfterTransition>
       <Box
-        className="
-          absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-          bg-white rounded-lg shadow-lg
-          w-[90%] xs:w-[400px] md:w-[450px]
-          p-3 xs:p-4
-        "
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          borderRadius: 2,
+          p: 4,
+          width: { xs: "90%", sm: 400, md: 450 },
+          outline: "none",
+          animation: "fadeIn 0.3s ease-out",
+        }}
       >
         <Typography
           variant="h6"
-          component="h2"
-          className="text-lg sm:text-xl font-bold text-gray-800"
+          sx={{
+            fontWeight: "bold",
+            color: "text.primary",
+            mb: 2,
+            textAlign: "center",
+          }}
         >
           Sign Out
         </Typography>
-        <Typography className="mt-2 text-sm sm:text-base text-gray-600">
+        <Typography
+          sx={{
+            color: "text.secondary",
+            textAlign: "center",
+            mb: 4,
+          }}
+        >
           Are you sure you want to sign out?
         </Typography>
-        <Box className="flex justify-between mt-6">
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 2,
+            mt: 2,
+          }}
+        >
           <Button
             variant="contained"
-            color="primary"
-            className="bg-blue-600 text-white hover:bg-blue-500 px-4 sm:px-6 py-2 rounded-lg"
+            sx={{
+              bgcolor: "primary.main",
+              color: "white",
+              flex: 1,
+              py: 1.5,
+              "&:hover": { bgcolor: "primary.dark" },
+              fontSize: "0.9rem",
+            }}
             onClick={onConfirm}
           >
-            Yes
+            Yes, Sign Out
           </Button>
           <Button
             variant="outlined"
-            color="secondary"
-            className="border-gray-400 text-gray-600 hover:bg-gray-100 px-4 sm:px-6 py-2 rounded-lg"
+            sx={{
+              color: "text.primary",
+              borderColor: "text.secondary",
+              flex: 1,
+              py: 1.5,
+              "&:hover": {
+                bgcolor: "action.hover",
+              },
+              fontSize: "0.9rem",
+            }}
             onClick={onClose}
           >
-            No
+            Cancel
           </Button>
         </Box>
       </Box>
