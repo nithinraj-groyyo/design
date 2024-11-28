@@ -53,13 +53,12 @@ const AddCatalogue = () => {
   const handleCategoryChange = (setFieldValue: any, selectedCategoryId: number) => {
     setSelectedCategory(selectedCategoryId);
     setFieldValue('category', selectedCategoryId);
-    setFieldValue('subCategory', ''); // Reset subcategory when category changes
+    setFieldValue('subCategory', '');
   };
 
   const handleToggleButtons = ({ method, setMethod }: { method: boolean; setMethod: React.Dispatch<React.SetStateAction<boolean>> }) => {
     setMethod(!method);
   };
-
 
   useEffect(() => {
     if (selectedCategory) {
@@ -109,7 +108,7 @@ const AddCatalogue = () => {
           <Form>
             <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
               <Card className="p-4 flex flex-col gap-6">
-                {/* Name and Min Quantity Fields */}
+
                 <div className="flex gap-6">
                   <Field
                     name="name"
@@ -125,7 +124,6 @@ const AddCatalogue = () => {
                   />
                 </div>
 
-                {/* Category and Subcategory Fields */}
                 <div className="w-full flex gap-6">
                   <FormControl fullWidth>
                     <InputLabel>Category</InputLabel>
@@ -165,7 +163,7 @@ const AddCatalogue = () => {
                   </FormControl>
                 </div>
                 <div className='flex gap-6 w-full justify-between'>
-                  {/* Premium Checkbox */}
+
                   <FormControlLabel
                     className='w-full'
                     control={
@@ -178,7 +176,6 @@ const AddCatalogue = () => {
                     label="Is this a premium product?"
                   />
 
-                  {/* Active Checkbox */}
                   <FormControlLabel
                     className='w-full'
                     control={
@@ -192,8 +189,6 @@ const AddCatalogue = () => {
                   />
                 </div>
 
-
-                {/* File Upload */}
                 <div className="flex flex-col gap-2 w-full mb-2">
                   <label htmlFor="upload-media" className="text-gray-700 font-medium">
                     Upload Media
@@ -209,7 +204,6 @@ const AddCatalogue = () => {
                   )}
                 </div>
 
-                {/* Description Field */}
                 <Field
                   name="description"
                   render={({ field }: any) => (
@@ -225,7 +219,6 @@ const AddCatalogue = () => {
                 />
               </Card>
 
-              {/* Submit Button */}
               <div className="flex justify-end mt-4">
                 <Button type="submit" variant="contained" color="primary" disabled={isAdding}>
                   {isAdding ? 'Submitting...' : 'Submit'}

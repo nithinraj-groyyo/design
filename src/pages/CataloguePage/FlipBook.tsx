@@ -4,7 +4,7 @@ import HTMLFlipBook from "react-pageflip";
 const FlipBook = forwardRef((props: any, ref) => {
     const { pageImages, isPortrait, onFlip, isMobile } = props;
     const [isMobileView, setIsMobileView] = useState(isMobile);
-
+    console.log(pageImages,"vevev")
     useEffect(() => {
         setIsMobileView(isMobile);
     }, [isMobile]);
@@ -41,11 +41,11 @@ const FlipBook = forwardRef((props: any, ref) => {
                     className="flipbook"
                     onFlip={onFlip}
                 >
-                    {pageImages.map((image: any, index: number) => (
+                    {pageImages?.map((image: any, index: number) => (
                         <div className="page" key={index}>
                             <img
-                                src={image.src}
-                                alt={image.alt}
+                                src={image?.signedUrl}
+                                alt={image?.createdAt}
                                 className="w-full h-full object-cover"
                             />
                         </div>
@@ -81,11 +81,11 @@ const FlipBook = forwardRef((props: any, ref) => {
                     className="flipbook"
                     onFlip={onFlip}
                 >
-                    {pageImages.map((image: any, index: number) => (
+                    {pageImages?.map((image: any, index: number) => (
                         <div className="page" key={index}>
                             <img
-                                src={image.src}
-                                alt={image.alt}
+                                src={image?.signedUrl}
+                                alt={image?.createdAt}
                                 className="w-full h-full object-cover"
                             />
                         </div>

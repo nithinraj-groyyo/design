@@ -1,66 +1,79 @@
-import { Card, CardContent, CardMedia,Typography } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography } from '@mui/material';
 import BasicLayout from '../../layouts/BasicLayout';
 import { motion } from 'framer-motion';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowForwardIos } from '@mui/icons-material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import FlipBook from './FlipBook';
-import { useLazyFetchCatalogueListQuery } from '../../rtk-query/catalogueApiSlice';
-
-
-const pageImages = [
-    { src: '/images/catalouges/catalouge1/image1.jpg', alt: 'Fashion cover' },
-    { src: '/images/catalouges/catalouge1/image2.jpg', alt: 'About us page' },
-    { src: '/images/catalouges/catalouge1/image3.jpg', alt: 'Product categories' },
-    { src: '/images/catalouges/catalouge1/image4.jpg', alt: 'Featured products' },
-    { src: '/images/catalouges/catalouge1/image5.jpg', alt: 'Best sellers' },
-];
+import { useFetchCatalogueByIdQuery, useLazyFetchCatalogueListQuery } from '../../rtk-query/catalogueApiSlice';
 
 const CatalougePageDetails = () => {
     const flipBookRef = useRef<any>(null);
     const [catalogues, setCatalogues] = useState([]);
+    const [pageImages, setPageImages] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
-    const [isPotraitMode, setIsPotraitMode] = useState(false)
+    const [isPotraitMode, setIsPotraitMode] = useState(false);
 
-    const token = JSON.parse(localStorage.getItem("authToken") || 'null');
-
+    const token = JSON.parse(localStorage.getItem('authToken') || 'null');
     const [fetchCatalogues, { data, isLoading: isProductLoading }] = useLazyFetchCatalogueListQuery();
 
+    const { catalogueId } = useParams<{ catalogueId: string }>(); 
+
+    const { data: catalogueDetials, isLoading, isError, error } = useFetchCatalogueByIdQuery({
+        catalogueId: Number(catalogueId),
+        token,
+    });
+
+    useEffect(() => {
+        if (catalogueDetials) {
+            console.log('Catalogue Details:', catalogueDetials);
+        }
+    }, [catalogueDetials]);
+
+    console.log(catalogueDetials,"kesav")
+
     const loadCatalogues = async () => {
-        const response = await fetchCatalogues(token);
-        if (response?.data) {
-            setCatalogues(response?.data || []);
-            // setPageCount(Math.ceil(response?.data?.total));
-            // setTotalCount(response?.data?.total)
+        try {
+            const response = await fetchCatalogues(token);
+            if (response?.data) {
+                setCatalogues(response?.data || []);
+
+                if (response.data[0]?.catalogueImages) {
+                    const images = response.data[0].catalogueImages.map((image: any) => ({
+                        src: image.signedUrl,
+                        alt: image.name || 'Catalogue Page',
+                    }));
+                    setPageImages(images);
+                    setTotalPage(images.length);
+                }
+            } else {
+                console.warn('No data received from API.');
+            }
+        } catch (error) {
+            console.error('Error fetching catalogues:', error);
         }
     };
-    useEffect(() => {
-        setTotalPage(pageImages?.length);
-    }, [])
 
     useEffect(() => {
-        window.scrollTo(0, 0)
-    }, [])
+        loadCatalogues();
+    }, []);
 
-    const navigate = useNavigate(); 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    const navigate = useNavigate();
 
     const handleNavigation = () => {
         navigate('/rfq');
     };
 
     useEffect(() => {
-        console.log(currentPage === totalPage - 1, currentPage , totalPage - 1)
-        setIsPotraitMode(currentPage === totalPage - 1)
-
+        setIsPotraitMode(currentPage === totalPage - 1);
     }, [currentPage, totalPage]);
-
-    useEffect(() => {
-        console.log("isMobile:", isMobile, "isPotraitMode:", isPotraitMode);
-    }, [isMobile, isPotraitMode]);
-    
 
     const onFlip = (e: any) => {
         setCurrentPage(e.data);
@@ -71,7 +84,6 @@ const CatalougePageDetails = () => {
         if (flipBookRef.current) {
             const currentPageIndex = flipBookRef.current.pageFlip().getCurrentPageIndex();
             const totalPageCount = flipBookRef.current.pageFlip().getPageCount();
-            console.log("Current Page Index:", currentPageIndex);
             setCurrentPage(currentPageIndex);
             setTotalPage(totalPageCount);
         }
@@ -80,44 +92,44 @@ const CatalougePageDetails = () => {
     useEffect(() => {
         const updateScreenOrientation = () => {
             const isPortrait = window.innerHeight > window.innerWidth;
-            setIsMobile(window.innerWidth <= 768); 
-            setIsPotraitMode(isPortrait); 
+            setIsMobile(window.innerWidth <= 768);
+            setIsPotraitMode(isPortrait);
         };
-    
+
         updateScreenOrientation();
-    
-        window.addEventListener("resize", updateScreenOrientation);
+
+        window.addEventListener('resize', updateScreenOrientation);
         return () => {
-            window.removeEventListener("resize", updateScreenOrientation);
+            window.removeEventListener('resize', updateScreenOrientation);
         };
     }, []);
 
     return (
         <BasicLayout>
             <div className="relative flex flex-col gap-8 justify-center items-center p-8 h-screen overflow-hidden mt-[5rem]">
-                <div className='flex justify-around w-full mt-10'>
+                <div className="flex justify-around w-full mt-10">
                     <motion.div
                         className="text-3xl font-semibold text-[#fff] flex items-center"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        Catalogue 1
+                        {catalogueDetials?.name}
                     </motion.div>
                 </div>
                 <div
                     className="absolute inset-0"
                     style={{
-                        backgroundImage: "url(/images/landingPages/floralPattern4.png)",
+                        backgroundImage: 'url(/images/landingPages/floralPattern4.png)',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         filter: 'blur(10px) brightness(0.6)',
-                        zIndex: -1
+                        zIndex: -1,
                     }}
                 ></div>
 
                 <motion.div
-                    className={`relative z-10 `}
+                    className="relative z-10"
                     style={{ overflow: 'visible' }}
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -125,18 +137,21 @@ const CatalougePageDetails = () => {
                 >
                     <FlipBook
                         ref={flipBookRef}
-                        pageImages={pageImages}
+                        pageImages={catalogueDetials?.catalogueImages}
                         isPortrait={isMobile || isPotraitMode}
                         onFlip={onFlip}
                         isMobile={isMobile}
                     />
-                    <div className='flex flex-col gap-4'>
+                    <div className="flex flex-col gap-4">
                         <div className="text-center text-white mt-4">
                             Click or swipe to flip pages!
                         </div>
                         <div className="flex gap-4 items-center justify-center">
                             <motion.button
-                                onClick={() => flipBookRef.current && flipBookRef.current.pageFlip().flipPrev()}
+                                onClick={() =>
+                                    flipBookRef.current &&
+                                    flipBookRef.current.pageFlip().flipPrev()
+                                }
                                 className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
                                 whileHover={{ scale: 1.1 }}
                                 transition={{ type: 'spring', stiffness: 300 }}
@@ -144,7 +159,10 @@ const CatalougePageDetails = () => {
                                 <ArrowBackIosIcon />
                             </motion.button>
                             <motion.button
-                                onClick={() => flipBookRef.current && flipBookRef.current.pageFlip().flipNext()}
+                                onClick={() =>
+                                    flipBookRef.current &&
+                                    flipBookRef.current.pageFlip().flipNext()
+                                }
                                 className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
                                 whileHover={{ scale: 1.1 }}
                                 transition={{ type: 'spring', stiffness: 300 }}
@@ -168,35 +186,53 @@ const CatalougePageDetails = () => {
             <div className="flex flex-col gap-6 my-6 p-12">
                 <div className="text-xl font-semibold text-gray-800">YOU MAY ALSO LIKE</div>
                 <div className="flex gap-6 overflow-x-auto py-4">
-                    {catalogues.map((catalogue:any) => (
-                        <Link to={`/catalogue/${catalogue}`} key={catalogue} style={{ textDecoration: 'none' }}>
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                whileHover={{ scale: 1.02 }}
-                                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                                className="w-60"
+                    {catalogues.map((catalogue: any) => {
+                        return (
+                            <Link
+                                to={`/catalogue/${catalogue?.id}`}
+                                key={catalogue?.id}
+                                style={{ textDecoration: 'none' }}
                             >
-                                <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden" style={{ backgroundColor: '#fff' }}>
-                                    <CardMedia
-                                        component="img"
-                                        height="200"
-                                        image={catalogue.thumbnail}
-                                        alt={catalogue?.name}
-                                        className="object-cover"
-                                    />
-                                    <CardContent className="p-4">
-                                        <Typography variant="h6" component="div" className="text-gray-800 font-semibold">
-                                            {catalogue.name}
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                            {catalogue.category} - {catalogue.subcategory}
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
-                        </Link>
-                    ))}
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    whileHover={{ scale: 1.02 }}
+                                    transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                                    className="w-60"
+                                >
+                                    <Card
+                                        className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden"
+                                        style={{ backgroundColor: '#fff' }}
+                                    >
+                                        <CardMedia
+                                            component="img"
+                                            height="200"
+                                            image={catalogue?.catalogueImages[0]?.signedUrl}
+                                            alt={catalogue?.name || 'Catalogue'}
+                                            className="object-cover !w-[full] !h-36"
+                                        />
+                                        <CardContent className="p-4">
+                                            <Typography
+                                                variant="h6"
+                                                component="div"
+                                                className="text-gray-800 font-semibold"
+                                            >
+                                                {catalogue?.name || 'Untitled'}
+                                            </Typography>
+                                            <Typography
+                                                variant="body2"
+                                                color="textSecondary"
+                                            >
+                                                {catalogue?.category
+                                                    ? `${catalogue?.category?.name}`
+                                                    : 'No category available'}
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </BasicLayout>
