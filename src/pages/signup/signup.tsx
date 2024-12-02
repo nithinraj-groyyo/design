@@ -48,7 +48,7 @@ const Signup = () => {
         const response = await signUp(newData).unwrap();
         const responseData = response;
 
-        if(responseData?.status){
+        if (responseData?.status) {
           toast.success("Signup successful! Please verify OTP.");
           setIsOtpModalOpen(true);
         }
@@ -59,29 +59,29 @@ const Signup = () => {
       }
     }
   });
-  
-  
+
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [updateLocalWishlist] = useUpdateLocalWishlistMutation();
 
-    const handleVerifyOtp = async () => {
+  const handleVerifyOtp = async () => {
     try {
       const response: any = await verifyOtpLogin({
         mobileNo: "null",
         email: formik.values.email,
         otpCode: otp,
-        fcmToken: "",   
-        deviceId: "",   
+        fcmToken: "",
+        deviceId: "",
         platform: "GROYYO_DESIGN"
       }).unwrap();
-      
+
       if (response?.status) {
         toast.success("OTP Verified Successfully!");
         dispatch(setToken({ token: response?.result?.token }));
         localStorage.setItem("authToken", JSON.stringify(response?.result?.token));
         localStorage.setItem('isAdmin', JSON.stringify(response?.result?.role?.name === "ADMIN"));
-        
+
         const productIds = JSON.parse(localStorage.getItem("localWishList") as string);
         await updateLocalWishlist({ token: response?.result?.token, payload: productIds }).then((res) => {
           dispatch(setWishlistItems(res?.data?.count));
@@ -105,7 +105,7 @@ const Signup = () => {
           <img className="object-cover w-full h-full" src="/images/auth/login_img_2.jpeg" alt="login_bg2" />
         </div>
       </div>
-      
+
       <div className="fixed inset-0 flex items-center justify-center">
         <div
           style={{
@@ -114,7 +114,7 @@ const Signup = () => {
           className="w-[25rem] xl:w-[30rem] rounded p-4 flex flex-col gap-4"
         >
           <Typography variant="h6">Create your account</Typography>
-          
+
           <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
             <TextField
               id="name"
@@ -128,7 +128,7 @@ const Signup = () => {
               error={formik.touched.name && Boolean(formik.errors.name)}
               helperText={formik.touched.name && formik.errors.name}
             />
-            
+
             <TextField
               id="mobileNo"
               name="mobileNo"
@@ -141,7 +141,7 @@ const Signup = () => {
               error={formik.touched.mobileNo && Boolean(formik.errors.mobileNo)}
               helperText={formik.touched.mobileNo && formik.errors.mobileNo}
             />
-            
+
             <TextField
               id="email"
               name="email"
@@ -154,7 +154,7 @@ const Signup = () => {
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
             />
-            
+
             <Button
               type="submit"
               variant="contained"
@@ -162,7 +162,7 @@ const Signup = () => {
             >
               {isLoading ? <CircularProgress size={24} color="inherit" /> : "Sign Up"}
             </Button>
-            
+
             <Typography variant="body2" className="w-full text-right">
               Already a user?{" "}
               <Link to={"/login"}>
@@ -172,10 +172,10 @@ const Signup = () => {
           </form>
         </div>
       </div>
-      
-      
+
+
       <Modal open={isOtpModalOpen} onClose={() => setIsOtpModalOpen(false)}>
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-50">
           <div className="p-8 bg-white rounded-lg shadow-lg max-w-lg w-full flex flex-col gap-4">
             <h2 className="text-2xl font-semibold text-center">Enter OTP</h2>
             <TextField
@@ -187,21 +187,26 @@ const Signup = () => {
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
             />
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
+            <button
               onClick={handleVerifyOtp}
               disabled={isOtpLoading || !otp}
+              className={`w-full px-4 py-2 text-white bg-black rounded-lg ${isOtpLoading || !otp
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-gray-800 transition-all duration-300'
+                }`}
             >
-              {isOtpLoading ? <CircularProgress size={24} /> : "Verify OTP"}
-            </Button>
-            <Button variant="text" onClick={()=>setIsOtpModalOpen(false)}>
+              {isOtpLoading ? <CircularProgress size={24} className="text-white" /> : 'Verify OTP'}
+            </button>
+            <button
+              onClick={() => setIsOtpModalOpen(false)}
+              className="w-full px-4 py-2 text-black bg-white border border-black rounded-lg hover:bg-black hover:text-white transition-all duration-300"
+            >
               Cancel
-            </Button>
+            </button>
           </div>
         </div>
       </Modal>
+
     </BasicLayout>
   );
 }

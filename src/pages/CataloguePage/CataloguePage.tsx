@@ -1,9 +1,24 @@
 import { useEffect, useState } from 'react';
-import { Card, CardMedia, CardContent, Typography, Select, MenuItem, FormControl, InputLabel, Grid } from '@mui/material';
+import { 
+  Card, 
+  CardMedia, 
+  CardContent, 
+  Typography, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  InputLabel, 
+  Grid, 
+  Pagination 
+} from '@mui/material';
 import BasicLayout from '../../layouts/BasicLayout';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useFetchCategoryListQuery, useFetchSubCategoriesListQuery, useLazyFetchCatalogueListQuery } from '../../rtk-query/catalogueApiSlice';
+import { 
+  useFetchCategoryListQuery, 
+  useFetchSubCategoriesListQuery, 
+  useLazyFetchCatalogueListQuery 
+} from '../../rtk-query/catalogueApiSlice';
 
 interface ICategory {
   id: number;
@@ -32,23 +47,27 @@ const CataloguePage = () => {
   const [selectedCategory, setSelectedCategory] = useState<any>('All');
   const [selectedSubcategory, setSelectedSubcategory] = useState('All');
   const [catalogues, setCatalogues] = useState<ICatalogue[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Number of items per page
   const token = JSON.parse(localStorage.getItem("authToken") || 'null');
 
   const [fetchCatalogues, { data, isLoading: isProductLoading }] = useLazyFetchCatalogueListQuery();
 
   const { data: categories } = useFetchCategoryListQuery(token);
-  
+
   const { data: subCategories, refetch } = useFetchSubCategoriesListQuery(
     { categoryId: +selectedCategory || 0, token },
     { skip: !selectedCategory }
   );
 
   const loadCatalogues = async () => {
+    console.log("Fetching catalogues...");
     const response = await fetchCatalogues(token);
+    console.log("Fetched Catalogues Response:", response);
     if (response?.data) {
-        setCatalogues(response?.data || []);
+      setCatalogues(response?.data || []);
     }
-};
+  };
 
   useEffect(() => {
     if (categories && Array.isArray(categories)) {
@@ -64,21 +83,40 @@ const CataloguePage = () => {
 
   useEffect(() => {
     if (selectedCategory) {
+      console.log("Selected Category Changed:", selectedCategory);
       refetch?.();
     }
   }, [selectedCategory, refetch]);
 
   useEffect(() => {
+    console.log("Loading catalogues...");
     loadCatalogues();
   }, [selectedCategory, selectedSubcategory]);
 
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    console.log("Page Changed to:", value);
+    setCurrentPage(value);
+  };
+
   const filteredCatalogues = catalogues.filter((catalogue) => {
+    console.log("Filtering catalogues with:", {
+      selectedCategory,
+      selectedSubcategory,
+      catalogueCategoryId: catalogue?.category?.id,
+      catalogueSubCategoryId: catalogue?.subCategory?.id,
+    });
     return (
       (selectedCategory === 'All' || catalogue?.category?.id === +selectedCategory) &&
       (selectedSubcategory === 'All' || catalogue?.subCategory?.id === +selectedSubcategory)
     );
   });
-  
+
+  const totalPages = Math.ceil(filteredCatalogues.length / itemsPerPage);
+
+  const paginatedCatalogues = filteredCatalogues.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <BasicLayout>
@@ -125,7 +163,7 @@ const CataloguePage = () => {
         </motion.div>
 
         <Grid container spacing={3}>
-          {filteredCatalogues.map((catalogue: any) => (
+          {paginatedCatalogues.map((catalogue: any) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
               <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
                 <motion.div
@@ -138,7 +176,7 @@ const CataloguePage = () => {
                     <CardMedia
                       component="img"
                       height="200"
-                      image={catalogue.catalogueImages[0].signedUrl}
+                      image={catalogue.catalogueImages[0]?.signedUrl || ''}
                       alt={catalogue?.name}
                       className="object-cover h-36 w-48"
                     />
@@ -153,6 +191,19 @@ const CataloguePage = () => {
             </Grid>
           ))}
         </Grid>
+
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8">
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              variant="outlined"
+              shape="rounded"
+            />
+          </div>
+        )}
       </div>
     </BasicLayout>
   );

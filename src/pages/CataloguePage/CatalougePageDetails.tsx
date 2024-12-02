@@ -109,7 +109,7 @@ const CatalougePageDetails = () => {
             <div className="relative flex flex-col gap-8 justify-center items-center p-8 h-screen overflow-hidden mt-[5rem]">
                 <div className="flex justify-around w-full mt-10">
                     <motion.div
-                        className="text-3xl font-semibold text-[#fff] flex items-center"
+                        className="text-3xl font-semibold flex items-center"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
@@ -118,14 +118,15 @@ const CatalougePageDetails = () => {
                     </motion.div>
                 </div>
                 <div
-                    className="absolute inset-0"
-                    style={{
-                        backgroundImage: 'url(/images/landingPages/floralPattern4.png)',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        filter: 'blur(10px) brightness(0.6)',
-                        zIndex: -1,
-                    }}
+                    className="absolute inset-0 bg-gray-100"
+                // style={{
+                //     // backgroundImage: 'url(/images/landingPages/floralPattern4.png)',
+                //     backgroundColor:"fefefe"
+                //     // backgroundSize: 'cover',
+                //     // backgroundPosition: 'center',
+                //     filter: 'blur(10px) brightness(0.6)',
+                //     zIndex: -1,
+                // }}
                 ></div>
 
                 <motion.div
@@ -144,36 +145,36 @@ const CatalougePageDetails = () => {
                     />
                     <div className="flex flex-col gap-4">
                         <div className='flex justify-center gap-6 items-center align-middle mt-4'>
-                        <motion.button
-                            onClick={() =>
-                                flipBookRef.current &&
-                                flipBookRef.current.pageFlip().flipPrev()
-                            }
-                            className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ type: 'spring', stiffness: 300 }}
-                        >
-                            <ArrowBackIosIcon />
-                        </motion.button>
-                        <div className="text-center text-white mt-4">
-                            Click or swipe to flip pages!
+                            <motion.button
+                                onClick={() =>
+                                    flipBookRef.current &&
+                                    flipBookRef.current.pageFlip().flipPrev()
+                                }
+                                className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ type: 'spring', stiffness: 300 }}
+                            >
+                                <ArrowBackIosIcon />
+                            </motion.button>
+                            <div className="text-center  mt-4">
+                                Click or swipe to flip pages!
+                            </div>
+
+                            <motion.button
+                                onClick={() =>
+                                    flipBookRef.current &&
+                                    flipBookRef.current.pageFlip().flipNext()
+                                }
+                                className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ type: 'spring', stiffness: 300 }}
+                            >
+                                <ArrowForwardIos />
+                            </motion.button>
+                            <div />
                         </div>
 
-                        <motion.button
-                            onClick={() =>
-                                flipBookRef.current &&
-                                flipBookRef.current.pageFlip().flipNext()
-                            }
-                            className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ type: 'spring', stiffness: 300 }}
-                        >
-                            <ArrowForwardIos />
-                        </motion.button>
-                    <div />
-                    </div>
-
-                     <div className="flex justify-center">
+                        <div className="flex justify-center">
                             <motion.button
                                 className="px-6 py-3 rounded-lg bg-black text-white font-semibold shadow-md focus:outline-none min-w-[10rem]"
                                 whileHover={{ scale: 1.1 }}
