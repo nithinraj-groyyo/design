@@ -91,7 +91,7 @@ const adminMenuItems = [
       // { title: "Brands", route: "/account/brands" },
       // { title: "Add Brands", route: "/account/add-brands" },
       { title: "Manage Categories", route: "/account/manage-categories" },
-      // { title: "Manage Subscriptions", route: "/account/manage-subscriptions" },
+      { title: "Manage Subscriptions", route: "/account/manage-subscriptions" },
     ],
   },
 ];

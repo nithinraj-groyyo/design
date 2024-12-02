@@ -20,7 +20,7 @@ const CatalougePageDetails = () => {
     const token = JSON.parse(localStorage.getItem('authToken') || 'null');
     const [fetchCatalogues, { data, isLoading: isProductLoading }] = useLazyFetchCatalogueListQuery();
 
-    const { catalogueId } = useParams<{ catalogueId: string }>(); 
+    const { catalogueId } = useParams<{ catalogueId: string }>();
 
     const { data: catalogueDetials, isLoading, isError, error } = useFetchCatalogueByIdQuery({
         catalogueId: Number(catalogueId),
@@ -33,7 +33,7 @@ const CatalougePageDetails = () => {
         }
     }, [catalogueDetials]);
 
-    console.log(catalogueDetials,"kesav")
+    console.log(catalogueDetials, "kesav")
 
     const loadCatalogues = async () => {
         try {
@@ -143,36 +143,39 @@ const CatalougePageDetails = () => {
                         isMobile={isMobile}
                     />
                     <div className="flex flex-col gap-4">
+                        <div className='flex justify-center gap-6 items-center align-middle mt-4'>
+                        <motion.button
+                            onClick={() =>
+                                flipBookRef.current &&
+                                flipBookRef.current.pageFlip().flipPrev()
+                            }
+                            className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                        >
+                            <ArrowBackIosIcon />
+                        </motion.button>
                         <div className="text-center text-white mt-4">
                             Click or swipe to flip pages!
                         </div>
-                        <div className="flex gap-4 items-center justify-center">
+
+                        <motion.button
+                            onClick={() =>
+                                flipBookRef.current &&
+                                flipBookRef.current.pageFlip().flipNext()
+                            }
+                            className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                        >
+                            <ArrowForwardIos />
+                        </motion.button>
+                    <div />
+                    </div>
+
+                     <div className="flex justify-center">
                             <motion.button
-                                onClick={() =>
-                                    flipBookRef.current &&
-                                    flipBookRef.current.pageFlip().flipPrev()
-                                }
-                                className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
-                                whileHover={{ scale: 1.1 }}
-                                transition={{ type: 'spring', stiffness: 300 }}
-                            >
-                                <ArrowBackIosIcon />
-                            </motion.button>
-                            <motion.button
-                                onClick={() =>
-                                    flipBookRef.current &&
-                                    flipBookRef.current.pageFlip().flipNext()
-                                }
-                                className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md"
-                                whileHover={{ scale: 1.1 }}
-                                transition={{ type: 'spring', stiffness: 300 }}
-                            >
-                                <ArrowForwardIos />
-                            </motion.button>
-                        </div>
-                        <div className="flex justify-center">
-                            <motion.button
-                                className="px-6 py-3 rounded-lg bg-[#ee572f] text-black font-semibold shadow-md focus:outline-none min-w-[10rem]"
+                                className="px-6 py-3 rounded-lg bg-black text-white font-semibold shadow-md focus:outline-none min-w-[10rem]"
                                 whileHover={{ scale: 1.1 }}
                                 transition={{ type: 'spring', stiffness: 300 }}
                                 onClick={handleNavigation}

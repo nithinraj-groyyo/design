@@ -10,6 +10,7 @@ import { Service } from "../../types/service";
 import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
 import { useFetchAllServicesQuery } from "../../rtk-query/serviceApiSlice";
+import SubscriptionPage from "./SubscriptionPage";
 
 export enum ServiceButtons {
   ExploreDesigns = "Explore our Designs",
@@ -275,52 +276,7 @@ const ServicePage = () => {
           </div>
         </div>
         
-        <div className="flex justify-center items-center w-full sm:w-1/2 relative py-8 sm:py-0 my-32 sm:my-0">          
-          <div className="bg-gradient-to-br from-[#CEC1B2] to-[#D8C9BB] w-[20rem] sm:w-[26rem] h-[13rem] sm:h-[15rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">            
-            <div className="bg-gradient-to-br from-[#B9A99A] to-[#CAB7A9] w-[18rem] sm:w-[23rem] h-[18rem] sm:h-[20rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out">              
-              <div className="bg-gradient-to-br from-[#978776] to-[#B19C89] w-[15rem] sm:w-[20rem] h-[22rem] sm:h-[25rem] rounded-3xl shadow-2xl relative z-20 transform hover:scale-105 transition-transform duration-300 ease-out">                
-                <div className="absolute -top-8 sm:-top-12 left-[50%] transform -translate-x-[50%]">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#B9A99A] rounded-full flex justify-center items-center shadow-md">
-                    <span className="text-3xl sm:text-4xl">💎</span>
-                  </div>
-                </div>
-                
-                <div className="text-center mt-12">
-                  <span className="inline-block bg-[#60594D] text-white text-xs px-4 sm:px-4 py-1 rounded-full shadow-lg">
-                    Design +
-                  </span>
-                </div>
-                
-                <div className="text-center mt-4 sm:mt-6 flex justify-center items-baseline">
-                  <h3 className="text-[#F3EDE5] text-5xl sm:text-6xl font-bold drop-shadow-lg">
-                    $10
-                  </h3>
-                  <span className="text-[#F3EDE5] text-lg ml-1 drop-shadow-md">
-                    /MO
-                  </span>
-                </div>
-                
-                <div className="text-[#F3EDE5] text-center mt-6 sm:mt-8 text-opacity-90 space-y-2">
-                  <p className="flex items-center justify-center">
-                    <span className="mr-2">🔥</span> Best Price ever
-                  </p>
-                  <p className="flex items-center justify-center">
-                    <span className="mr-2">✨</span> Best Design ever
-                  </p>
-                  <p className="flex items-center justify-center">
-                    <span className="mr-2">🌟</span> 11:11 lorem ipsum
-                  </p>
-                </div>
-                
-                <div className="flex justify-center mt-6 sm:mt-8">
-                  <button className="bg-[#60594D] text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 ease-out">
-                    Get Started
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <SubscriptionPage/>
       </section>
     </BasicLayout>
   );
