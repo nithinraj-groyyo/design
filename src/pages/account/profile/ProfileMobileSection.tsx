@@ -69,7 +69,7 @@ const ProfileMobileSection = () => {
                                     {isLoading ? (
                                         <Skeleton variant="text" width={150} height={20} />
                                     ) : (
-                                        <span>{profileData?.contactName || "N/A"}</span>
+                                        <span>{profileData?.name || "N/A"}</span>
                                     )}
                                 </div>
                             </div>
@@ -80,7 +80,7 @@ const ProfileMobileSection = () => {
                                     {isLoading ? (
                                         <Skeleton variant="text" width={120} height={20} />
                                     ) : (
-                                        profileData?.contactNumber || "N/A"
+                                        profileData?.mobileNo || "N/A"
                                     )}
                                 </div>
                             </div>
