@@ -3,16 +3,16 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { TextField, Button, FormControl, Checkbox, FormControlLabel, Grid } from '@mui/material';
 import { useAddRFQMutation } from '../../rtk-query/rfqSlice';
+import { useParams } from 'react-router-dom';
 
 const AddRFQ = () => {
+  const { catalogueId } = useParams<{ catalogueId: any }>();
   const [addRFQ, { isLoading }] = useAddRFQMutation();
   const token = JSON.parse(localStorage.getItem("authToken") as string);
 
   const validationSchema = Yup.object({
     id: Yup.string(),
     brandName: Yup.string().required('Brand Name is required'),
-    email: Yup.string().email('Invalid email format').required('Email is required'),
-    mobileNo: Yup.string().required('Mobile Number is required'),
     country: Yup.string().required('Country is required'),
     minOrderQty: Yup.number().required('Minimum Order Quantity is required'),
     targetCost: Yup.number(),
@@ -22,10 +22,8 @@ const AddRFQ = () => {
   });
 
   const initialValues = {
-    id: '',
+    id: catalogueId || '',
     brandName: '',
-    email: '',
-    mobileNo: '',
     country: '',
     minOrderQty: '',
     targetCost: '',
@@ -44,7 +42,8 @@ const AddRFQ = () => {
           formData.append(key, values[key]);
         }
       });
-      await addRFQ({ formData, token }).unwrap();
+      formData.append("catalogueId", catalogueId || "");
+      await addRFQ({ formData, token, catalogueId  }).unwrap();
       alert('RFQ submitted successfully');
     } catch (err) {
       console.error('Error submitting RFQ:', err);
@@ -75,7 +74,7 @@ const AddRFQ = () => {
                 </FormControl>
               </Grid>
               
-              <Grid item xs={12} sm={6}>
+              {/* <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
                   <Field
                     name="email"
@@ -99,7 +98,7 @@ const AddRFQ = () => {
                     helperText={<ErrorMessage name="mobileNo" />}
                   />
                 </FormControl>
-              </Grid>
+              </Grid> */}
 
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>

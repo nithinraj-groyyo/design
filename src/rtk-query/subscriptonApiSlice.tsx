@@ -26,6 +26,15 @@ const subscriptionApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    subscribeUser: builder.mutation({
+      query: ({ userId, token }: { userId: number; token: string }) => ({
+        url: `/user/subscribe/${userId}`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
   }),
 });
 
@@ -33,4 +42,5 @@ export const {
   useCreateSubscriptionMutation,
   useGetSubscriptionListQuery,
   useGetSubscriptionByIdQuery,
+  useSubscribeUserMutation, 
 } = subscriptionApiSlice;

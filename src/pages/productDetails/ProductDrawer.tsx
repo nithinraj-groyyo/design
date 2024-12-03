@@ -29,6 +29,12 @@ import ColorOption from '../shoppingBag/ColorOptions';
 import { useNavigate } from 'react-router-dom';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
+type Size = {
+    productSizeId: number;
+    id: number;
+    name: string;
+  };
+
 const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose: () => void, product: IProduct }) => {
     const navigate = useNavigate();
     const isMobile = useMediaQuery('(max-width:600px)');
@@ -46,7 +52,29 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
 
     const [addToCart] = useAddToCartMutation();
 
+    const [availableSizes, setAvailableSizes] = useState<Size[]>([]);
+
     useEffect(() => {
+        if (selectedColor) {
+            // Filter the inventory based on the selected color
+            const relevantInventory = product.inventory && product.inventory.filter(
+                (inventoryItem) => inventoryItem.colorId === selectedColor.id
+            ) || [];
+
+            // Extract unique sizeIds from the filtered inventory
+            const sizeIds = relevantInventory.map((item) => item.sizeId);
+
+            // Find sizes that match the sizeIds from the product's sizes
+            const sizesForColor = product.sizes.filter((size) => sizeIds.includes(size.id));
+
+            // Set the available sizes
+            setAvailableSizes(sizesForColor);
+        }
+    }, [selectedColor, product]);
+
+    console.log("outside variations", variations)
+    useEffect(() => {
+        console.log("inside variations", variations)
         const totalQty = variations.reduce((sum, variation) => sum + variation.quantity, 0);
         setOverallQuantity(totalQty);
         setPricePerPiece(getPriceForTotalQuantity(totalQty));
@@ -302,7 +330,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                                         variant="contained"
                                         color="primary"
                                         className="transition-all duration-300 ease-in-out transform shadow-lg !bg-black !text-white"
-                                        onClick={() => setOpenVariationTable(false)} 
+                                        onClick={() => setOpenVariationTable(false)}
                                     >
                                         Select New Variants
                                     </Button>
@@ -360,19 +388,25 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                             </Grid>
 
                             <Divider sx={{ my: 2 }} />
+                            {
+                                availableSizes?.length > 0 && (
+                                    <>
+                                        <p className='text-sm 2xl:text-[1rem] my-2 text-gray-500'>
+                                            2. Size({product?.sizes?.length}): {selectedSize?.name}
+                                        </p>
+                                        <Grid container spacing={2}>
+                                            {availableSizes?.map((size, index) => (
+                                                <Grid item key={index} onClick={() => setSelectedSize({ id: size?.id, name: size?.name, productSizeId: size?.productSizeId })}>
+                                                    <div className={`bg-[#F4F4F4] text-center cursor-pointer rounded-lg p-2 min-w-10 ${selectedSize?.id === size?.id ? "border-2 border-black" : ""}`}>
+                                                        {size?.name}
+                                                    </div>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                    </>
+                                )
+                            }
 
-                            <p className='text-sm 2xl:text-[1rem] my-2 text-gray-500'>
-                                2. Size({product?.sizes?.length}): {selectedSize?.name}
-                            </p>
-                            <Grid container spacing={2}>
-                                {product?.sizes.map((size, index) => (
-                                    <Grid item key={index} onClick={() => setSelectedSize({ id: size?.id, name: size?.name, productSizeId: size?.productSizeId })}>
-                                        <div className={`bg-[#F4F4F4] text-center cursor-pointer rounded-lg p-2 min-w-10 ${selectedSize?.id === size?.id ? "border-2 border-black" : ""}`}>
-                                            {size?.name}
-                                        </div>
-                                    </Grid>
-                                ))}
-                            </Grid>
 
                             <Divider sx={{ my: 2 }} />
 

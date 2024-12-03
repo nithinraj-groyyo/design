@@ -7,12 +7,10 @@ const SubscriptionPage = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
 
-  // Handle loading state
   if (isLoading) {
     return <div className="text-center mt-32">Loading subscriptions...</div>;
   }
 
-  // Handle error state
   if (error || !subscriptions?.status) {
     return (
       <div className="text-center mt-32 text-red-600">

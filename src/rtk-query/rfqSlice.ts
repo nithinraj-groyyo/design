@@ -6,14 +6,14 @@ const rfqUrl = "rfq";
 const rfqApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     addRFQ: builder.mutation({
-      query: ({formData,token}:{formData: FormData,token:string}) => ({
-        url: `${rfqUrl}/add`,
+      query: ({ formData, token, catalogueId }: { formData: FormData; token: string; catalogueId: string }) => ({
+        url: `${rfqUrl}/add/${catalogueId}`, 
         method: "POST",
         body: formData,
         providesTags: ["RFQ"],
         headers: {
-            Authorization: `Bearer ${token}`, 
-          },
+          Authorization: `Bearer ${token}`,
+        },
       }),
       transformResponse: (response: ResponseDTO<any>) => {
         if (response.status && response.data) {
@@ -23,6 +23,7 @@ const rfqApiSlice = apiSlice.injectEndpoints({
         }
       },
     }),
+    
 
     getRFQList: builder.query({
       query: (token:string) => ({
