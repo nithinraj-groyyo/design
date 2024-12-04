@@ -59,6 +59,25 @@ const rfqApiSlice = apiSlice.injectEndpoints({
         }
       },
       providesTags: ["RFQ"],
+    }), 
+    
+    updateRFQStatus: builder.mutation({
+      query: ({ id, status, token }: { id: string; status: string; token: string }) => ({
+        url: `${rfqUrl}/${id}/update/status`,
+        method: "PATCH",
+        body: { status },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      transformResponse: (response: ResponseDTO<any>) => {
+        if (response.status && response.data) {
+          return response.data;
+        } else {
+          throw new Error(response.errorReason || "Failed to update RFQ status");
+        }
+      },
+      invalidatesTags: ["RFQ"],
     }),
   }),
 });
@@ -66,5 +85,6 @@ const rfqApiSlice = apiSlice.injectEndpoints({
 export const {
   useAddRFQMutation,
   useGetRFQListQuery,
-  useGetUserRFQListQuery, 
+  useGetUserRFQListQuery,
+  useUpdateRFQStatusMutation, 
 } = rfqApiSlice;

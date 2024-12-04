@@ -1,28 +1,75 @@
-import React, { useEffect } from 'react';
-import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Button, Box } from '@mui/material';
-import { useGetRFQListQuery } from '../../../rtk-query/rfqSlice';
+import React, { useEffect, useState } from 'react';
+import {
+    CircularProgress,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    Paper,
+    Button,
+    Box,
+    Select,
+    MenuItem,
+} from '@mui/material';
+import { useGetRFQListQuery, useUpdateRFQStatusMutation } from '../../../rtk-query/rfqSlice';
 import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
 import { useNavigate } from 'react-router-dom';
 
+export enum RFQEnums {
+    REQUESTED = 'REQUESTED',
+    IN_PROGRESS = 'IN_PROGRESS',
+    ORDER_PLACED = 'ORDER_PLACED',
+    DECLINED_BY_USER = 'DECLINED_BY_USER',
+    DELINED_BY_ADMIN = 'DELINED_BY_ADMIN',
+}
+
 const AdminRFQList = () => {
-    const token = JSON.parse(localStorage.getItem("authToken") as string);
+    const token = JSON.parse(localStorage.getItem('authToken') as string);
 
     const { data, error, isLoading, isError } = useGetRFQListQuery(token);
+    const [updateRFQStatus, { isLoading: isUpdating }] = useUpdateRFQStatusMutation();
 
     const navigate = useNavigate();
+    const [rfqStatuses, setRfqStatuses] = useState<any>({});
 
     useEffect(() => {
-        if (isError) {
-            console.error("Error fetching RFQ list:", error);
+        if (data && data.length > 0) {
+            const initialStatuses = data.reduce((acc: any, rfq: any) => {
+                acc[rfq.id] = rfq.status ?? '';
+                return acc;
+            }, {});
+            setRfqStatuses(initialStatuses);
         }
-    }, [isError, error]);
+
+        if (isError) {
+            console.error('Error fetching RFQ list:', error);
+        }
+    }, [data, isError, error]);
 
     if (isLoading) {
         return <CircularProgress />;
     }
 
+    const handleStatusChange = async (rfqId: string, newStatus: string) => {
+        setRfqStatuses((prevStatuses: any) => ({
+            ...prevStatuses,
+            [rfqId]: newStatus,
+        }));
+
+        try {
+            await updateRFQStatus({ id: rfqId, status: newStatus, token }).unwrap();
+            console.log(`Successfully updated status for RFQ ${rfqId} to ${newStatus}`);
+        } catch (updateError) {
+            console.error(`Error updating status for RFQ ${rfqId}:`, updateError);
+            alert('Failed to update status. Please try again.');
+        }
+    };
+
     const handleCreateRfq = () => {
-        navigate("/add-rfq");
+        navigate('/add-rfq');
     };
 
     const handleDownload = (signedURL: string) => {
@@ -35,11 +82,11 @@ const AdminRFQList = () => {
 
     return (
         <AccountSettingsLayout>
-            <AccountSettingsLayout.Header title='Admin RFQ List'>
+            <AccountSettingsLayout.Header title="Admin RFQ List">
                 <Box display="flex" justifyContent="flex-end">
                     {/* <Button variant="contained" color="primary" onClick={handleCreateRfq}>
-                        Add New RFQ
-                    </Button> */}
+            Add New RFQ
+          </Button> */}
                 </Box>
             </AccountSettingsLayout.Header>
             <div style={{ marginTop: '20px' }}>
@@ -61,13 +108,32 @@ const AdminRFQList = () => {
                             {data && data.length > 0 ? (
                                 data.map((rfq: any) => (
                                     <TableRow key={rfq?.id} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                                        <TableCell align="center">{rfq?.brandName ?? "-"}</TableCell>
-                                        <TableCell align="center">{rfq?.email ?? "-"}</TableCell>
-                                        <TableCell align="center">{rfq?.minOrderQty ?? "-"}</TableCell>
-                                        <TableCell align="center">{rfq?.targetCost ?? "-"}</TableCell>
-                                        <TableCell align="center">{rfq?.country ?? "-"}</TableCell>
-                                        <TableCell align="center">{rfq?.description ?? "-"}</TableCell>
-                                        <TableCell align="center">{rfq?.status ?? "-"}</TableCell>
+                                        <TableCell align="center">{rfq?.brandName ?? '-'}</TableCell>
+                                        <TableCell align="center">{rfq?.email ?? '-'}</TableCell>
+                                        <TableCell align="center">{rfq?.minOrderQty ?? '-'}</TableCell>
+                                        <TableCell align="center">{rfq?.targetCost ?? '-'}</TableCell>
+                                        <TableCell align="center">{rfq?.country ?? '-'}</TableCell>
+                                        <TableCell align="center">{rfq?.description ?? '-'}</TableCell>
+                                        <TableCell align="center">
+                                            <Select
+                                                value={rfqStatuses[rfq.id] ?? ''}
+                                                onChange={(e) => handleStatusChange(rfq.id, e.target.value)}
+                                                displayEmpty
+                                                sx={{
+                                                    minWidth: 100,
+                                                    fontSize: '0.875rem',
+                                                    padding: '4px 8px',
+                                                }}
+                                                size="small"
+                                            >
+                                                {Object.entries(RFQEnums).map(([key, value]) => (
+                                                    <MenuItem key={key} value={value} className='!text-sm !min-w-full'>
+                                                        {value.replace(/_/g, ' ')}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </TableCell>
+
                                         <TableCell align="center">
                                             {rfq?.signedUrl ? (
                                                 <Button

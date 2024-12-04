@@ -72,7 +72,7 @@ const CatalougePageDetails = () => {
             alert("Catalogue ID is missing!");
         }
     };
-    
+
 
     useEffect(() => {
         setIsPotraitMode(currentPage === totalPage - 1);
@@ -109,7 +109,7 @@ const CatalougePageDetails = () => {
 
     return (
         <BasicLayout>
-            <div className="relative flex flex-col gap-8 justify-center items-center p-8 h-screen overflow-hidden mt-[5rem] bg-slate-300">
+            <div className="relative flex flex-col gap-8 justify-center items-center p-8 h-screen overflow-hidden mt-[5rem]">
                 <div className="flex justify-center w-full mt-6 gap-10">
                     <motion.div
                         className="text-3xl font-semibold flex items-center text-black"
@@ -121,27 +121,28 @@ const CatalougePageDetails = () => {
                     </motion.div>
 
                     <div className="flex justify-center">
-                            <motion.button
-                                className="px-6 py-3 rounded-lg bg-black text-white font-semibold shadow-md focus:outline-none min-w-[10rem]"
-                                whileHover={{ scale: 1.1 }}
-                                transition={{ type: 'spring', stiffness: 300 }}
-                                onClick={handleNavigation}
-                            >
-                                RFQ
-                            </motion.button>
-                        </div>
+                        <motion.button
+                            className="px-6 py-3 rounded-lg bg-black text-white font-semibold shadow-md focus:outline-none min-w-[10rem]"
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                            onClick={handleNavigation}
+                        >
+                            RFQ
+                        </motion.button>
+                    </div>
                 </div>
-                {/* <div
-                    className="absolute inset-0 bg-gray-100"
-                style={{
-                    backgroundImage: 'url(/images/landingPages/floralPattern4.png)',
-                    backgroundColor:"fefefe",
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    filter: 'blur(10px) brightness(0.6)',
-                    zIndex: -1,
-                }}
-                ></div> */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        // backgroundImage: `url(${catalogueDetials?.catalogueImages[0])}`,
+                        backgroundImage: `url(${catalogueDetials?.catalogueImages[0]?.signedUrl})`,
+                        // backgroundColor: "red",
+                        // backgroundSize: 'cover', 
+                        backgroundPosition: 'center',
+                        filter: 'blur(15px) brightness(0.6)',
+                        zIndex: -1,
+                    }}
+                ></div>
 
                 <motion.div
                     className="relative z-10"
@@ -187,7 +188,7 @@ const CatalougePageDetails = () => {
                         </div>
 
 
-                        
+
                     </div>
                 </motion.div>
             </div>

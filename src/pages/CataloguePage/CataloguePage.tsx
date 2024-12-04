@@ -9,7 +9,9 @@ import {
   FormControl, 
   InputLabel, 
   Grid, 
-  Pagination 
+  Pagination, 
+  Button, 
+  Box 
 } from '@mui/material';
 import BasicLayout from '../../layouts/BasicLayout';
 import { Link } from 'react-router-dom';
@@ -52,18 +54,14 @@ const CataloguePage = () => {
   const token = JSON.parse(localStorage.getItem("authToken") || 'null');
 
   const [fetchCatalogues, { data, isLoading: isProductLoading }] = useLazyFetchCatalogueListQuery();
-
   const { data: categories } = useFetchCategoryListQuery(token);
-
   const { data: subCategories, refetch } = useFetchSubCategoriesListQuery(
     { categoryId: +selectedCategory || 0, token },
     { skip: !selectedCategory }
   );
 
   const loadCatalogues = async () => {
-    console.log("Fetching catalogues...");
     const response = await fetchCatalogues(token);
-    console.log("Fetched Catalogues Response:", response);
     if (response?.data) {
       setCatalogues(response?.data || []);
     }
@@ -71,45 +69,28 @@ const CataloguePage = () => {
 
   useEffect(() => {
     if (categories && Array.isArray(categories)) {
-      const formattedCategories = categories.map((cat: Record<string, any>) => ({
-        id: cat.id,
-        name: cat.name,
-      })) as ICategory[];
-      setCategoriesListArray(formattedCategories);
-    } else {
-      setCategoriesListArray([]);
+      setCategoriesListArray(categories.map((cat: any) => ({ id: cat.id, name: cat.name })));
     }
   }, [categories]);
 
   useEffect(() => {
     if (selectedCategory) {
-      console.log("Selected Category Changed:", selectedCategory);
       refetch?.();
     }
   }, [selectedCategory, refetch]);
 
   useEffect(() => {
-    console.log("Loading catalogues...");
     loadCatalogues();
   }, [selectedCategory, selectedSubcategory]);
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    console.log("Page Changed to:", value);
     setCurrentPage(value);
   };
 
-  const filteredCatalogues = catalogues.filter((catalogue) => {
-    console.log("Filtering catalogues with:", {
-      selectedCategory,
-      selectedSubcategory,
-      catalogueCategoryId: catalogue?.category?.id,
-      catalogueSubCategoryId: catalogue?.subCategory?.id,
-    });
-    return (
-      (selectedCategory === 'All' || catalogue?.category?.id === +selectedCategory) &&
-      (selectedSubcategory === 'All' || catalogue?.subCategory?.id === +selectedSubcategory)
-    );
-  });
+  const filteredCatalogues = catalogues.filter((catalogue) => (
+    (selectedCategory === 'All' || catalogue?.category?.id === +selectedCategory) &&
+    (selectedSubcategory === 'All' || catalogue?.subCategory?.id === +selectedSubcategory)
+  ));
 
   const totalPages = Math.ceil(filteredCatalogues.length / itemsPerPage);
 
@@ -120,7 +101,40 @@ const CataloguePage = () => {
 
   return (
     <BasicLayout>
-      <div className="p-4 sm:p-8 md:p-16 mt-[5rem] md:mt-[10rem] bg-gray-100 min-h-screen">
+      {/* Header Section */}
+      <Box
+        sx={{
+          background: '#b8a99a',
+          color: '#fff',
+          padding: '3rem 1rem',
+          textAlign: 'center',
+          borderRadius: '0 0 20px 20px',
+          marginTop: "10rem"
+        }}
+        
+      >
+        <Typography variant="h3" gutterBottom className='!font-bold !tracking-wide text-black'>
+          Explore Our Exclusive Catalogue
+        </Typography>
+        <Typography variant="subtitle1" className='!text-black !mb-6'>
+          Discover the best products tailored for your needs.
+        </Typography>
+        <Button
+          variant="contained"
+          color="secondary"
+          sx={{
+            marginTop: '1rem',
+            backgroundColor: '#000000',
+            color: '#fff',
+            textTransform: 'none',
+          }}
+        >
+          Learn More
+        </Button>
+      </Box>
+
+      {/* Filters Section */}
+      <Box sx={{ padding: '2rem', backgroundColor: '#f9f9f9' }}>
         <motion.div
           className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6"
           initial={{ opacity: 0, y: -20 }}
@@ -136,7 +150,7 @@ const CataloguePage = () => {
               className="bg-white rounded-lg shadow-lg"
             >
               <MenuItem value="All">All</MenuItem>
-              {categoriesListArray?.map((category: any) => (
+              {categoriesListArray?.map((category) => (
                 <MenuItem key={category.id} value={category.id}>
                   {category.name}
                 </MenuItem>
@@ -161,9 +175,12 @@ const CataloguePage = () => {
             </Select>
           </FormControl>
         </motion.div>
+      </Box>
 
-        <Grid container spacing={3}>
-          {paginatedCatalogues.map((catalogue: any) => (
+      {/* Catalogue Cards */}
+      <Grid container spacing={3} sx={{ padding: '2rem' }}>
+        {paginatedCatalogues.length > 0 ? (
+          paginatedCatalogues.map((catalogue) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
               <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
                 <motion.div
@@ -172,7 +189,7 @@ const CataloguePage = () => {
                   whileHover={{ scale: 1.02 }}
                   transition={{ type: 'spring', stiffness: 200, damping: 15 }}
                 >
-                  <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden" style={{ backgroundColor: '#fff' }}>
+                  <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden">
                     <CardMedia
                       component="img"
                       height="200"
@@ -180,31 +197,48 @@ const CataloguePage = () => {
                       alt={catalogue?.name}
                       className="object-cover h-36 w-48"
                     />
-                    <CardContent className="p-4">
-                      <Typography variant="h6" component="div" className="text-gray-800 font-semibold">
+                    <CardContent>
+                      <Typography variant="h6" className="text-gray-800 font-semibold">
                         {catalogue?.name}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {catalogue.description || 'No description available'}
                       </Typography>
                     </CardContent>
                   </Card>
                 </motion.div>
               </Link>
             </Grid>
-          ))}
-        </Grid>
-
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-8">
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-              variant="outlined"
-              shape="rounded"
-            />
-          </div>
+          ))
+        ) : (
+          <Box sx={{ textAlign: 'center', width: '100%', padding: '2rem' }}>
+            <Typography variant="h5" color="textSecondary">
+              No catalogues available
+            </Typography>
+          </Box>
         )}
-      </div>
+      </Grid>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            variant="outlined"
+            shape="rounded"
+          />
+        </Box>
+      )}
+
+      {/* Footer */}
+      <Box sx={{ padding: '1rem', textAlign: 'center', backgroundColor: '#f1f1f1', marginTop: '2rem' }}>
+        <Typography variant="body2" color="textSecondary">
+          © 2024 Your Company Name. All rights reserved.
+        </Typography>
+      </Box>
     </BasicLayout>
   );
 };
