@@ -17,13 +17,14 @@ const menuItems = [
     subItems: [
       { title: "Profile", route: "/account/profile" },
       { title: "Addresses", route: "/account/address" },
-      { title: "Change Password", route: "/account/changePassword" },
+      // { title: "Change Password", route: "/account/changePassword" },
     ],
   },
   {
     title: "Orders",
     subItems: [
       { title: "Orders", route: "/account/orders" },
+      { title: "RFQ List", route: "/account/rfq/list" },
     ],
   },
   
@@ -38,7 +39,7 @@ const adminMenuItems = [
     title: "Website Info",
     subItems: [
       // { title: "About us", route: "/account/web-info/about-us" },
-      { title: "Teams", route: "/account/web-info/teams" },
+      // { title: "Teams", route: "/account/web-info/teams" },
       { title: "Services", route: "/account/web-info/services" },
       { title: "FAQ", route: "/account/web-info/faq" },
     ],
@@ -63,7 +64,7 @@ const adminMenuItems = [
     title: "RFQ",
     subItems: [
       // { title: "Add RFQ", route: "/account/add-rfq" },
-      { title: "RFQ List", route: "/account/rfq-list" },
+      { title: "RFQ List", route: "/account/admin-rfq-list" },
       // { title: "Catalogue Categories", route: "/account/manage-catalogue-categories" },
     ],
   },

@@ -71,7 +71,7 @@ const ProductDetails = () => {
     const handleCloseDrawer = () => {
         setIsDrawerOpen(false);
     }
-console.log(isMobileView, "isMobileView")
+
     return (
         <BasicLayout showFooter={isMobileView ? false : true}>
             <div className="flex mt-[5rem] lg:mt-[12rem] flex-col gap-6">
