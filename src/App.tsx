@@ -10,7 +10,6 @@ import Signup from "./pages/signup/signup";
 import { ContactUs } from "./pages/contactUs";
 import AccountPage from "./pages/account";
 import Address from "./pages/account/profile/Address";
-import Orders from "./pages/account/orders/Orders";
 import Profile from "./pages/account/profile/Profile";
 import ChangePassword from "./pages/account/profile/ChangePassword";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -42,6 +41,9 @@ import EditCatalogue from "./pages/account/catalogue/EditCatalogue";
 import AdminRFQList from "./pages/account/rfq/AdminRFQList";
 import RFQPage from "./pages/RfqPage/RFQPage";
 import AddRFQ from "./pages/RfqPage/AddRFQ";
+import UserRFQList from "./pages/RfqPage/UserRFQList";
+import Orders from "./pages/account/orders/Orders";
+import AdminUserRFQList from "./pages/account/rfq/AdminUserRFQList";
 
 const App = () => {
   const isAuthenticated = useAuth();
@@ -119,7 +121,10 @@ const App = () => {
         
         
 
-        <Route path="rfq-list" element={<AdminRoutes/>}>
+        <Route path="rfq/list" element={<AdminRoutes/>}>
+          <Route path="" element={<AdminUserRFQList />} />
+        </Route>
+        <Route path="admin-rfq-list" element={<AdminRoutes/>}>
           <Route path="" element={<AdminRFQList />} />
         </Route>
 

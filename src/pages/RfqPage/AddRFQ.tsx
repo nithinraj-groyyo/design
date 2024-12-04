@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { TextField, Button, FormControl, Checkbox, FormControlLabel, Grid } from '@mui/material';
@@ -9,6 +9,8 @@ const AddRFQ = () => {
   const { catalogueId } = useParams<{ catalogueId: any }>();
   const [addRFQ, { isLoading }] = useAddRFQMutation();
   const token = JSON.parse(localStorage.getItem("authToken") as string);
+
+  const fileInputRef = useRef<HTMLInputElement>(null); 
 
   const validationSchema = Yup.object({
     id: Yup.string(),
@@ -32,7 +34,7 @@ const AddRFQ = () => {
     file: null,
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: any, { resetForm }: { resetForm: () => void }) => {
     try {
       const formData = new FormData();
       Object.keys(values).forEach((key) => {
@@ -43,8 +45,12 @@ const AddRFQ = () => {
         }
       });
       formData.append("catalogueId", catalogueId || "");
-      await addRFQ({ formData, token, catalogueId  }).unwrap();
+      await addRFQ({ formData, token, catalogueId }).unwrap();
       alert('RFQ submitted successfully');
+      resetForm(); 
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''; 
+      }
     } catch (err) {
       console.error('Error submitting RFQ:', err);
       alert('Failed to submit RFQ');
@@ -73,32 +79,6 @@ const AddRFQ = () => {
                   />
                 </FormControl>
               </Grid>
-              
-              {/* <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <Field
-                    name="email"
-                    as={TextField}
-                    label="Email"
-                    variant="outlined"
-                    fullWidth
-                    helperText={<ErrorMessage name="email" />}
-                  />
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <Field
-                    name="mobileNo"
-                    as={TextField}
-                    label="Mobile Number"
-                    variant="outlined"
-                    fullWidth
-                    helperText={<ErrorMessage name="mobileNo" />}
-                  />
-                </FormControl>
-              </Grid> */}
 
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>
@@ -175,9 +155,10 @@ const AddRFQ = () => {
               <Grid item xs={12}>
                 <FormControl fullWidth>
                   <input
+                    ref={fileInputRef} 
                     type="file"
                     name="file"
-                    onChange={(event) => setFieldValue('file'," Successfully Uploaded")}
+                    onChange={(event) => setFieldValue('file', event.target.files?.[0] || null)}
                   />
                   <ErrorMessage name="file" component="div" />
                 </FormControl>

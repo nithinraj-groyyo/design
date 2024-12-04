@@ -112,7 +112,7 @@ const CatalougePageDetails = () => {
             <div className="relative flex flex-col gap-8 justify-center items-center p-8 h-screen overflow-hidden mt-[5rem]">
                 <div className="flex justify-center w-full mt-6 gap-10">
                     <motion.div
-                        className="text-3xl font-semibold flex items-center text-black"
+                        className="text-3xl font-semibold flex items-center text-white"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
@@ -175,14 +175,14 @@ const CatalougePageDetails = () => {
                                     onClick={() =>
                                         flipBookRef.current && flipBookRef.current.pageFlip().flipNext()
                                     }
-                                    className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md flex items-center justify-center"
+                                    className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md flex items-center justify-center border border-white"
                                     whileHover={{ scale: 1.1 }}
                                     transition={{ type: 'spring', stiffness: 300 }}
                                 >
                                     <ArrowForwardIos />
                                 </motion.button>
                             </div>
-                            <div className="text-center mt-2">
+                            <div className="text-center mt-2 text-white">
                                 Click or swipe to flip pages!
                             </div>
                         </div>

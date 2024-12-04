@@ -104,7 +104,6 @@ const CataloguePage = () => {
 
   return (
     <BasicLayout>
-      {/* Header Section */}
       <Box
         sx={{
           background: '#b8a99a',
@@ -124,22 +123,25 @@ const CataloguePage = () => {
         </Typography>
         <Button
           variant="contained"
-          // color="secondary"
           sx={{
             marginTop: '1rem',
             backgroundColor: '#000000',
             color: '#fff',
             textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#333333',
+              color: '#fff',
+            },
           }}
         >
           RFQ Logs
         </Button>
+
       </Box>
 
-      {/* Filters Section */}
       <div className='flex'>
-      <div className='flex-1 p-4 max-w-fit'>
-          <Typography variant="h6" className='!mt-10'>Categories</Typography>
+        <div className='flex-1 p-4 max-w-fit'>
+          <Typography variant="h6" className='!mt-10 !font-semibold'>Categories</Typography>
           <RadioGroup
             value={selectedCategory}
             onChange={(e) => {
@@ -158,12 +160,12 @@ const CataloguePage = () => {
             ))}
           </RadioGroup>
 
-          <Typography variant="h6" sx={{ marginTop: '1rem' }}>Subcategories</Typography>
+          <Typography variant="h6" sx={{ marginTop: '1rem' }} className=' !font-semibold'>Subcategories</Typography>
           <RadioGroup
             value={selectedSubcategory}
             onChange={(e) => setSelectedSubcategory(e.target.value)}
           >
-            <FormControlLabel style={{whiteSpace:"nowrap"}} value="All" control={<Radio />} label="All Subcategories" />
+            <FormControlLabel style={{ whiteSpace: "nowrap" }} value="All" control={<Radio />} label="All Subcategories" />
             {subCategories?.map((subcategory: any) => (
               <FormControlLabel
                 key={subcategory.id}
@@ -216,7 +218,6 @@ const CataloguePage = () => {
             )}
           </Grid>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
               <Pagination
