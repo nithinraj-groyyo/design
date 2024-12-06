@@ -41,14 +41,15 @@ const SubscriptionPriceDetails = () => {
   }
 
   return (
-    <div className="px-6">
+    <div className="px-4 sm:px-6">
       {selectedSubscription && (
         <div className="flex flex-col items-center">
-          <h2 className="text-2xl sm:text-4xl font-extrabold mb-10 text-center text-gray-800 ">
+          <h2 className="text-2xl sm:text-4xl font-extrabold mb-10 text-center text-gray-800">
             {/* {selectedSubscription.name} */}
             Design +
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-2 gap-6 w-full max-w-5xl">
+          {/* Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 w-full max-w-5xl">
             {selectedSubscription.tenures.map((tenure: any) => (
               <div
                 key={tenure.id}

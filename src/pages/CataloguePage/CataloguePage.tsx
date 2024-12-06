@@ -210,8 +210,6 @@ const CataloguePage = () => {
 
       </div>
 
-
-
     </BasicLayout>
   );
 };

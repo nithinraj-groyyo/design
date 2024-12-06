@@ -832,8 +832,8 @@ const AddProducts = () => {
           </div>
           <div className="flex-[1]">
             <Card className="p-4 flex flex-col gap-4">
-              <div className="font-bold">Left Top Section</div>
-              <div className="font-bold">Left Top Section</div>
+              <div className="font-bold">Left Section</div>
+              <div className="font-bold">Left Visible Section</div>
               <TextField
                 label="Heading"
                 name="leftTopHeader"
@@ -855,7 +855,7 @@ const AddProducts = () => {
                 helperText={formik.touched.leftTopContent && formik.errors.leftTopContent}
               />
               <Divider />
-              <div className="font-bold">Left Bottom Section</div>
+              <div className="font-bold">Left Toggle Section</div>
               <TextField
                 label="Heading"
                 name="leftBottomHeader"

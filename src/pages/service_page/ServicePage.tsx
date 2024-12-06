@@ -264,35 +264,44 @@ const ServicePage = () => {
       </motion.div>
 
       <section className="w-screen h-auto sm:h-[100vh] flex flex-col sm:flex-row bg-gradient-to-b from-white via-gray-100 to-white">
-        {/* Left Section */}
-        <div className="w-full sm:w-1/3 flex flex-col justify-center items-center py-8 sm:py-12 px-6 sm:px-10 bg-gradient-to-br from-white to-gray-100 shadow-md rounded-lg">
-          <div className="flex flex-col items-center bg-white shadow-xl rounded-lg p-6 sm:p-10 max-w-lg">
-            <h2 className="text-gray-800 text-2xl sm:text-4xl font-extrabold mb-6 text-center">
-              Why Go Premium?
-            </h2>
-            <ul className="text-gray-700 text-base sm:text-lg space-y-4 list-disc pl-8">
-              <li><span className="font-medium">24*7 Customer Support</span></li>
-              <li><span className="font-medium">Access to Premium Designs</span></li>
-              <li><span className="font-medium">High-Resolution Downloads</span></li>
-              <li><span className="font-medium">Interactive Catalogues</span></li>
-            </ul>
-            <div className="mt-8">
-              <img
-                src="/images/DummyImages/contact.png"
-                alt="Illustration"
-                className="object-contain w-[16rem] h-[16rem] sm:w-[20rem] sm:h-[20rem] mx-auto"
-              />
-            </div>
-          </div>
-        </div>
+  {/* Left Section */}
+  <div className="w-full sm:w-1/3 flex flex-col justify-center items-center py-8 sm:py-12 px-6 sm:px-10 bg-gradient-to-br from-white to-gray-100 shadow-md rounded-b-lg sm:rounded-r-none sm:rounded-l-lg">
+    <div className="flex flex-col items-center bg-white shadow-xl rounded-lg p-6 sm:p-10 max-w-lg">
+      <h2 className="text-gray-800 text-2xl sm:text-4xl font-extrabold mb-6 text-center">
+        Why Go Premium?
+      </h2>
+      <ul className="text-gray-700 text-base sm:text-lg space-y-4 list-disc pl-8">
+        <li>
+          <span className="font-medium">24*7 Customer Support</span>
+        </li>
+        <li>
+          <span className="font-medium">Access to Premium Designs</span>
+        </li>
+        <li>
+          <span className="font-medium">High-Resolution Downloads</span>
+        </li>
+        <li>
+          <span className="font-medium">Interactive Catalogues</span>
+        </li>
+      </ul>
+      <div className="mt-8">
+        <img
+          src="/images/DummyImages/contact.png"
+          alt="Illustration"
+          className="object-contain w-[12rem] h-[12rem] sm:w-[16rem] sm:h-[16rem] lg:w-[20rem] lg:h-[20rem] mx-auto"
+        />
+      </div>
+    </div>
+  </div>
 
-        {/* Right Section */}
-        <div className="w-full sm:w-2/3 flex justify-center items-start  bg-white m-12 p-4 rounded-lg">
-          <div className="w-full px-8 sm:px-12">
-            <SubscriptionPriceDetails />
-          </div>
-        </div>
-      </section>
+  {/* Right Section */}
+  <div className="w-full sm:w-2/3 flex justify-center items-start bg-white mt-8 sm:mt-0 p-6 sm:p-12 rounded-t-lg sm:rounded-l-none sm:rounded-r-lg shadow-md">
+    <div className="w-full px-4 sm:px-8 lg:px-12">
+      <SubscriptionPriceDetails />
+    </div>
+  </div>
+</section>
+
 
 
     </BasicLayout>

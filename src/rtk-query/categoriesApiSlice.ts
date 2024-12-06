@@ -81,7 +81,8 @@ const categoriesApiSlice = apiSlice.injectEndpoints({
     
     updateCategory: builder.mutation<
     { message: string; data: any },
-    { name: string } 
+    { name: string;
+      parentId?: number;  } 
   >({
     query: (categoryData) => ({
       url: `${categoryUrl}/add`,

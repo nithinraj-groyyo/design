@@ -23,7 +23,7 @@ const Login = () => {
   const [isVerifyLoading, setIsVerifyLoading] = useState(false);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+const dispatch = useDispatch();
 
   const [generateOtp, { isLoading }] = useLazyGenerateOtpQuery();
   const [verifyOtpLogin] = useVerifyOtpLoginMutation();
@@ -38,11 +38,10 @@ const Login = () => {
       try {
         const response = await generateOtp({ email: formik.values.email, platform: "GROYYO_DESIGN" }).unwrap();
 
-        console.log(response, "signin");
+        console.log(response,"ashish")
 
         toast.success("OTP sent to your email!");
         setIsModalOpen(true)
-        // modalToggleHandler();
       } catch (error: any) {
         console.log(error, "error")
         toast.error("Failed to send OTP", error);
@@ -68,7 +67,8 @@ const Login = () => {
         dispatch(setToken({ token: response?.result?.token }));
         localStorage.setItem("authToken", JSON.stringify(response?.result?.token));
         localStorage.setItem('isAdmin', JSON.stringify(response?.result?.role?.name === "ADMIN"));
-
+        localStorage.setItem('factoryId', JSON.stringify(response?.result?.factoryId));
+        
         const productIds = JSON.parse(localStorage.getItem("localWishList") as string);
         await updateLocalWishlist({ token: response?.result?.token, payload: productIds }).then((res) => {
           dispatch(setWishlistItems(res?.data?.count));
