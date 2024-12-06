@@ -5,8 +5,10 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { motion } from "framer-motion";
 import { useLazyLoadAllCategoriesWithSubCategoriesQuery } from "../../rtk-query/categoriesApiSlice";
+import { useSuperAdminMutation } from "../../rtk-query/profileApiSlice"; // Import the mutation hook
 import { ICategoryWithSubcategories } from "../../types/categories";
 import CategoriesLoader from "./CategoriesLoader";
+import useAuth from "../../hooks/useAuth";
 
 const NavigationBar = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -17,7 +19,10 @@ const NavigationBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [loadAllCategoriesWithSubCategories, { isLoading, isFetching }] = useLazyLoadAllCategoriesWithSubCategoriesQuery();
+  const [loadAllCategoriesWithSubCategories, { isLoading, isFetching }] =
+    useLazyLoadAllCategoriesWithSubCategoriesQuery();
+  const [triggerSuperAdmin, { isLoading: isSuperAdminLoading, data: superAdminData, error: superAdminError }] =
+    useSuperAdminMutation(); // Use the mutation hook
 
   useEffect(() => {
     void loadAllCategoriesWithSubCategories()?.then((res) => {
@@ -44,8 +49,28 @@ const NavigationBar = () => {
   const handleSubCategoryHover = (subcategory: string) => {
     setHoveredSubCategory(subcategory);
   };
-
+  const token = JSON.parse(localStorage.getItem("authToken") as string);
   const isActive = (path: string) => location.pathname === path;
+  const factoryId = localStorage.getItem("factoryId");
+
+  const isAuthenticated = useAuth()
+
+  const checkRole = async () => {
+    try {
+      const response = await triggerSuperAdmin({token,payload:{ factoryId: +factoryId! }}).unwrap();
+      console.log("Super Admin API Response:", response);
+    } catch (err) {
+      console.error("Super Admin API Error:", err);
+    }
+  };
+  
+  useEffect(() => {
+    if(isAuthenticated){
+
+      void checkRole(); 
+    }
+  }, [isAuthenticated])
+  
 
   return (
     <div>
@@ -94,28 +119,6 @@ const NavigationBar = () => {
             </motion.span>
           </Button>
         </li>
-        {/* <li>
-          <Button
-            component={Link}
-            to="/team"
-            sx={{
-              color: isActive("/team") ? "#ee572f" : "black",
-              backgroundColor: "transparent",
-              "&:hover": {
-                backgroundColor: "transparent",
-              },
-            }}
-          >
-            <motion.span
-              className="whitespace-nowrap"
-              initial={{ scale: 1 }}
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              Team
-            </motion.span>
-          </Button>
-        </li> */}
         <li>
           <Button
             aria-controls={open ? "categories-menu" : undefined}
@@ -140,7 +143,12 @@ const NavigationBar = () => {
             >
               Categories
             </motion.span>
-            <motion.span className="whitespace-nowrap" initial={{ rotate: 0 }} animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.3 }}>
+            <motion.span
+              className="whitespace-nowrap"
+              initial={{ rotate: 0 }}
+              animate={{ rotate: open ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
               <KeyboardArrowDownIcon sx={{ marginLeft: "5px" }} />
             </motion.span>
           </Button>
@@ -183,7 +191,11 @@ const NavigationBar = () => {
                         }}
                       >
                         <span className="opacity-70 arrow-icon">{category}</span>
-                        <span className={`${hoveredCategory === category ? "opacity-100" : "opacity-0"}`}>
+                        <span
+                          className={`${
+                            hoveredCategory === category ? "opacity-100" : "opacity-0"
+                          }`}
+                        >
                           <KeyboardArrowRightIcon />
                         </span>
                       </MenuItem>
@@ -206,7 +218,8 @@ const NavigationBar = () => {
                           }
                           onMouseEnter={() => handleSubCategoryHover(subcat.name)}
                           sx={{
-                            backgroundColor: hoveredSubCategory === subcat.name ? "rgba(0, 0, 0, 0.05)" : "transparent",
+                            backgroundColor:
+                              hoveredSubCategory === subcat.name ? "rgba(0, 0, 0, 0.05)" : "transparent",
                           }}
                         >
                           <span className="opacity-70 sub-cat">{subcat.name}</span>
@@ -221,6 +234,7 @@ const NavigationBar = () => {
             )}
           </Menu>
         </li>
+       
         <li>
           <Button
             component={Link}

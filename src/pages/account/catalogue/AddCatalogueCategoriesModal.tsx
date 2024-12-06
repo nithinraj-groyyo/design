@@ -27,6 +27,7 @@ const AddCatalogueCategoriesModal = ({ categoryModal, toggleAddCategory }: any) 
                 token,
                 numberOfFreeCatalogues: 10
             }).unwrap();
+            toggleAddCategory();
             console.log("Category updated successfully", result);
         } catch (error) {
             console.error("Failed to update category", error);

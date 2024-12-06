@@ -1,82 +1,108 @@
-import React from 'react';
-import SubscriptionModal from './SubscriptionModal';
-import { useSubscribeUserMutation } from '../../rtk-query/subscriptonApiSlice';
+import React, { useEffect, useState } from 'react';
+import { useSubscribeUserMutation, useGetSubscriptionListQuery } from '../../rtk-query/subscriptonApiSlice';
 
-const SubscriptionPriceDetails = ({
-  isModalOpen,
-  onClose,
-  selectedSubscription,
-}: {
-  isModalOpen: boolean;
-  onClose: () => void;
-  selectedSubscription: any;
-}) => {
-
+const SubscriptionPriceDetails = () => {
+  const { data: subscriptions, error, isLoading } = useGetSubscriptionListQuery(null);
   const token = JSON.parse(localStorage.getItem('authToken') as string);
+  const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
 
-  const [subscribeUser, { isLoading, isSuccess, isError }] = useSubscribeUserMutation();
+  const [subscribeUser, { isSuccess, isError }] = useSubscribeUserMutation();
+  const [loadingButton, setLoadingButton] = useState<number | null>(null); // Track which button is loading
+
+  useEffect(() => {
+    if (subscriptions?.data && subscriptions.data.length > 0) {
+      setSelectedSubscription(subscriptions.data[0]);
+    }
+  }, [subscriptions]);
 
   const handleSubscribe = async (subscriptionPriceId: number) => {
+    setLoadingButton(subscriptionPriceId); // Set the loading state for the clicked button
     try {
-      await subscribeUser({ userId: subscriptionPriceId, token: token }).unwrap();
+      await subscribeUser({ userId: subscriptionPriceId, token }).unwrap();
       alert('Subscription successful!');
     } catch (error) {
       console.error('Subscription failed:', error);
       alert('Subscription failed. Please try again.');
+    } finally {
+      setLoadingButton(null); // Reset the loading state
     }
   };
 
-  return (
-    <SubscriptionModal isOpen={isModalOpen} onClose={onClose}>
-      {selectedSubscription && (
-        <div className="w-full">
-          <div>
-            <h2 className="text-3xl font-extrabold mb-8 text-center text-gray-900 tracking-wide">
-              {selectedSubscription.name}
-            </h2>
-          </div>
+  if (isLoading) {
+    return <div className="text-center mt-32 text-lg font-medium">Loading subscriptions...</div>;
+  }
 
-          <div className="flex flex-row gap-8 justify-center overflow-x-auto p-6">
+  if (error || !subscriptions?.status) {
+    return (
+      <div className="text-center mt-32 text-red-600 text-lg font-medium">
+        Failed to load subscriptions. Please try again later.
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-4 sm:px-6">
+      {selectedSubscription && (
+        <div className="flex flex-col items-center">
+          <h2 className="text-2xl sm:text-4xl font-extrabold mb-10 text-center text-gray-800">
+            {/* {selectedSubscription.name} */}
+            Design +
+          </h2>
+          {/* Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 w-full max-w-5xl">
             {selectedSubscription.tenures.map((tenure: any) => (
               <div
                 key={tenure.id}
-                className="w-[250px] h-[320px] p-6 bg-gradient-to-br from-[#978776] to-[#B19C89] backdrop-blur-lg bg-opacity-30 rounded-3xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-transform duration-300 flex flex-col justify-between items-center border border-white/30"
+                className="bg-gradient-to-br from-[#CEC1B2] to-[#D8C9BB] border border-gray-200 rounded-lg shadow-lg p-6 hover:shadow-2xl transition-transform transform hover:scale-105 duration-300 flex flex-col items-center"
               >
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold text-gray-700 mb-3 tracking-wide">
+                {/* Badge/Icon */}
+                <div className="flex justify-center items-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#978776] to-[#B19C89] rounded-full flex justify-center items-center shadow-md">
+                    <span className="text-2xl text-white">💎</span>
+                  </div>
+                </div>
+
+                {/* Card Content */}
+                <div className="flex flex-col items-center text-center mb-4 space-y-2">
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-gray-800">
                     {tenure.tenureInMonths} Month{tenure.tenureInMonths > 1 && 's'}
                   </h3>
+
+                  {/* Price */}
+                  <div className="flex items-baseline space-x-2">
+                    <p className="text-xl font-bold text-gray-800">₹{tenure.subscriptionPrice.price}</p>
+                    <p className="text-sm text-gray-500">per month</p>
+                  </div>
                 </div>
 
-                <div className="bg-white shadow-md w-[120px] h-[120px] rounded-full flex flex-col justify-center items-center border-4 border-[#978776] z-10">
-                  <span className="text-4xl font-bold text-gray-800">
-                    ₹{tenure.subscriptionPrice.price}
-                  </span>
-                  <p className="text-sm text-gray-600">/mo</p>
-                </div>
-
+                {/* Button */}
                 <button
-                  className="mt-6 bg-gradient-to-r from-[#4A403A] to-[#2C2B2A] text-white py-2 px-6 rounded-full shadow-md hover:shadow-lg transform hover:scale-110 transition-transform"
+                  className={`w-full py-2 mt-auto rounded-full text-white text-sm font-medium transition-transform transform hover:scale-105 duration-300 ${
+                    loadingButton === tenure.subscriptionPrice.id
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-br from-[#978776] to-[#B19C89] hover:from-[#b4a093] hover:to-[#c6b4a6]'
+                  }`}
                   onClick={() => handleSubscribe(tenure.subscriptionPrice.id)}
+                  disabled={loadingButton === tenure.subscriptionPrice.id}
                 >
-                  {isLoading ? 'Processing...' : 'Buy Now'}
+                  {loadingButton === tenure.subscriptionPrice.id ? (
+                    <div className="flex items-center justify-center">
+                      <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-white mr-2"></span>
+                      Processing...
+                    </div>
+                  ) : (
+                    'Buy Now'
+                  )}
                 </button>
               </div>
             ))}
           </div>
-
-          <button
-            className="mt-8 bg-gradient-to-r from-[#4A403A] to-[#2C2B2A] text-white py-3 px-8 rounded-lg w-full hover:shadow-xl transform transition-transform duration-300"
-            onClick={onClose}
-          >
-            Close
-          </button>
-
           {isError && <p className="text-red-500 text-center mt-4">Something went wrong. Please try again.</p>}
           {isSuccess && <p className="text-green-500 text-center mt-4">Subscription successful!</p>}
         </div>
       )}
-    </SubscriptionModal>
+    </div>
   );
 };
 

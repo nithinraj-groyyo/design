@@ -1,6 +1,7 @@
 import { Box, Button, Modal, TextField, Typography, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
 import React, { useState } from "react";
 import { useLoadCategoriesWithPaginationQuery } from "../../../rtk-query/categoriesApiSlice";
+import { useUpdateCategoryMutation } from "../../../rtk-query/categoriesApiSlice";
 
 const style = {
   position: "absolute",
@@ -16,12 +17,33 @@ const style = {
 
 const AddSubCategoriesModal = ({ subCategoryModal, toggleAddSubCategory, categoriesOptions }: any) => {
   const [subcategoryName, setSubcategoryName] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<number | string>('');  // Ensure it's a number or string
 
   const { data: categoriesData, isLoading: isCategoriesLoading, isError } = useLoadCategoriesWithPaginationQuery({
     pageIndex: 0,
     pageSize: 999,
   });
+
+  const [updateCategory] = useUpdateCategoryMutation();
+
+  const handleUpdateCategory = async () => {
+    try {
+      const categoryId = Number(selectedCategory);
+      if (!categoryId) {
+        throw new Error("Category is not selected.");
+      }
+
+      const result = await updateCategory({
+        name: subcategoryName,
+        parentId: categoryId,  
+      }).unwrap();
+
+      console.log("Category updated successfully", result);
+      toggleAddSubCategory();
+    } catch (error) {
+      console.error("Failed to update category", error);
+    }
+  };
 
   return (
     <Modal
@@ -49,7 +71,7 @@ const AddSubCategoriesModal = ({ subCategoryModal, toggleAddSubCategory, categor
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             {categoriesData?.map((category: any) => (
-              <MenuItem key={category?.id} value={category?.name}>
+              <MenuItem key={category?.id} value={category?.id}>  {/* Store category id here */}
                 {category?.name}
               </MenuItem>
             ))}
@@ -69,10 +91,7 @@ const AddSubCategoriesModal = ({ subCategoryModal, toggleAddSubCategory, categor
           <Button
             variant="contained"
             color="primary"
-            onClick={() => {
-              console.log("Subcategory Name:", subcategoryName);
-              console.log("Selected Category:", selectedCategory);
-            }}
+            onClick={handleUpdateCategory}
           >
             Confirm
           </Button>
