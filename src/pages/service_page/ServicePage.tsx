@@ -11,6 +11,7 @@ import DOMPurify from "dompurify";
 import { useNavigate } from "react-router-dom";
 import { useFetchAllServicesQuery } from "../../rtk-query/serviceApiSlice";
 import SubscriptionPage from "./SubscriptionPage";
+import SubscriptionPriceDetails from "./SubscriptionPriceDetails";
 
 export enum ServiceButtons {
   ExploreDesigns = "Explore our Designs",
@@ -40,6 +41,8 @@ const ServicePage = () => {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [currentService, setCurrentService] = useState(0);
   const navigate = useNavigate();
+  const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
+
 
   const { data: services = [] } = useFetchAllServicesQuery();
 
@@ -55,7 +58,7 @@ const ServicePage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
- 
+
   useEffect(() => {
     const interval = setInterval(() => {
       handleIndex(1);
@@ -67,7 +70,7 @@ const ServicePage = () => {
   }, [currentService]);
 
   const navigateButtons = (buttonName: ServiceButtons) => {
-    switch(buttonName) {
+    switch (buttonName) {
       case ServiceButtons.ExploreDesigns:
         return "/";
       case ServiceButtons.BookAppointment:
@@ -81,12 +84,12 @@ const ServicePage = () => {
   const handleButtonClick = (buttonName: ServiceButtons) => {
     const path = navigateButtons(buttonName);
     if (path) {
-      navigate(path); // Perform navigation
+      navigate(path);
     }
   };
 
   return (
-    <BasicLayout>      
+    <BasicLayout>
       <motion.div
         className="relative w-full min-h-[70vh] mt-[4rem] sm:mt-[6rem] lg:mt-[10rem] flex justify-center items-center"
         style={{
@@ -103,12 +106,12 @@ const ServicePage = () => {
         <motion.div
           className="p-4 sm:p-6 lg:p-8 flex items-center justify-between rounded-xl w-full max-w-[90vw] lg:max-w-[50vw]"
           style={{
-            position: "relative", 
+            position: "relative",
           }}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-        >          
+        >
           <div
             className="flex items-center cursor-pointer absolute left-5 sm:left-10 lg:left-20"
             onClick={() => handleIndex(-1)}
@@ -152,21 +155,20 @@ const ServicePage = () => {
               </Button>
             </div>
           </motion.div>
-          
+
           <div
             className="flex items-center cursor-pointer absolute right-5 sm:right-10 lg:right-20"
             onClick={() => handleIndex(1)}
           >
             <KeyboardArrowRightIcon />
           </div>
-          
+
           <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex gap-2">
             {carouselDetails.map((_, index) => (
               <motion.div
                 key={index}
-                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer ${
-                  index === currentService ? "bg-black" : "bg-gray-400"
-                }`}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer ${index === currentService ? "bg-black" : "bg-gray-400"
+                  }`}
                 onClick={() => setCurrentService(index)}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -176,110 +178,127 @@ const ServicePage = () => {
           </div>
         </motion.div>
       </motion.div>
-            
-<motion.div
-  className="px-4 sm:px-16 lg:px-32 py-8 flex flex-col gap-8"
-  initial={{ opacity: 0, y: 50 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 1.2 }}
->
-  <div className="text-center font-semibold text-2xl sm:text-3xl lg:text-4xl">
-    Services
-  </div>
-  
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 lg:gap-16 justify-center">
-    {services.map((serviceDetail, index) => {
-      const sanitizedDescription = DOMPurify.sanitize(serviceDetail?.description);
-      return (
-        <motion.div
-          key={index}
-          className="px-6 py-4 sm:px-8 sm:py-8 flex flex-col gap-8 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 w-full h-fit"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 1 }}
-        >
-          <div className="flex flex-col gap-6 justify-between">
-            <div className="flex justify-center items-center">
-              <img
-                src={serviceDetail?.imagePath}
-                alt="Thumbnail"
-                className="h-40 sm:h-48 w-full sm:w-64 object-cover rounded-xl"
-              />
-            </div>
 
-            <div className="flex-2">
-              <div className="font-bold text-md sm:text-lg text-center">
-                {serviceDetail?.title}
-              </div>
-              <div
-                className="whitespace-normal text-justify my-2 text-xs sm:text-sm"
-                dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
-              />
-              {expandedCard === index &&
-                serviceDetail?.featuresList?.map((feature, featureIndex) => (
-                  <div key={featureIndex} className="flex flex-col gap-2">
-                    <li className="text-xs">
-                      <span className="font-semibold">{feature?.featureName}</span>
-                      <span className="ml-2">{feature?.featureDetail}</span>
-                    </li>
+      <motion.div
+        className="px-4 sm:px-16 lg:px-32 py-8 flex flex-col gap-8"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.2 }}
+      >
+        <div className="text-center font-semibold text-2xl sm:text-3xl lg:text-4xl">
+          Services
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 lg:gap-16 justify-center">
+          {services.map((serviceDetail, index) => {
+            const sanitizedDescription = DOMPurify.sanitize(serviceDetail?.description);
+            return (
+              <motion.div
+                key={index}
+                className="px-6 py-4 sm:px-8 sm:py-8 flex flex-col gap-8 shadow-lg rounded-lg border-none bg-[#f5f5f5] bg-opacity-40 w-full h-fit"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 1 }}
+              >
+                <div className="flex flex-col gap-6 justify-between">
+                  <div className="flex justify-center items-center">
+                    <img
+                      src={serviceDetail?.imagePath}
+                      alt="Thumbnail"
+                      className="h-40 sm:h-48 w-full sm:w-64 object-cover rounded-xl"
+                    />
                   </div>
-                ))}
-              <Button
-                onClick={() => handleToggleDetails(index)}
-                className="cursor-pointer"
-                sx={{
-                  fontSize: "0.725rem",
-                  borderRadius: "0.5rem",
-                }}
-              >
-                {expandedCard === index ? "View Less" : "View More"}
-              </Button>
-            </div>
 
-            <div className="text-center">
-              <Button
-                variant="outlined"
-                sx={{
-                  color: "black",
-                  borderColor: "black",
-                  backgroundColor: "transparent",
-                  minWidth: "12rem",
-                  "&:hover": {
-                    backgroundColor: "black",
-                    color: "white",
-                  },
-                }}
-                onClick={() =>  handleButtonClick(serviceDetail?.buttonLabel as ServiceButtons)}
-              >
-                {serviceDetail?.buttonLabel}
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      );
-    })}
-  </div>
-</motion.div>
+                  <div className="flex-2">
+                    <div className="font-bold text-md sm:text-lg text-center">
+                      {serviceDetail?.title}
+                    </div>
+                    <div
+                      className="whitespace-normal text-justify my-2 text-xs sm:text-sm"
+                      dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
+                    />
+                    {expandedCard === index &&
+                      serviceDetail?.featuresList?.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex flex-col gap-2">
+                          <li className="text-xs">
+                            <span className="font-semibold">{feature?.featureName}</span>
+                            <span className="ml-2">{feature?.featureDetail}</span>
+                          </li>
+                        </div>
+                      ))}
+                    <Button
+                      onClick={() => handleToggleDetails(index)}
+                      className="cursor-pointer"
+                      sx={{
+                        fontSize: "0.725rem",
+                        borderRadius: "0.5rem",
+                      }}
+                    >
+                      {expandedCard === index ? "View Less" : "View More"}
+                    </Button>
+                  </div>
 
-          
-      <section className="w-screen h-auto sm:h-[100vh] flex flex-col sm:flex-row">        
-        <div className="bg-[#B7A99A] w-full sm:w-1/2 flex flex-col justify-center items-center py-8 sm:py-0">
-          <div className="flex flex-col items-center">
-            <img
-              src="/images/DummyImages/contact.png"
-              alt="Illustration"
-              className="object-cover w-[18rem] h-[18rem] sm:w-[24rem] sm:h-[24rem] mb-4"
-            />
-            <h2 className="text-[#F3EDE5] text-3xl sm:text-4xl font-bold">
-              Subscription
+                  <div className="text-center">
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        color: "black",
+                        borderColor: "black",
+                        backgroundColor: "transparent",
+                        minWidth: "12rem",
+                        "&:hover": {
+                          backgroundColor: "black",
+                          color: "white",
+                        },
+                      }}
+                      onClick={() => handleButtonClick(serviceDetail?.buttonLabel as ServiceButtons)}
+                    >
+                      {serviceDetail?.buttonLabel}
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      <section className="w-screen h-auto sm:h-[100vh] flex flex-col sm:flex-row bg-gradient-to-b from-white via-gray-100 to-white">
+        {/* Left Section */}
+        <div className="w-full sm:w-1/3 flex flex-col justify-center items-center py-8 sm:py-12 px-6 sm:px-10 bg-gradient-to-br from-white to-gray-100 shadow-md rounded-lg">
+          <div className="flex flex-col items-center bg-white shadow-xl rounded-lg p-6 sm:p-10 max-w-lg">
+            <h2 className="text-gray-800 text-2xl sm:text-4xl font-extrabold mb-6 text-center">
+              Why Go Premium?
             </h2>
+            <ul className="text-gray-700 text-base sm:text-lg space-y-4 list-disc pl-8">
+              <li><span className="font-medium">24*7 Customer Support</span></li>
+              <li><span className="font-medium">Access to Premium Designs</span></li>
+              <li><span className="font-medium">High-Resolution Downloads</span></li>
+              <li><span className="font-medium">Interactive Catalogues</span></li>
+            </ul>
+            <div className="mt-8">
+              <img
+                src="/images/DummyImages/contact.png"
+                alt="Illustration"
+                className="object-contain w-[16rem] h-[16rem] sm:w-[20rem] sm:h-[20rem] mx-auto"
+              />
+            </div>
           </div>
         </div>
-        
-        <SubscriptionPage/>
+
+        {/* Right Section */}
+        <div className="w-full sm:w-2/3 flex justify-center items-start  bg-white m-12 p-4 rounded-lg">
+          <div className="w-full px-8 sm:px-12">
+            <SubscriptionPriceDetails />
+          </div>
+        </div>
       </section>
+
+
     </BasicLayout>
   );
 };
 
 export default ServicePage;
+
+

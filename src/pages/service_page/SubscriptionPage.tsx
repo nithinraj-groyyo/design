@@ -27,9 +27,9 @@ const SubscriptionPage = () => {
   return (
     <>
       <div className="flex flex-wrap justify-center items-center gap-8 w-full my-32">
-        {subscriptions.data.map((subscription: any, subscriptionIndex:number) => (
+        {subscriptions.data.map((subscription: any, subscriptionIndex: number) => (
 
-subscriptionIndex===0 &&
+          subscriptionIndex === 0 &&
           <div
             key={subscription?.id}
             className="bg-gradient-to-br from-[#CEC1B2] to-[#D8C9BB] w-[20rem] sm:w-[26rem] h-[13rem] sm:h-[15rem] flex justify-center items-center rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 ease-out"
@@ -56,7 +56,7 @@ subscriptionIndex===0 &&
                 </div>
 
                 <div className="text-center mt-6">
-                <span className="inline-block  text-white text-xs px-4 py-1 rounded-full ">
+                  <span className="inline-block  text-white text-xs px-4 py-1 rounded-full ">
                     {subscription.description}
                   </span>
                 </div>
@@ -76,11 +76,11 @@ subscriptionIndex===0 &&
       </div>
 
       {/* Modal */}
-      <SubscriptionPriceDetails
+      {/* <SubscriptionPriceDetails
         isModalOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         selectedSubscription={selectedSubscription}
-      />
+      /> */}
     </>
   );
 };

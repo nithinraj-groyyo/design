@@ -175,7 +175,7 @@ const CatalougePageDetails = () => {
                                     onClick={() =>
                                         flipBookRef.current && flipBookRef.current.pageFlip().flipNext()
                                     }
-                                    className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md flex items-center justify-center border border-white"
+                                    className="px-4 py-2 rounded-full bg-white text-black font-semibold shadow-md flex items-center justify-center border "
                                     whileHover={{ scale: 1.1 }}
                                     transition={{ type: 'spring', stiffness: 300 }}
                                 >

@@ -35,6 +35,15 @@ const subscriptionApiSlice = apiSlice.injectEndpoints({
         },
       }),
     }),
+    getSubscriptionInfo: builder.query({
+      query: ({ token }: { token: string }) => ({
+        url: `/user/subscription/info`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
   }),
 });
 
@@ -42,5 +51,6 @@ export const {
   useCreateSubscriptionMutation,
   useGetSubscriptionListQuery,
   useGetSubscriptionByIdQuery,
-  useSubscribeUserMutation, 
+  useSubscribeUserMutation,
+  useGetSubscriptionInfoQuery,
 } = subscriptionApiSlice;
