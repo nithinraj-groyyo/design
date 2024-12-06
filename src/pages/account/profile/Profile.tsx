@@ -26,6 +26,7 @@ const Profile = () => {
         const response = await getUserProfile({authToken}).unwrap();
         if (response?.status) {
           setProfileData(response?.result);
+          console.log(profileData,"profileDataprofileData")
         }
       } catch (error: any) {
         let errorMessage = "An unknown error occurred while fetching user profile.";

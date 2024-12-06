@@ -24,6 +24,7 @@ const AddCategoriesModal = ({ categoryModal, toggleAddCategory }: any) => {
         name: categoryName,
       }).unwrap();
       console.log("Category updated successfully", result);
+      toggleAddCategory();
     } catch (error) {
       console.error("Failed to update category", error);
     }

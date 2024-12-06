@@ -30,7 +30,7 @@ export const ContactUs = () => {
 
   return (
     <BasicLayout>
-      <div className="w-full p-6 sm:p-8 md:p-10 bg-gray-100 mt-20 flex flex-col md:flex-row justify-center items-stretch space-y-8 md:space-y-0 md:space-x-8">        
+      <div className="w-full p-6 sm:p-8 md:p-10 bg-gray-100 flex flex-col md:flex-row justify-center items-stretch space-y-8 md:space-y-0 md:space-x-8 mt-[10rem]">        
         <div className="md:w-[35%] bg-[#1E201E] p-6 md:p-8  text-xl font-bold flex flex-col items-center">
           <div className="mb-4 w-full">
             <img

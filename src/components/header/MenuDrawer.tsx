@@ -178,13 +178,13 @@ const MenuDrawer: React.FC<MenuDrawerProps> = ({ open, onClose, isAccountOpened,
                                         <ListItemText primary="About Us" />
                                     </ListItem>
                                     <ListItem
-                                        onClick={() => handleNavigation('/team')}
+                                        onClick={() => handleNavigation('/catalogue')}
                                         sx={{
-                                            backgroundColor: isActive('/team') ? '#f0f0f0' : 'transparent',
+                                            backgroundColor: isActive('/catalogue') ? '#f0f0f0' : 'transparent',
                                             borderRadius: '0.25rem',
                                         }}
                                     >
-                                        <ListItemText primary="Team" />
+                                        <ListItemText primary="Catalogue" />
                                     </ListItem>
                                     <ListItem
                                         onClick={() => handleNavigation('/services')}

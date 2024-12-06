@@ -1,10 +1,18 @@
 import React from 'react';
-import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, IconButton } from '@mui/material';
+import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, Button } from '@mui/material';
 import { useGetUserRFQListQuery } from '../../rtk-query/rfqSlice';
 
 const UserRFQList = () => {
   const token = JSON.parse(localStorage.getItem("authToken") as string);
   const { data, isLoading, isError, error } = useGetUserRFQListQuery(token);
+
+  const handleDownload = (signedURL: string) => {
+    if (!signedURL) {
+      alert('Download URL not available.');
+      return;
+    }
+    window.open(signedURL, '_blank');
+  };
 
   if (isLoading) {
     return (
@@ -43,17 +51,31 @@ const UserRFQList = () => {
               <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Email</TableCell>
               <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>MOQ</TableCell>
               <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Target Cost</TableCell>
-              <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Description</TableCell>
+              <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
+              <TableCell className='!text-center' sx={{ color: 'white', fontWeight: 'bold' }}>Download</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map((rfq: any, index: number) => (
               <TableRow key={index} sx={{ '&:hover': { backgroundColor: '#f1f1f1' } }}>
-                <TableCell className='!text-center'>{rfq.brandName}</TableCell>
-                <TableCell className='!text-center'>{rfq.email}</TableCell>
-                <TableCell className='!text-center'>{rfq.minOrderQty}</TableCell>
-                <TableCell className='!text-center'>{rfq.targetCost}</TableCell>
-                <TableCell className='!text-center'>{rfq.description}</TableCell>
+                <TableCell className='!text-center'>{rfq?.brandName}</TableCell>
+                <TableCell className='!text-center'>{rfq?.email}</TableCell>
+                <TableCell className='!text-center'>{rfq?.minOrderQty}</TableCell>
+                <TableCell className='!text-center'>{rfq?.targetCost}</TableCell>
+                <TableCell className='!text-center'>{rfq?.status}</TableCell>
+                <TableCell className='!text-center'>
+                  {rfq.signedUrl ? (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleDownload(rfq.signedUrl)}
+                    >
+                      Download
+                    </Button>
+                  ) : (
+                    <Typography color="textSecondary">Not Available</Typography>
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

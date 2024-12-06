@@ -11,7 +11,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import BasicLayout from "../../layouts/BasicLayout";
-import {  useLazyGenerateOtpQuery, useVerifyOtpLoginMutation } from "../../rtk-query/authApiSlice";
+import { useLazyGenerateOtpQuery, useVerifyOtpLoginMutation } from "../../rtk-query/authApiSlice";
 import { useDispatch } from "react-redux";
 import { setToken } from "../../redux/userSlice";
 import { setWishlistItems } from "../../redux/wishlistSlice";
@@ -23,9 +23,9 @@ const Login = () => {
   const [isVerifyLoading, setIsVerifyLoading] = useState(false);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+const dispatch = useDispatch();
 
-  const [ generateOtp, {isLoading} ] = useLazyGenerateOtpQuery();
+  const [generateOtp, { isLoading }] = useLazyGenerateOtpQuery();
   const [verifyOtpLogin] = useVerifyOtpLoginMutation();
   const [updateLocalWishlist] = useUpdateLocalWishlistMutation();
 
@@ -38,12 +38,11 @@ const Login = () => {
       try {
         const response = await generateOtp({ email: formik.values.email, platform: "GROYYO_DESIGN" }).unwrap();
 
-        console.log(response, "signin");
+        console.log(response,"ashish")
 
         toast.success("OTP sent to your email!");
         setIsModalOpen(true)
-        // modalToggleHandler();
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error, "error")
         toast.error("Failed to send OTP", error);
       }
@@ -68,7 +67,8 @@ const Login = () => {
         dispatch(setToken({ token: response?.result?.token }));
         localStorage.setItem("authToken", JSON.stringify(response?.result?.token));
         localStorage.setItem('isAdmin', JSON.stringify(response?.result?.role?.name === "ADMIN"));
-
+        localStorage.setItem('factoryId', JSON.stringify(response?.result?.factoryId));
+        
         const productIds = JSON.parse(localStorage.getItem("localWishList") as string);
         await updateLocalWishlist({ token: response?.result?.token, payload: productIds }).then((res) => {
           dispatch(setWishlistItems(res?.data?.count));
@@ -130,15 +130,15 @@ const Login = () => {
             </Button>
           </form>
           <Typography variant="body2" className="w-full text-right">
-              New user?{" "}
-              <Link to={"/signup"}>
-                <span className="underline font-semibold">Sign up</span>
-              </Link>
-            </Typography>        </div>
+            New user?{" "}
+            <Link to={"/signup"}>
+              <span className="underline font-semibold">Sign up</span>
+            </Link>
+          </Typography>        </div>
       </div>
 
       <Modal open={isModalOpen} onClose={modalToggleHandler}>
-        <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-50">
           <div className="p-8 bg-white rounded-lg shadow-lg max-w-lg w-full flex flex-col gap-4">
             <h2 className="text-2xl font-semibold text-center">Enter OTP</h2>
             <TextField
@@ -151,21 +151,26 @@ const Login = () => {
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
             />
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
+            <button
               onClick={handleVerifyOtp}
               disabled={isVerifyLoading || !otp}
+              className={`w-full px-4 py-2 text-white bg-black rounded-lg ${isVerifyLoading || !otp
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-gray-800 transition-all duration-300'
+                }`}
             >
-              {isVerifyLoading ? <CircularProgress size={24} /> : "Verify OTP"}
-            </Button>
-            <Button variant="text" onClick={modalToggleHandler}>
+              {isVerifyLoading ? <CircularProgress size={24} className="text-white" /> : 'Verify OTP'}
+            </button>
+            <button
+              onClick={modalToggleHandler}
+              className="w-full px-4 py-2 text-black bg-white border border-black rounded-lg hover:bg-black hover:text-white transition-all duration-300"
+            >
               Cancel
-            </Button>
+            </button>
           </div>
         </div>
       </Modal>
+
     </BasicLayout>
   );
 };

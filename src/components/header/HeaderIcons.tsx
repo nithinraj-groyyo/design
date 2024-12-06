@@ -8,6 +8,7 @@ import CustomizedShoppingBadges from './badges/CustomizedShoppingBadges';
 import useSignOut from '../../hooks/useSignOut';
 import SignOutModal from './SignOutModal';
 import CustomizedWishlist from './badges/CustomizedWishlist';
+import { useGetSubscriptionInfoQuery } from '../../rtk-query/subscriptonApiSlice';
 
 interface IconButtonConfig {
     icon: React.ReactNode;
@@ -79,18 +80,26 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSignOutClick = () => {
-    setIsModalOpen(true);
-  };
+    const handleSignOutClick = () => {
+        setIsModalOpen(true);
+    };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
 
-  const handleConfirmSignOut = () => {
-    signOut()
-    window.location.href = '/login';
-  };
+    const handleConfirmSignOut = () => {
+        signOut();
+        window.location.href = '/login';
+    };
+
+    // Fetch subscription data
+    const { data: subscriptionData = [] } = useGetSubscriptionInfoQuery({
+        token: JSON.parse(localStorage.getItem("authToken") as string),
+    });
+
+    console.log(subscriptionData,"Data")
+
     return (
         <div className="xxs:hidden lg:flex gap-[3rem] items-center">
             {filteredIconButtons.map((button, index) => (
@@ -104,43 +113,47 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
                 </Link>
             ))}
 
-            {
-                isAuthenticated && (
-                    <div className='flex flex-col items-center justify-between my-auto whitespace-nowrap'>
+            {isAuthenticated && (
+                <div className="flex flex-col items-center justify-between my-auto whitespace-nowrap">
+                    <div
+                        className={`!p-1 rounded-full ${
+                            subscriptionData?.data && subscriptionData?.data.length > 0 ? "!bg-yellow-500" : ""
+                        }`}
+                    >
                         <IconButton
-                            className='!w-9 !h-9'
+                            className="!w-9 !h-9"
                             onClick={handleMenuClick}
                         >
                             <PersonIcon fontSize="large" />
                         </IconButton>
-                        <Typography>accounts</Typography>
-                        <Menu
-                            anchorEl={anchorEl}
-                            open={open}
-                            onClose={handleMenuClose}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'center',
-                            }}
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'center',
-                            }}
-                        >
-                            <MenuItem onClick={() => handleMenuNavigation("profile")}>Account Settings</MenuItem>
-                            <MenuItem onClick={() => handleMenuNavigation("orders")}>Orders</MenuItem>
-                            <MenuItem onClick={() => handleMenuNavigation("address")}>Address</MenuItem>
-                            {isAuthenticated && <MenuItem onClick={handleSignOutClick}>Sign Out</MenuItem>}
-
-                            <SignOutModal
-                                open={isModalOpen}
-                                onClose={handleCloseModal}
-                                onConfirm={handleConfirmSignOut}
-                            />
-                        </Menu>
                     </div>
-                )
-            }
+                    <Typography>accounts</Typography>
+                    <Menu
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleMenuClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center',
+                        }}
+                    >
+                        <MenuItem onClick={() => handleMenuNavigation("profile")}>Account Settings</MenuItem>
+                        <MenuItem onClick={() => handleMenuNavigation("orders")}>Orders</MenuItem>
+                        <MenuItem onClick={() => handleMenuNavigation("address")}>Address</MenuItem>
+                        {isAuthenticated && <MenuItem onClick={handleSignOutClick}>Sign Out</MenuItem>}
+
+                        <SignOutModal
+                            open={isModalOpen}
+                            onClose={handleCloseModal}
+                            onConfirm={handleConfirmSignOut}
+                        />
+                    </Menu>
+                </div>
+            )}
         </div>
     );
 };

@@ -10,7 +10,6 @@ import Signup from "./pages/signup/signup";
 import { ContactUs } from "./pages/contactUs";
 import AccountPage from "./pages/account";
 import Address from "./pages/account/profile/Address";
-import Orders from "./pages/account/orders/Orders";
 import Profile from "./pages/account/profile/Profile";
 import ChangePassword from "./pages/account/profile/ChangePassword";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -40,8 +39,11 @@ import AdminCatalogueList from "./pages/account/catalogue/AdminCatalogueList";
 import ManageCatalogueCategories from "./pages/account/catalogue/ManageCatalogueCategories";
 import EditCatalogue from "./pages/account/catalogue/EditCatalogue";
 import AdminRFQList from "./pages/account/rfq/AdminRFQList";
-import AddRFQ from "./pages/RfqPage/AddRFQ";
 import RFQPage from "./pages/RfqPage/RFQPage";
+import AddRFQ from "./pages/RfqPage/AddRFQ";
+import UserRFQList from "./pages/RfqPage/UserRFQList";
+import Orders from "./pages/account/orders/Orders";
+import AdminUserRFQList from "./pages/account/rfq/AdminUserRFQList";
 
 const App = () => {
   const isAuthenticated = useAuth();
@@ -76,8 +78,8 @@ const App = () => {
       <Route path="/team" element={<TeamsPage />} />
       <Route path="/catalogue" element={<CataloguePage />} />
       <Route path="/catalogue/:catalogueId" element={<CatalougePageDetails />} />
-      <Route path="add-rfq" element={<AddRFQ />} />
-      <Route path="rfq" element={<RFQPage />} />
+      {/* <Route path="/rfq/:catalogueId" element={<AddRFQ/>} /> */}
+      <Route path="/rfq/:catalogueId" element={<RFQPage />} />
 
       <Route path="account" element={<AccountPage />}>
         <Route path="address" element={<Address />} />
@@ -119,7 +121,10 @@ const App = () => {
         
         
 
-        <Route path="rfq-list" element={<AdminRoutes/>}>
+        <Route path="rfq/list" element={<AdminRoutes/>}>
+          <Route path="" element={<AdminUserRFQList />} />
+        </Route>
+        <Route path="admin-rfq-list" element={<AdminRoutes/>}>
           <Route path="" element={<AdminRFQList />} />
         </Route>
 

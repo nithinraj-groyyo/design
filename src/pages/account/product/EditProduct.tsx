@@ -837,6 +837,18 @@ const EditProduct = () => {
                     </TableContainer>
                   </div>
 
+                  <div className="font-bold">Minimum Quantity</div>
+
+                  <TextField
+                    // label="Min Quantity"
+                    name="minQty"
+                    value={formik.values.minQty}
+                    onChange={formik.handleChange}
+                    fullWidth
+                    error={formik.touched.minQty && Boolean(formik.errors.minQty)}
+
+                  />
+
                   <div className="flex-[5] px-2">
                     <div className="font-bold">Product Pricing :</div>
                     <TableContainer>
@@ -982,17 +994,7 @@ const EditProduct = () => {
               />
               <Divider />
 
-              <div className="font-bold">Minimum Quantity</div>
 
-              <TextField
-                // label="Min Quantity"
-                name="minQty"
-                value={formik.values.minQty}
-                onChange={formik.handleChange}
-                fullWidth
-                error={formik.touched.minQty && Boolean(formik.errors.minQty)}
-
-              />
             </Card>
           </div>
         </div>
