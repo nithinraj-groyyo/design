@@ -2,10 +2,13 @@ import React from 'react';
 import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, Button } from '@mui/material';
 import { useGetUserRFQListQuery } from '../../rtk-query/rfqSlice';
 import { toast } from 'react-toastify';
+import useAuth from '../../hooks/useAuth';
+import NoDataAvailable from '../../components/NoDataAvailable';
 
 const UserRFQList = () => {
   const token = JSON.parse(localStorage.getItem("authToken") as string);
   const { data, isLoading, isError, error } = useGetUserRFQListQuery(token);
+  const isAuthenticated = useAuth();
 
   const handleDownload = (signedURL: string) => {
     if (!signedURL) {
@@ -23,27 +26,28 @@ const UserRFQList = () => {
     );
   }
 
-  if (isError) {
-    return (
-      <Typography color="error" align="center" sx={{ marginTop: '2rem' }}>
-        Failed to load RFQ List. {'Please try again later.'}
-      </Typography>
-    );
-  }
+  // if (isError) {
+  //   return (
+  //     <Typography color="error" align="center" sx={{ marginTop: '2rem' }}>
+  //       Failed to load RFQ List. {'Please try again later.'}
+  //     </Typography>
+  //   );
+  // }
 
-  if (!data || data.length === 0) {
-    return (
-      <Typography align="center" sx={{ marginTop: '2rem' }}>
-        No RFQs available.
-      </Typography>
-    );
-  }
+  // if (!data || data.length === 0) {
+  //   return (
+  //     <Typography align="center" sx={{ marginTop: '2rem' }}>
+  //       No RFQs available.
+  //     </Typography>
+  //   );
+  // }
 
   return (
     <Box sx={{ padding: '2rem', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
       <Typography variant="h5" sx={{ marginBottom: '2rem', fontWeight: 600 }}>
         Your RFQ List
       </Typography>
+      {isAuthenticated ?
       <TableContainer component={Paper} sx={{ borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
         <Table>
           <TableHead sx={{ backgroundColor: '#4caf50' }}>
@@ -81,7 +85,7 @@ const UserRFQList = () => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer> : <NoDataAvailable/>}
     </Box>
   );
 };
