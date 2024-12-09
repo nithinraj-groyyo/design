@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import { useGetUserRFQListQuery } from '../../../rtk-query/rfqSlice';
 import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
+import { toast } from 'react-toastify';
 
 const AdminUserRFQList = () => {
   const token = JSON.parse(localStorage.getItem('authToken') as string);
@@ -39,7 +40,7 @@ const AdminUserRFQList = () => {
 
   const handleDownload = (signedURL: string) => {
     if (!signedURL) {
-      alert('Download URL not available.');
+      toast.error('Download URL not available.');
       return;
     }
     window.open(signedURL, '_blank');

@@ -20,6 +20,7 @@ import {
   useUpdateCatalogueMutation,
 } from '../../../rtk-query/catalogueApiSlice';
 import { skipToken } from '@reduxjs/toolkit/query';
+import { toast } from 'react-toastify';
 
 interface ICategory {
   id: number;
@@ -111,8 +112,8 @@ const EditCatalogue = () => {
               name: values.name,
               minQty: values.minQty,
               description: values.description,
-              isPublic: values.isPremium,
-              isActive: values.isActive,
+              isPublic: !values.isPremium,
+              isActive: !values.isActive,
               categoryId: values.category,
               subCategoryId: values.subCategory,
             };
@@ -123,12 +124,12 @@ const EditCatalogue = () => {
                 catalogueId: Number(catalogueId),
                 token,
               }).unwrap();
-              alert('Catalogue updated successfully');
+              toast.success('Catalogue updated successfully');
               navigate('/account/catalogue-list');
             }
           } catch (err) {
             console.error('Failed to update catalogue:', err);
-            alert('Error updating catalogue');
+            toast.error('Error updating catalogue');
           }
         }}
       >
@@ -199,7 +200,7 @@ const EditCatalogue = () => {
                     control={
                       <Checkbox
                         name="isPremium"
-                        checked={isPublic}
+                        checked={!isPublic}
                         onChange={() =>
                           handleToggleButtons({ method: isPublic, setMethod: setIsPublic })
                         }

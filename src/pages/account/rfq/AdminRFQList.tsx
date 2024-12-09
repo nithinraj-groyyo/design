@@ -17,6 +17,7 @@ import {
 import { useGetRFQListQuery, useUpdateRFQStatusMutation } from '../../../rtk-query/rfqSlice';
 import AccountSettingsLayout from '../../../layouts/AccountSettingsLayout';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export enum RFQEnums {
     REQUESTED = 'REQUESTED',
@@ -49,6 +50,8 @@ const AdminRFQList = () => {
         }
     }, [data, isError, error]);
 
+    console.log(data,"feefeefef")
+
     if (isLoading) {
         return <CircularProgress />;
     }
@@ -64,7 +67,7 @@ const AdminRFQList = () => {
             console.log(`Successfully updated status for RFQ ${rfqId} to ${newStatus}`);
         } catch (updateError) {
             console.error(`Error updating status for RFQ ${rfqId}:`, updateError);
-            alert('Failed to update status. Please try again.');
+            toast.error('Failed to update status. Please try again.');
         }
     };
 
@@ -74,7 +77,7 @@ const AdminRFQList = () => {
 
     const handleDownload = (signedURL: string) => {
         if (!signedURL) {
-            alert('Download URL not available.');
+            toast.error('Download URL not available.');
             return;
         }
         window.open(signedURL, '_blank');
@@ -162,9 +165,9 @@ const AdminRFQList = () => {
                     </Table>
                 </TableContainer>
 
-                {isError && (
+                {/* {isError && (
                     <Typography color="error" align="center" sx={{ marginTop: '20px' }}>Failed to fetch RFQ list</Typography>
-                )}
+                )} */}
             </div>
         </AccountSettingsLayout>
     );

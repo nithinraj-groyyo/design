@@ -9,7 +9,7 @@ import {
     setCartItems,
 } from "../../redux/bagSlice";
 import ShoppingBagEmptyIcon from "@mui/icons-material/ShoppingCartOutlined";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
     Box,
@@ -55,13 +55,13 @@ const ShoppingBag = () => {
 
     const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
 
-    // const { data: addresses } = useGetAddressesQuery({ token });
-    const [addresses, setAddresses] = useState<any>([])
+    const { data: addresses } = useGetAddressesQuery({ token });
+    // const [addresses, setAddresses] = useState<any>([])
     const [getAddress] = useLazyGetAddressesQuery();
 
     useEffect(() => {
-        if(token){
-            getAddress({token})
+        if (token) {
+            getAddress({ token })
         }
     }, [])
 
@@ -72,11 +72,11 @@ const ShoppingBag = () => {
     const [removeCart] = useRemoveCartMutation();
     const [addToWishlist] = useAddToWishListMutation();
     const [updateDefaultAddress] = useUpdateDefaultAddressMutation();
-    const [createOrderCheckout, {isLoading: isCheckoutLoading}] = useCreateOrderCheckoutMutation();
+    const [createOrderCheckout, { isLoading: isCheckoutLoading }] = useCreateOrderCheckoutMutation();
 
     const handleOpenAddressesModal = () => {
         setOpenAddressSelectionModal(true);
-        const defaultAddress: any = addresses?.find((address: any) => address.isDefault);
+        const defaultAddress: any = addresses && addresses?.data?.find((address: any) => address.isDefault);
         if (defaultAddress && defaultAddress?.id) {
             setSelectedAddress(defaultAddress?.id)
         };
@@ -103,6 +103,8 @@ const ShoppingBag = () => {
     const handleAddressChange = (event: any) => {
         setSelectedAddress(Number(event.target.value));
     };
+    console.log(addresses, "kekfne")
+
 
     const handleClickOpen = () => {
         setOpenRemovalDialog(true);
@@ -131,7 +133,7 @@ const ShoppingBag = () => {
     }
 
     const handleCheckout = async () => {
-        const defaultAddress: any = addresses?.find((address: any) => address.isDefault);
+        const defaultAddress: any = addresses?.data?.find((address: any) => address.isDefault);
 
         if (defaultAddress) {
             const payload = {
@@ -159,7 +161,7 @@ const ShoppingBag = () => {
 
     const handleOrderSuccess = () => {
         setOpenThanksDialog(true);
-        
+
     };
 
     const handleConfirmThanks = () => {
@@ -198,138 +200,125 @@ const ShoppingBag = () => {
 
     return (
         <BasicLayout>
-            <section className="cart-section flex justify-center items-start min-h-screen mt-[12rem]">
-                <div className="flex gap-8 justify-center w-[90%] mx-auto">
-                    <div className="flex flex-col w-3/4">
+            <section className="cart-section flex justify-center items-start min-h-screen mt-[5rem] md:mt-[10rem]">
+                <div className="flex flex-col md:flex-row gap-8 justify-center w-[90%] mx-auto">
+                    <div className="flex flex-col w-full lg:w-3/4 px-4">
                         {cart.data.length > 0 && (
                             <div className="bg-white p-4 mb-6 shadow-md">
-                                {
-                                    addresses
-                                        ?.filter((address: any) => address?.isDefault)
-                                        .map((address: any) => (
-                                            <div key={address.id} className="flex flex-row gap-2 items-center">
-                                                <div className="flex-[3]">
-                                                    <div >
-                                                        <span className="">Deliver To: </span>
-                                                        <span className="font-semibold">{address?.name}</span>
-                                                    </div>
-                                                    <div className="text-sm">
-                                                        <span>{address?.street}, </span>
-                                                        <span>{address?.city}</span>
-                                                    </div>
-                                                    <div className="text-sm">
-                                                        <span>{address?.state}, </span>
-                                                        <span>{address?.country} </span>
-                                                        <span>{address?.postalCode}</span>
-                                                    </div>
+                                {addresses?.data
+                                    ?.filter((address: any) => address?.isDefault)
+                                    .map((address: any) => (
+                                        <div key={address.id} className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+                                            <div className="flex-[3]">
+                                                <div>
+                                                    <span>Deliver To: </span>
+                                                    <span className="font-semibold">{address?.name}</span>
                                                 </div>
-                                                <div className="flex-[1]">
-                                                    <Button variant="outlined" className="!text-black !border !border-black" onClick={handleOpenAddressesModal}>Change Address</Button>
+                                                <div className="text-sm">
+                                                    <span>{address?.street}, </span>
+                                                    <span>{address?.city}</span>
+                                                </div>
+                                                <div className="text-sm">
+                                                    <span>{address?.state}, </span>
+                                                    <span>{address?.country} </span>
+                                                    <span>{address?.postalCode}</span>
                                                 </div>
                                             </div>
-                                        ))
-                                }
-                                {
-                                    !addresses?.data?.filter((address: any) => address?.isDefault).length && (
-                                        <button className="px-4 py-2 bg-black text-white font-semibold" onClick={() => navigate("/account/address")}>
-                                        ADD ADDRESS
-                                    </button>
-                                    )
-                                }
-                               
+                                            <div className="flex-[1]">
+                                                <Button
+                                                    variant="outlined"
+                                                    className="!text-black !border !border-black"
+                                                    onClick={handleOpenAddressesModal}
+                                                >
+                                                    Change Address
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                {!addresses?.data?.filter((address: any) => address?.isDefault).length && (
+                                    <div className="flex justify-end">
+                                        <button
+                                            className="px-4 py-2 bg-black text-white font-semibold w-full lg:w-auto"
+                                            onClick={() => navigate("/account/address")}
+                                        >
+                                            ADD ADDRESS
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
 
-                        {cart.data.length > 0 ? (
+                        {cart?.data?.length > 0 ? (
                             <>
-                                <h2 className="text-lg font-bold mb-2">SHOPPING BAG</h2>
-                                <div className="bg-white p-6 shadow-md mb-6">
-                                    {cart.data.map((bag) => {
+                                <h2 className="text-lg lg:text-xl font-bold mb-2">SHOPPING BAG</h2>
+                                <div className="bg-white p-4 lg:p-6 shadow-md mb-6">
+                                    {cart?.data?.map((bag) => {
                                         const minVariantsToBeShown = 2;
                                         return (
-                                            <div
-                                                key={bag.id}
-                                                className="flex flex-col justify-between border-b pb-4 mb-4 gap-6"
-                                            >
-                                                <div className="flex">
-                                                    <img
-                                                        src={bag.product?.imageData?.signedUrl}
-                                                        alt={bag.product.name}
-                                                        className="w-28 h-40 object-cover mr-4"
-                                                    />
+                                            <div key={bag.id} className="flex flex-col border-b pb-4 mb-4 gap-6">
+                                                <div className="flex flex-col lg:flex-row gap-4">
+                                                    <Link to={`/product-details/${bag?.product?.id}`}>
+                                                        <img
+                                                            src={bag?.product?.imageData?.signedUrl}
+                                                            alt={bag?.product?.name}
+                                                            className="w-full lg:w-28 h-auto lg:h-40 object-cover"
+                                                        />
+
+                                                    </Link>
                                                     <div className="flex flex-col gap-2">
-                                                        <h3 className="font-light text-sm">
-                                                            {bag.product.name}
-                                                        </h3>
+                                                        <h3 className="font-light text-sm">{bag.product.name}</h3>
                                                         <p className="text-sm">
-                                                            <CurrencyRupeeIcon
-                                                                sx={{ fontSize: "inherit" }}
-                                                            />
+                                                            <CurrencyRupeeIcon sx={{ fontSize: "inherit" }} />
                                                             {Number(bag.unitPrice * bag.totalQuantity)?.toFixed(2)}
                                                         </p>
-
                                                         {bag.cartItemVariants.length > 0 && (
                                                             <div>
                                                                 <p className="text-xs text-[#646463] font-normal mb-2">
                                                                     Selected Variants:
                                                                 </p>
-
-                                                                <div className="flex flex-row gap-3 rounded-lg">
+                                                                <div className="flex flex-col lg:flex-row gap-3 rounded-lg">
                                                                     {bag.cartItemVariants
                                                                         .slice(0, minVariantsToBeShown)
-                                                                        .map((cartItemVariant: any) => {
-                                                                            return (
-                                                                                <div
-                                                                                    key={cartItemVariant?.id}
-                                                                                    className="flex items-center justify-between bg-white p-2 rounded-lg shadow-md relative cursor-pointer"
-                                                                                    onClick={() => handleDrawer(bag)}
-                                                                                >
-                                                                                    <div className="flex items-center gap-2 relative">
-                                                                                        <div
-                                                                                            className="w-8 h-8 rounded-full border-2 border-white shadow-md"
-                                                                                            style={{
-                                                                                                backgroundColor:
-                                                                                                    cartItemVariant?.productColor
-                                                                                                        ?.color?.name,
-                                                                                            }}
-                                                                                        />
-                                                                                        <p className="text-sm font-medium">
-                                                                                            {cartItemVariant?.productColor?.color?.name}{" "}
-                                                                                            / {cartItemVariant?.productSize?.size?.name}
-                                                                                        </p>
-                                                                                        <div className="absolute -top-4 -right-4 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
-                                                                                            x{cartItemVariant?.quantity}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            );
-                                                                        })}
-
-                                                                    {bag.cartItemVariants.length >
-                                                                        minVariantsToBeShown && (
+                                                                        .map((cartItemVariant: any) => (
                                                                             <div
-                                                                                className="flex items-center justify-center bg-gray-200 p-2 rounded-lg shadow-md h-auto min-w-28 cursor-pointer"
+                                                                                key={cartItemVariant?.id}
+                                                                                className="flex items-center justify-between bg-white p-2 rounded-lg shadow-md relative cursor-pointer"
                                                                                 onClick={() => handleDrawer(bag)}
                                                                             >
-                                                                                <p className="text-sm font-bold text-center whitespace-nowrap">
-                                                                                    +{bag.cartItemVariants.length -
-                                                                                        minVariantsToBeShown}{" "}
-                                                                                    more
-                                                                                </p>
+                                                                                <div className="flex items-center gap-2 relative">
+                                                                                    <div
+                                                                                        className="w-8 h-8 rounded-full border-2 border-white shadow-md"
+                                                                                        style={{
+                                                                                            backgroundColor:
+                                                                                                cartItemVariant?.productColor?.color?.name,
+                                                                                        }}
+                                                                                    />
+                                                                                    <p className="text-sm font-medium">
+                                                                                        {cartItemVariant?.productColor?.color?.name} /{" "}
+                                                                                        {cartItemVariant?.productSize?.size?.name}
+                                                                                    </p>
+                                                                                    <div className="absolute -top-4 -right-4 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md">
+                                                                                        x{cartItemVariant?.quantity}
+                                                                                    </div>
+                                                                                </div>
                                                                             </div>
-                                                                        )}
+                                                                        ))}
+                                                                    {bag.cartItemVariants.length > minVariantsToBeShown && (
+                                                                        <div
+                                                                            className="flex items-center justify-center bg-gray-200 p-2 rounded-lg shadow-md h-auto min-w-28 cursor-pointer"
+                                                                            onClick={() => handleDrawer(bag)}
+                                                                        >
+                                                                            <p className="text-sm font-bold text-center whitespace-nowrap">
+                                                                                +{bag.cartItemVariants.length - minVariantsToBeShown} more
+                                                                            </p>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         )}
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-4">
-                                                    {/* <button
-                                                        className="text-sm text-[#646463]"
-                                                        onClick={() => handleBuyLater(bag.product.id)}
-                                                    >
-                                                        Buy Later
-                                                    </button> */}
                                                     <button
                                                         className="text-sm text-red-500"
                                                         onClick={handleClickOpen}
@@ -409,7 +398,7 @@ const ShoppingBag = () => {
                                                     onClose={handleAddressesCloseModal}
                                                 >
                                                     <DialogTitle>Change Address</DialogTitle>
-                                                    <DialogContent>
+                                                    <DialogContent style={{ display: "flex", justifyContent: "center", flexDirection: "column" }}>
                                                         <RadioGroup value={selectedAddress} onChange={handleAddressChange}>
                                                             {addresses?.data?.map((address: any) => (
                                                                 <div key={address.id} className="flex flex-row items-start mb-4">
@@ -437,6 +426,12 @@ const ShoppingBag = () => {
                                                                 </div>
                                                             ))}
                                                         </RadioGroup>
+                                                        <button
+                                                            className="px-4 py-2 text-black font-semibold w-full lg:w-auto border border-1 border-black"
+                                                            onClick={() => navigate("/account/address")}
+                                                        >
+                                                            ADD ADDRESS
+                                                        </button>
                                                     </DialogContent>
                                                     <DialogActions>
                                                         <Button onClick={handleAddressesCloseModal} color="primary">Cancel</Button>
@@ -453,9 +448,10 @@ const ShoppingBag = () => {
                         )}
                     </div>
 
-                    <div className="w-1/4">
-                        <div className="bg-white p-6 shadow-md">
-                            <h2 className="font-bold text-xl mb-4">Subtotal</h2>
+
+                    <div className="w-full md:w-1/4 px-4">
+                        <div className="bg-white p-4 md:p-6 shadow-md">
+                            <h2 className="font-bold text-lg md:text-xl mb-4">Subtotal</h2>
                             <div className="flex justify-between mb-2">
                                 <span>Subtotal</span>
                                 <span>
@@ -475,11 +471,16 @@ const ShoppingBag = () => {
                                 </span>
                             </div>
 
-                            <button disabled={cart?.data?.length===0 || isCheckoutLoading} className={`w-full bg-black text-white font-semibold py-2 ${(cart?.data?.length===0 || isCheckoutLoading) ? "cursor-not-allowed": "cursor-pointer"}`} onClick={handleCheckout}>
+                            <button
+                                disabled={cart?.data?.length === 0 || isCheckoutLoading}
+                                className={`w-full bg-black text-white font-semibold py-2 ${(cart?.data?.length === 0 || isCheckoutLoading) ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+                                onClick={handleCheckout}
+                            >
                                 {isCheckoutLoading ? <CircularProgress /> : "Checkout"}
                             </button>
                         </div>
                     </div>
+
                 </div>
             </section>
         </BasicLayout>
