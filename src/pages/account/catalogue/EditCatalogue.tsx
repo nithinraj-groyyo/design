@@ -113,7 +113,7 @@ const EditCatalogue = () => {
               minQty: values.minQty,
               description: values.description,
               isPublic: !values.isPremium,
-              isActive: values.isActive,
+              isActive: !values.isActive,
               categoryId: values.category,
               subCategoryId: values.subCategory,
             };

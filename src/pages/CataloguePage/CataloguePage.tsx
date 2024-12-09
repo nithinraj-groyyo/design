@@ -164,7 +164,7 @@ const CataloguePage = () => {
             <div className='flex flex-col p-8 w-full mt-[10rem]'>
               <Grid container spacing={3} sx={{ padding: '2rem' }}>
                 {paginatedCatalogues.length > 0 ? (
-                  paginatedCatalogues.map((catalogue) => (
+                  paginatedCatalogues?.filter((cat: any) => cat.isActive)?.map((catalogue) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
                       <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
                         <motion.div
