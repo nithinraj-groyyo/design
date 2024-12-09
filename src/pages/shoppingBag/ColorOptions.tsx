@@ -7,7 +7,7 @@ const ColorOption = ({ color, count, selectedColor }: { color: string; count: nu
                 width: 48,
                 height: 48,
                 borderRadius: '8px',
-                border: selectedColor ? '2px solid black' : "",
+                border: selectedColor ? '3px solid black' : "1px solid gray",
             }}
             className="!flex !justify-center !items-center"
         >

@@ -4,7 +4,6 @@ import HTMLFlipBook from "react-pageflip";
 const FlipBook = forwardRef((props: any, ref) => {
     const { pageImages, isPortrait, onFlip, isMobile } = props;
     const [isMobileView, setIsMobileView] = useState(isMobile);
-    console.log(pageImages,"vevev")
     useEffect(() => {
         setIsMobileView(isMobile);
     }, [isMobile]);
@@ -18,12 +17,12 @@ const FlipBook = forwardRef((props: any, ref) => {
                     style={{}}
                     ref={ref}
                     startZIndex={1}
-                    width={400}
-                    height={400}
-                    minWidth={300}
-                    maxWidth={800}
-                    minHeight={200}
-                    maxHeight={400}
+                    width={500}
+                    height={300}
+                    minWidth={400}
+                    maxWidth={1000}
+                    minHeight={150}
+                    maxHeight={300}
                     size="stretch"
                     drawShadow={true}
                     flippingTime={1000}
@@ -58,12 +57,12 @@ const FlipBook = forwardRef((props: any, ref) => {
                     style={{}}
                     ref={ref}
                     startZIndex={1}
-                    width={960}
-                    height={540}
-                    minWidth={700}
-                    maxWidth={1200}
-                    minHeight={400}
-                    maxHeight={675}
+                    width={800}
+                    height={450}
+                    minWidth={600}
+                    maxWidth={1000}
+                    minHeight={337.5}
+                    maxHeight={562.5}
                     size="stretch"
                     drawShadow={true}
                     flippingTime={1000}
@@ -91,6 +90,7 @@ const FlipBook = forwardRef((props: any, ref) => {
                         </div>
                     ))}
                 </HTMLFlipBook>
+
             )}
         </>
     );

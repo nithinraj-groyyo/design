@@ -97,13 +97,15 @@ const adminMenuItems = [
   },
 ];
 
+
 const AccountPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const token = JSON.parse(localStorage.getItem("authToken") as string);
   const decodedToken: any = jwtDecode(token);
-  const isAdmin = decodedToken?.isAdmin;
+  // const isAdmin = decodedToken?.role?.name==="ADMIN";
+  const isSuperAdmin = decodedToken?.role?.name==="SUPER_ADMIN";
   console.log(decodedToken, "decodedToken")
 
   const handleSelectedList = (selectedRoute: string) => {
@@ -158,7 +160,7 @@ const AccountPage = () => {
             ))}
 
             {/* {user && user.role === "Admin" && */}
-            {isAdmin &&
+            {isSuperAdmin &&
               adminMenuItems.map((menuItem, index) => (
                 <React.Fragment key={index}>
                   <ListItem>

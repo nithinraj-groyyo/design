@@ -10,7 +10,7 @@ import {
   useGetAddressesQuery,
   useDeleteAddressMutation,
   useUpdateDefaultAddressMutation
-} from '../../../rtk-query/addressApiSlice';  
+} from '../../../rtk-query/addressApiSlice';
 import NoDataAvailable from '../../../components/NoDataAvailable';
 
 const Address = () => {
@@ -23,15 +23,15 @@ const Address = () => {
 
   const { data: addresses, isError, isLoading, refetch } = useGetAddressesQuery({ token });
   const [deleteAddress] = useDeleteAddressMutation();
-  const [updateDefaultAddress] = useUpdateDefaultAddressMutation();  
+  const [updateDefaultAddress] = useUpdateDefaultAddressMutation();
 
   const handleSetDefaultAddress = async (addressId: number) => {
     try {
-      const response = await updateDefaultAddress({ addressId, token }).unwrap();  
+      const response = await updateDefaultAddress({ addressId, token }).unwrap();
       if (response) {
         setDefaultAddress(addressId);
         toast.success("Updated Default Address Successfully");
-        refetch();  
+        refetch();
       }
     } catch (error: any) {
       toast.error("Unable to Set Default Address");
@@ -44,7 +44,7 @@ const Address = () => {
       const response = await deleteAddress({ addressId, token }).unwrap();
       if (response?.status) {
         toast.success(response?.message);
-        refetch();  
+        refetch();
       }
     } catch (error: any) {
       toast.error("Unable to Remove this Address");
@@ -69,14 +69,102 @@ const Address = () => {
 
   return (
     <>
-    <div className="xxs:hidden lg:block">
-      {/* Desktop view */}
-      <AccountSettingsLayout>
+      <div className="xxs:hidden lg:block">
+        {/* Desktop view */}
+        <AccountSettingsLayout>
+          <AccountSettingsLayout.Header title="Manage Address">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleCreateAddress}
+            >
+              Add Address
+            </Button>
+          </AccountSettingsLayout.Header>
+          {addAddressModal && (
+            <AddAddress
+              setAddAddressModal={setAddAddressModal}
+              address={selectedAddress!}
+            />
+          )}
+          {!addAddressModal && (
+            addresses && addresses?.data?.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 p-4 bg-white rounded-lg">
+                {addresses?.data?.map((address: any) => (
+                  <div
+                    key={address?.id}
+                    className={`p-4 border rounded-lg shadow-md ${address?.isDefault ? "bg-green-200" : "bg-gray-50"}`}
+                  >
+                    <div className="flex items-center mb-2">
+                      {address?.addressType === "Work" ? (
+                        <WorkIcon className="text-gray-500" />
+                      ) : (
+                        <HomeIcon className="text-gray-500" />
+                      )}
+                      <div className="ml-2 font-semibold">{address?.name}</div>
+                    </div>
+                    <div className="text-sm text-gray-700">
+                      <p>{address?.street}</p>
+                      <p>
+                        {address?.city}, {address?.state}, {address?.postalCode}
+                      </p>
+                      <p>{address?.country}</p>
+                    </div>
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        variant="outlined"
+                        className="w-[30%] !border-gray-500 !text-black"
+                        onClick={() => handleEditAddress(address)}
+                      >
+                        Edit
+                      </Button>
+                      {address?.flag ? (
+                        <Button
+                          variant="outlined"
+                          className="flex-1 !border-green-500 !text-green-600 whitespace-nowrap"
+                        >
+                          Default
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          className="flex-1 !border-gray-500 !text-black whitespace-nowrap"
+                          onClick={() => handleSetDefaultAddress(address?.id)}
+                        >
+                          Set Default
+                        </Button>
+                      )}
+                      <Button
+                        variant="outlined"
+                        className="flex-1 !border-red-500 !text-red-600 whitespace-nowrap"
+                        onClick={() => handleRemoveAddress(address?.id)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex justify-center w-full p-4">
+                <NoDataAvailable />
+              </div>
+            )
+          )}
+
+
+        </AccountSettingsLayout>
+      </div>
+
+      {/* Mobile view */}
+      <div className="lg:hidden p-4">
         <AccountSettingsLayout.Header title="Manage Address">
           <Button
             variant="contained"
             color="primary"
             onClick={handleCreateAddress}
+            fullWidth
+          // sx={{width:"50%"}}
           >
             Add Address
           </Button>
@@ -88,130 +176,44 @@ const Address = () => {
           />
         )}
         {!addAddressModal && (
-          <div className="p-4 bg-white m-4 rounded-lg">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {
-                addresses && addresses?.data?.length > 0 && (
-                  addresses?.data?.map((address: any) => (
-                    <div
-                      key={address?.id}
-                      className={` p-4 border rounded-lg shadow-md ${address?.isDefault ? "bg-green-200" : "bg-gray-50"}`}
-                    >
-                      <div className="flex items-center mb-2">
-                        {address?.addressType === "Work" ? (
-                          <WorkIcon className="text-gray-500" />
-                        ) : (
-                          <HomeIcon className="text-gray-500" />
-                        )}
-                        <div className="ml-2 font-semibold">{address?.name}</div>
-                      </div>
-                      <div className="text-sm text-gray-700">
-                        <p>{address?.street}</p>
-                        <p>
-                          {address?.city}, {address?.state}, {address?.postalCode}
-                        </p>
-                        <p>{address?.country}</p>
-                      </div>
-                      <div className="mt-4 flex gap-2">
-                        <Button
-                          variant="outlined"
-                          className="w-[30%] !border-gray-500 !text-black"
-                          onClick={() => handleEditAddress(address)}
-                        >
-                          Edit
-                        </Button>
-                        {address?.flag ? (
-                          <Button
-                            variant="outlined"
-                            className="w-[30%] !border-green-500 !text-green-600"
-                          >
-                            Default
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outlined"
-                            className="w-[30%] !border-gray-500 !text-black"
-                            onClick={() => handleSetDefaultAddress(address?.id)}
-                          >
-                            Set Default
-                          </Button>
-                        )}
-                        <Button
-                          variant="outlined"
-                          className="w-[30%] !border-red-500 !text-red-600"
-                          onClick={() => handleRemoveAddress(address?.id)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                )
-              }
-            </div>
+          <div className="space-y-4">
+            {addresses?.data?.map((address) => (
+              <div
+                key={address.id}
+                className={`p-4 border rounded-lg shadow-md ${address.isDefault ? "bg-green-200" : "bg-gray-50"}`}
+              >
+                <div className="flex items-center mb-2">
+                  {address.addressType === "Work" ? <WorkIcon className="text-gray-500" /> : <HomeIcon className="text-gray-500" />}
+                  <div className="ml-2 font-semibold">{address.street}</div>
+                </div>
+                <div className="text-sm text-gray-700">
+                  <p>{address.street}</p>
+                  <p>{`${address.city}, ${address.state}, ${address.postalCode}`}</p>
+                  <p>{address.country}</p>
+                </div>
+                <div className="mt-4 flex flex-col gap-2">
+                  <Button variant="outlined" className="!border-gray-500 !text-black" onClick={() => handleEditAddress(address)}>
+                    Edit
+                  </Button>
+                  {address.isDefault ? (
+                    <Button variant="outlined" className="!border-green-500 !text-green-600">
+                      Default
+                    </Button>
+                  ) : (
+                    <Button variant="outlined" className="!border-gray-500 !text-black" onClick={() => handleSetDefaultAddress(address.id)}>
+                      Set Default
+                    </Button>
+                  )}
+                  <Button variant="outlined" className="!border-red-500 !text-red-600" onClick={() => handleRemoveAddress(address.id)}>
+                    Remove
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {addresses?.data?.length === 0 && <NoDataAvailable />}
           </div>
         )}
-      </AccountSettingsLayout>
-    </div>
-
-    {/* Mobile view */}
-    <div className="lg:hidden p-4">
-      <AccountSettingsLayout.Header title="Manage Address">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleCreateAddress}
-          fullWidth
-          // sx={{width:"50%"}}
-        >
-          Add Address
-        </Button>
-      </AccountSettingsLayout.Header>
-      {addAddressModal && (
-        <AddAddress
-          setAddAddressModal={setAddAddressModal}
-          address={selectedAddress!}
-        />
-      )}
-      {!addAddressModal && (
-        <div className="space-y-4">
-          {addresses?.data?.map((address) => (
-            <div
-              key={address.id}
-              className={`p-4 border rounded-lg shadow-md ${address.isDefault ? "bg-green-200" : "bg-gray-50"}`}
-            >
-              <div className="flex items-center mb-2">
-                {address.addressType === "Work" ? <WorkIcon className="text-gray-500" /> : <HomeIcon className="text-gray-500" />}
-                <div className="ml-2 font-semibold">{address.street}</div>
-              </div>
-              <div className="text-sm text-gray-700">
-                <p>{address.street}</p>
-                <p>{`${address.city}, ${address.state}, ${address.postalCode}`}</p>
-                <p>{address.country}</p>
-              </div>
-              <div className="mt-4 flex flex-col gap-2">
-                <Button variant="outlined" className="!border-gray-500 !text-black" onClick={() => handleEditAddress(address)}>
-                  Edit
-                </Button>
-                {address.isDefault ? (
-                  <Button variant="outlined" className="!border-green-500 !text-green-600">
-                    Default
-                  </Button>
-                ) : (
-                  <Button variant="outlined" className="!border-gray-500 !text-black" onClick={() => handleSetDefaultAddress(address.id)}>
-                    Set Default
-                  </Button>
-                )}
-                <Button variant="outlined" className="!border-red-500 !text-red-600" onClick={() => handleRemoveAddress(address.id)}>
-                  Remove
-                </Button>
-              </div>
-            </div>
-          ))}
-          {addresses?.data?.length === 0 && <NoDataAvailable />}
-        </div>
-      )}
-    </div>
+      </div>
     </>
   );
 };

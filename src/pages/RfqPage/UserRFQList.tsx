@@ -1,6 +1,7 @@
 import React from 'react';
 import { CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, Button } from '@mui/material';
 import { useGetUserRFQListQuery } from '../../rtk-query/rfqSlice';
+import { toast } from 'react-toastify';
 
 const UserRFQList = () => {
   const token = JSON.parse(localStorage.getItem("authToken") as string);
@@ -8,7 +9,7 @@ const UserRFQList = () => {
 
   const handleDownload = (signedURL: string) => {
     if (!signedURL) {
-      alert('Download URL not available.');
+      toast.error('Download URL not available.');
       return;
     }
     window.open(signedURL, '_blank');
