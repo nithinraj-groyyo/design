@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { TextField, Button, FormControl, Checkbox, FormControlLabel, Grid } from '@mui/material';
 import { useAddRFQMutation } from '../../rtk-query/rfqSlice';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const AddRFQ = () => {
   const { catalogueId } = useParams<{ catalogueId: any }>();
@@ -46,14 +47,14 @@ const AddRFQ = () => {
       });
       formData.append("catalogueId", catalogueId || "");
       await addRFQ({ formData, token, catalogueId }).unwrap();
-      alert('RFQ submitted successfully');
+      toast.success('RFQ submitted successfully');
       resetForm(); 
       if (fileInputRef.current) {
         fileInputRef.current.value = ''; 
       }
     } catch (err) {
       console.error('Error submitting RFQ:', err);
-      alert('Failed to submit RFQ');
+      toast.error('Failed to submit RFQ');
     }
   };
 

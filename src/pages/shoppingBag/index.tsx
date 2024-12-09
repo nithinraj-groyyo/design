@@ -9,7 +9,7 @@ import {
     setCartItems,
 } from "../../redux/bagSlice";
 import ShoppingBagEmptyIcon from "@mui/icons-material/ShoppingCartOutlined";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
     Box,
@@ -55,8 +55,8 @@ const ShoppingBag = () => {
 
     const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
 
-    // const { data: addresses } = useGetAddressesQuery({ token });
-    const [addresses, setAddresses] = useState<any>([])
+    const { data: addresses } = useGetAddressesQuery({ token });
+    // const [addresses, setAddresses] = useState<any>([])
     const [getAddress] = useLazyGetAddressesQuery();
 
     useEffect(() => {
@@ -76,7 +76,7 @@ const ShoppingBag = () => {
 
     const handleOpenAddressesModal = () => {
         setOpenAddressSelectionModal(true);
-        const defaultAddress: any = addresses?.find((address: any) => address.isDefault);
+        const defaultAddress: any = addresses && addresses?.data?.find((address: any) => address.isDefault);
         if (defaultAddress && defaultAddress?.id) {
             setSelectedAddress(defaultAddress?.id)
         };
@@ -103,7 +103,7 @@ const ShoppingBag = () => {
     const handleAddressChange = (event: any) => {
         setSelectedAddress(Number(event.target.value));
     };
-    console.log(addresses,"kekfne")
+    console.log(addresses, "kekfne")
 
 
     const handleClickOpen = () => {
@@ -133,7 +133,7 @@ const ShoppingBag = () => {
     }
 
     const handleCheckout = async () => {
-        const defaultAddress: any = addresses?.find((address: any) => address.isDefault);
+        const defaultAddress: any = addresses?.data?.find((address: any) => address.isDefault);
 
         if (defaultAddress) {
             const payload = {
@@ -200,12 +200,12 @@ const ShoppingBag = () => {
 
     return (
         <BasicLayout>
-            <section className="cart-section flex justify-center items-start min-h-screen mt-[12rem]">
+            <section className="cart-section flex justify-center items-start min-h-screen mt-[5rem] md:mt-[10rem]">
                 <div className="flex flex-col md:flex-row gap-8 justify-center w-[90%] mx-auto">
                     <div className="flex flex-col w-full lg:w-3/4 px-4">
                         {cart.data.length > 0 && (
                             <div className="bg-white p-4 mb-6 shadow-md">
-                                {addresses
+                                {addresses?.data
                                     ?.filter((address: any) => address?.isDefault)
                                     .map((address: any) => (
                                         <div key={address.id} className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
@@ -236,30 +236,35 @@ const ShoppingBag = () => {
                                         </div>
                                     ))}
                                 {!addresses?.data?.filter((address: any) => address?.isDefault).length && (
-                                    <button
-                                        className="px-4 py-2 bg-black text-white font-semibold w-full lg:w-auto"
-                                        onClick={() => navigate("/account/address")}
-                                    >
-                                        ADD ADDRESS
-                                    </button>
+                                    <div className="flex justify-end">
+                                        <button
+                                            className="px-4 py-2 bg-black text-white font-semibold w-full lg:w-auto"
+                                            onClick={() => navigate("/account/address")}
+                                        >
+                                            ADD ADDRESS
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         )}
 
-                        {cart.data.length > 0 ? (
+                        {cart?.data?.length > 0 ? (
                             <>
                                 <h2 className="text-lg lg:text-xl font-bold mb-2">SHOPPING BAG</h2>
                                 <div className="bg-white p-4 lg:p-6 shadow-md mb-6">
-                                    {cart.data.map((bag) => {
+                                    {cart?.data?.map((bag) => {
                                         const minVariantsToBeShown = 2;
                                         return (
                                             <div key={bag.id} className="flex flex-col border-b pb-4 mb-4 gap-6">
                                                 <div className="flex flex-col lg:flex-row gap-4">
-                                                    <img
-                                                        src={bag.product?.imageData?.signedUrl}
-                                                        alt={bag.product.name}
-                                                        className="w-full lg:w-28 h-auto lg:h-40 object-cover"
-                                                    />
+                                                    <Link to={`/product-details/${bag?.product?.id}`}>
+                                                        <img
+                                                            src={bag?.product?.imageData?.signedUrl}
+                                                            alt={bag?.product?.name}
+                                                            className="w-full lg:w-28 h-auto lg:h-40 object-cover"
+                                                        />
+
+                                                    </Link>
                                                     <div className="flex flex-col gap-2">
                                                         <h3 className="font-light text-sm">{bag.product.name}</h3>
                                                         <p className="text-sm">
@@ -393,7 +398,7 @@ const ShoppingBag = () => {
                                                     onClose={handleAddressesCloseModal}
                                                 >
                                                     <DialogTitle>Change Address</DialogTitle>
-                                                    <DialogContent>
+                                                    <DialogContent style={{ display: "flex", justifyContent: "center", flexDirection: "column" }}>
                                                         <RadioGroup value={selectedAddress} onChange={handleAddressChange}>
                                                             {addresses?.data?.map((address: any) => (
                                                                 <div key={address.id} className="flex flex-row items-start mb-4">
@@ -421,6 +426,12 @@ const ShoppingBag = () => {
                                                                 </div>
                                                             ))}
                                                         </RadioGroup>
+                                                        <button
+                                                            className="px-4 py-2 text-black font-semibold w-full lg:w-auto border border-1 border-black"
+                                                            onClick={() => navigate("/account/address")}
+                                                        >
+                                                            ADD ADDRESS
+                                                        </button>
                                                     </DialogContent>
                                                     <DialogActions>
                                                         <Button onClick={handleAddressesCloseModal} color="primary">Cancel</Button>

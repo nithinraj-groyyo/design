@@ -28,6 +28,7 @@ import { useAddToCartMutation } from '../../rtk-query/cartApiSlice';
 import ColorOption from '../shoppingBag/ColorOptions';
 import { useNavigate } from 'react-router-dom';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import useAuth from '../../hooks/useAuth';
 
 type Size = {
     productSizeId: number;
@@ -53,6 +54,9 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
     const [addToCart] = useAddToCartMutation();
 
     const [availableSizes, setAvailableSizes] = useState<Size[]>([]);
+
+    const isAuthenticated = useAuth();
+
 
     useEffect(() => {
         if (selectedColor) {
@@ -214,9 +218,16 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
         }
     };
 
+    const handleRedirectToLoginPage = () =>{
+        navigate("/login")
+        toast.warning("Kindly Login to add items in cart");
+    }
+
     const handleColorGrid = ({ id, name, productColorId }: { id: number, name: string, productColorId: number }) => {
         setSelectedColor({ id: id, name: name, productColorId: productColorId })
+        setSelectedSize(undefined);
     }
+    
     const handleGoToBag = () => {
         navigate("/bag")
     }
@@ -245,8 +256,6 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                         <p className='text-sm 2xl:text-[1rem] font-bold'>Select variations and quantity</p>
                         <IconButton onClick={openVariationTable ? () => setOpenVariationTable(false) : onClose}>
                             {openVariationTable ? <KeyboardArrowDownIcon /> : <CloseIcon />}
-
-
                         </IconButton>
                     </Box>
 
@@ -395,7 +404,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                                 availableSizes?.length > 0 && (
                                     <>
                                         <p className='text-sm 2xl:text-[1rem] my-2 text-gray-500'>
-                                            2. Size({product?.sizes?.length}): {selectedSize?.name}
+                                            2. Size({availableSizes?.length}): {selectedSize?.name}
                                         </p>
                                         <Grid container spacing={2}>
                                             {availableSizes?.map((size, index) => (
@@ -469,7 +478,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                                 : "!bg-black !text-white"
                                 }`}
                             fullWidth
-                            onClick={handleAddToBag}
+                            onClick={isAuthenticated ? handleAddToBag : handleRedirectToLoginPage}
                             sx={{
                                 border: '1px solid',
                                 borderColor: Object.entries(variations)?.length === 0 ? 'black' : 'transparent',

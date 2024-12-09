@@ -159,7 +159,7 @@ const CatalogueTable: React.FC = () => {
                                                 <TableCell align="center" style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '10rem' }}>{catalogue?.category?.name ?? ''}</TableCell>
                                                 <TableCell align="center" style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '10rem' }}>{catalogue?.subCategory?.name}</TableCell>
                                                 <TableCell align="center" style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '10rem' }}>{catalogue?.minQty}</TableCell>
-                                                <TableCell align="center" style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '10rem' }}>{catalogue?.isPublic ? "true" : "false"}</TableCell>
+                                                <TableCell align="center" style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '10rem' }}>{!catalogue?.isPublic ? "true" : "false"}</TableCell>
                                                 <TableCell align="center" style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '10rem' }}>{catalogue?.isActive ? "true" : "false"}</TableCell>
                                                 <TableCell align="center" style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '10rem' }}>{catalogue?.description}</TableCell>
                                                 <TableCell align="center" style={{ wordWrap: 'break-word', whiteSpace: 'normal', minWidth: '10rem' }}>

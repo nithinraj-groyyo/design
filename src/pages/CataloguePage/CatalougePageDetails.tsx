@@ -7,6 +7,7 @@ import { ArrowForwardIos } from '@mui/icons-material';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import FlipBook from './FlipBook';
 import { useFetchCatalogueByIdQuery, useLazyFetchCatalogueListQuery } from '../../rtk-query/catalogueApiSlice';
+import { toast } from 'react-toastify';
 
 const CatalougePageDetails = () => {
     const flipBookRef = useRef<any>(null);
@@ -69,7 +70,7 @@ const CatalougePageDetails = () => {
         if (catalogueId) {
             navigate(`/rfq/${catalogueId}`);
         } else {
-            alert("Catalogue ID is missing!");
+            toast.error("Catalogue ID is missing!");
         }
     };
 

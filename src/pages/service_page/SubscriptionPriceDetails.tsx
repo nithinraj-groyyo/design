@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSubscribeUserMutation, useGetSubscriptionListQuery } from '../../rtk-query/subscriptonApiSlice';
+import { toast } from 'react-toastify';
 
 const SubscriptionPriceDetails = () => {
   const { data: subscriptions, error, isLoading } = useGetSubscriptionListQuery(null);
@@ -19,10 +20,11 @@ const SubscriptionPriceDetails = () => {
     setLoadingButton(subscriptionPriceId); 
     try {
       await subscribeUser({ userId: subscriptionPriceId, token }).unwrap();
-      alert('Subscription successful!');
-    } catch (error) {
+      toast.success('Subscription successful!');
+      window.location.reload();
+    } catch (error :any) {
       console.error('Subscription failed:', error);
-      alert('Subscription failed. Please try again.');
+      toast.warning(error?.data?.message);
     } finally {
       setLoadingButton(null); 
     }
@@ -98,8 +100,8 @@ const SubscriptionPriceDetails = () => {
               </div>
             ))}
           </div>
-          {isError && <p className="text-red-500 text-center mt-4">Something went wrong. Please try again.</p>}
-          {isSuccess && <p className="text-green-500 text-center mt-4">Subscription successful!</p>}
+          {/* {isError && <p className="text-red-500 text-center mt-4">Something went wrong. Please try again.</p>} */}
+          {/* {isSuccess && <p className="text-green-500 text-center mt-4">Subscription successful!</p>} */}
         </div>
       )}
     </div>

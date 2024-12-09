@@ -10,7 +10,7 @@ const rfqApiSlice = apiSlice.injectEndpoints({
         url: `${rfqUrl}/add/${catalogueId}`, 
         method: "POST",
         body: formData,
-        providesTags: ["RFQ"],
+        invalidatesTags: ["RFQ"],
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -40,7 +40,7 @@ const rfqApiSlice = apiSlice.injectEndpoints({
           throw new Error(response.errorReason || "Failed to fetch RFQ list");
         }
       },
-      providesTags: ["RFQ"],
+      providesTags: ["Address"],
     }),
 
     getUserRFQList: builder.query({

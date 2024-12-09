@@ -21,16 +21,16 @@ import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 interface OrderDetailsModalProps {
   open: boolean;
   handleClose: () => void;
-  order: any; 
+  order: any;
 }
 
 const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, handleClose, order }) => {
-    console.log(order, "order")
+  console.log(order, "order")
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>Order Details - #{order?.id}</DialogTitle>
       <DialogContent>
-        
+
         <Box sx={{ mb: 2 }}>
           <Typography variant="h6">Order Information</Typography>
           <Typography variant="body2">Order Status: <strong>{order?.status}</strong></Typography>
@@ -68,38 +68,42 @@ const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ open, handleClose
             <TableHead>
               <TableRow>
                 <TableCell>Product</TableCell>
-                <TableCell>Quantity</TableCell>
-                <TableCell>Unit Price</TableCell>
-                <TableCell>Total Price</TableCell>
+                <TableCell style={{whiteSpace:"nowrap"}}>Quantity</TableCell>
+                <TableCell  style={{whiteSpace:"nowrap"}}>Unit Price</TableCell>
+                <TableCell style={{whiteSpace:"nowrap"}}>Total Price</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {order?.cart?.cartItems?.map((item: any) => {
                 function getPriceForQuantity(quantity: number) {
-                    const range = item?.product?.productPrices?.find(
-                        (range: any) => quantity >= range.minQty && quantity <= range.maxQty
-                    );
-                    
-                    return range ? range.pricePerPiece : null; 
+                  const range = item?.product?.productPrices?.find(
+                    (range: any) => quantity >= range.minQty && quantity <= range.maxQty
+                  );
+
+                  return range ? range.pricePerPiece : null;
                 }
                 const unitPrice = getPriceForQuantity(item?.quantity)
                 return (
-                    <TableRow key={item.product.id}>
-                      <TableCell>
-                        <Typography variant="subtitle2">{item.product.name}</Typography>
-                        <Typography variant="body2" color="textSecondary">{item.product.description}</Typography>
-                      </TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>
+                  <TableRow key={item.product.id}>
+                    <TableCell>
+                      <Typography variant="subtitle2">{item.product.name}</Typography>
+                      <Typography variant="body2" color="textSecondary">{item.product.description}</Typography>
+                    </TableCell>
+                    <TableCell>{item.quantity}</TableCell>
+                    <TableCell>
+                      <div className='whitespace-nowrap'>
                         <CurrencyRupeeIcon fontSize="small" />
                         {unitPrice || "N/A"}
-                      </TableCell>
-                      <TableCell>
+                      </div>
+                    </TableCell>
+                    <TableCell >
+                      <div className='whitespace-nowrap'>
                         <CurrencyRupeeIcon fontSize="small" />
                         {item.quantity * (unitPrice || 0)}
-                      </TableCell>
-                    </TableRow>
-                  )
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
               })}
             </TableBody>
           </Table>

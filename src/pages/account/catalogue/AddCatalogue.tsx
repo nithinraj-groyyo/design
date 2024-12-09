@@ -17,6 +17,7 @@ import {
   useFetchSubCategoriesListQuery,
   useAddCatalogueMutation,
 } from '../../../rtk-query/catalogueApiSlice';
+import { toast } from 'react-toastify';
 
 interface ICategory {
   id: number;
@@ -96,11 +97,11 @@ const AddCatalogue = () => {
           try {
             await addCatalogue({formData,token}).unwrap();
             console.log(formData,"verma")
-            alert('Catalogue added successfully');
+            toast.success('Catalogue added successfully');
             resetForm();
           } catch (error) {
             console.error('Failed to add catalogue:', error);
-            alert('Error adding catalogue');
+            toast.success('Error adding catalogue');
           }
         }}
       >
