@@ -33,7 +33,7 @@ type Size = {
     productSizeId: number;
     id: number;
     name: string;
-  };
+};
 
 const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose: () => void, product: IProduct }) => {
     const navigate = useNavigate();
@@ -214,6 +214,9 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
         }
     };
 
+    const handleColorGrid = ({ id, name, productColorId }: { id: number, name: string, productColorId: number }) => {
+        setSelectedColor({ id: id, name: name, productColorId: productColorId })
+    }
     const handleGoToBag = () => {
         navigate("/bag")
     }
@@ -376,7 +379,7 @@ const ProductDrawer = ({ isOpen, onClose, product }: { isOpen: boolean; onClose:
                             <Grid container spacing={2}>
                                 {product?.productColors?.map(
                                     (color: any, index) => (
-                                        <Grid item key={index} onClick={() => setSelectedColor({ id: color?.id, name: color?.name, productColorId: color?.productColorId })}>
+                                        <Grid item key={index} onClick={() => handleColorGrid({ name: color?.name, id: color?.id, productColorId: color?.productColorId })}>
                                             <ColorOption
                                                 selectedColor={selectedColor?.id! === color?.id}
                                                 color={color?.name}
