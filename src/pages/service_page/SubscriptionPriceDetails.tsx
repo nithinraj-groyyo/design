@@ -7,7 +7,7 @@ const SubscriptionPriceDetails = () => {
   const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
 
   const [subscribeUser, { isSuccess, isError }] = useSubscribeUserMutation();
-  const [loadingButton, setLoadingButton] = useState<number | null>(null); // Track which button is loading
+  const [loadingButton, setLoadingButton] = useState<number | null>(null);
 
   useEffect(() => {
     if (subscriptions?.data && subscriptions.data.length > 0) {
@@ -16,7 +16,7 @@ const SubscriptionPriceDetails = () => {
   }, [subscriptions]);
 
   const handleSubscribe = async (subscriptionPriceId: number) => {
-    setLoadingButton(subscriptionPriceId); // Set the loading state for the clicked button
+    setLoadingButton(subscriptionPriceId); 
     try {
       await subscribeUser({ userId: subscriptionPriceId, token }).unwrap();
       alert('Subscription successful!');
@@ -24,7 +24,7 @@ const SubscriptionPriceDetails = () => {
       console.error('Subscription failed:', error);
       alert('Subscription failed. Please try again.');
     } finally {
-      setLoadingButton(null); // Reset the loading state
+      setLoadingButton(null); 
     }
   };
 

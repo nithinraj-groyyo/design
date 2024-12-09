@@ -109,10 +109,10 @@ const CatalougePageDetails = () => {
 
     return (
         <BasicLayout>
-            <div className="relative flex flex-col gap-8 justify-center items-center p-8 h-screen overflow-hidden mt-[5rem]">
+            <div className="relative flex flex-col gap-8 justify-center items-center p-8 h-fit md:h-screen  overflow-hidden mt-[5rem]">
                 <div className="flex justify-center w-full mt-6 gap-10">
                     <motion.div
-                        className="text-3xl font-semibold flex items-center text-white"
+                        className="text-2xl md:text-3xl font-semibold flex items-center text-white"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
@@ -122,7 +122,7 @@ const CatalougePageDetails = () => {
 
                     <div className="flex justify-center">
                         <motion.button
-                            className="px-6 py-3 rounded-lg bg-black text-white font-semibold shadow-md focus:outline-none min-w-[10rem]"
+                            className="px-6 py-3 rounded-lg bg-white text-black font-semibold shadow-md focus:outline-none min-w-[10rem]"
                             whileHover={{ scale: 1.1 }}
                             transition={{ type: 'spring', stiffness: 300 }}
                             onClick={handleNavigation}
@@ -192,7 +192,7 @@ const CatalougePageDetails = () => {
                     </div>
                 </motion.div>
             </div>
-            <div className="flex flex-col gap-6 my-6 p-12">
+            <div className="flex flex-col gap-6 my-3 md:my-6 p-6 md:p-12 ">
                 <div className="text-xl font-semibold text-gray-800">YOU MAY ALSO LIKE</div>
                 <div className="flex gap-6 overflow-x-auto py-4">
                     {catalogues.map((catalogue: any) => {
