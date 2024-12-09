@@ -50,6 +50,8 @@ const AdminRFQList = () => {
         }
     }, [data, isError, error]);
 
+    console.log(data,"feefeefef")
+
     if (isLoading) {
         return <CircularProgress />;
     }
@@ -163,9 +165,9 @@ const AdminRFQList = () => {
                     </Table>
                 </TableContainer>
 
-                {isError && (
+                {/* {isError && (
                     <Typography color="error" align="center" sx={{ marginTop: '20px' }}>Failed to fetch RFQ list</Typography>
-                )}
+                )} */}
             </div>
         </AccountSettingsLayout>
     );
