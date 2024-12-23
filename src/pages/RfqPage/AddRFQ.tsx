@@ -20,8 +20,8 @@ const AddRFQ = () => {
     minOrderQty: Yup.number().required('Minimum Order Quantity is required'),
     targetCost: Yup.number(),
     designAlterationRequired: Yup.boolean(),
-    description: Yup.string(),
-    file: Yup.mixed(),
+    description: Yup.string().optional().nullable(),
+    file: Yup.mixed().optional().nullable(),
   });
 
   const initialValues = {
@@ -42,11 +42,25 @@ const AddRFQ = () => {
         if (key === 'file' && values[key]) {
           formData.append(key, values[key]);
         } else {
-          formData.append(key, values[key]);
+
+          formData.append(key, values[key] ?? undefined);
         }
       });
       formData.append("catalogueId", catalogueId || "");
-      await addRFQ({ formData, token, catalogueId }).unwrap();
+      console.log(values,'fefe')
+
+      const payload = {
+        "id": values?.id,
+        "brandName": values?.brandName,
+        "country": values?.country,
+        "minOrderQty": values?.minOrderQty,
+        "targetCost": values?.targetCost,
+        "designAlterationRequired": values?.designAlterationRequired,
+        "description": values?.description?.length > 0 ?  values?.description : undefined,
+        "file": values?.file
+    }
+    
+      await addRFQ({ formData: payload, token, catalogueId }).unwrap();
       toast.success('RFQ submitted successfully');
       resetForm(); 
       if (fileInputRef.current) {

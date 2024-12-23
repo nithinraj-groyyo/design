@@ -68,7 +68,7 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`fixed hidden lg:flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30 bg-white hover:shadow-lg transition-all duration-500 ease-in-out p-6 rounded-lg`}
+      className={`fixed hidden lg:flex flex-row w-full justify-between px-[3.75rem] py-[1rem] items-center h-[10rem] z-30  hover:shadow-lg transition-all duration-500 ease-in-out p-6 rounded-lg`}
       style={{ opacity }}
       onMouseOver={handleHeaderOpacity}
     >
@@ -77,6 +77,7 @@ const Header: React.FC = () => {
           <img
             src="/images/Groyyo_Studio_Logo.png"
             className="md:w-24 md:h-24"
+            alt="image1"
             onClick={navigateToHomePage}
           />
         </div>

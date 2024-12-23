@@ -46,7 +46,7 @@ interface ICatalogue {
   subCategory: { id: number; name: string; isActive: boolean };
 }
 
-const CataloguePageMobile = () => {
+const CataloguePageMobile = (premiumUser:any) => {
   const [categoriesListArray, setCategoriesListArray] = useState<ICategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('All');
@@ -218,46 +218,74 @@ const CataloguePageMobile = () => {
 
         {/* Catalogue Cards */}
         <div className="flex flex-col w-full">
-          <Grid container spacing={3} sx={{ padding: '2rem' }}>
-            {paginatedCatalogues.length > 0 ? (
-              paginatedCatalogues.map((catalogue) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
-                  <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ scale: 1.02 }}
-                      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                    >
-                      <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden">
-                        <CardMedia
-                          component="img"
-                          height="200"
-                          image={catalogue.catalogueImages[0]?.signedUrl || ''}
-                          alt={catalogue?.name}
-                          className="object-cover h-36 w-48"
-                        />
-                        <CardContent>
-                          <Typography variant="h6" className="text-gray-800 font-semibold">
-                            {catalogue?.name}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary">
-                            {catalogue.description || 'No description available'}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  </Link>
-                </Grid>
-              ))
-            ) : (
-              <Box sx={{ textAlign: 'center', width: '100%', padding: '2rem' }}>
-                <Typography variant="h5" color="textSecondary">
-                  No catalogues available
+        <Grid container spacing={3} sx={{ padding: '2rem' }}>
+  {paginatedCatalogues.length > 0 ? (
+    paginatedCatalogues.map((catalogue) => (
+      <Grid item xs={12} sm={6} md={4} lg={3} className="relative" key={catalogue.id}>
+        {catalogue.isPublic ? (
+          <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            >
+              <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden">
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={catalogue.catalogueImages[0]?.signedUrl || ''}
+                  alt={catalogue?.name}
+                  className="object-cover h-36 w-48"
+                />
+                <CardContent>
+                  <Typography variant="h6" className="text-gray-800 font-semibold">
+                    {catalogue?.name}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {catalogue.description || 'No description available'}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </Link>
+        ) : (
+          <Link to="/services">
+            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 ml-3 mt-3">
+              <div className="text-white font-bold bg-black hover:animate-pulse bg-opacity-70 px-4 py-2 rounded-lg text-lg">
+                Upgrade to Premium
+              </div>
+            </div>
+            <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden blur-sm z-0 relative !bg-orange-200">
+              <CardMedia
+                component="img"
+                height="200"
+                image="/images/landingPages/landingPage_1_2.png"
+                alt="Premium Content"
+                className="object-cover h-36 w-48"
+              />
+              <CardContent>
+                <Typography variant="h6" className="text-gray-800 font-semibold">
+                  {catalogue?.name || 'Premium Content'}
                 </Typography>
-              </Box>
-            )}
-          </Grid>
+                <Typography variant="body2" color="textSecondary">
+                  {catalogue.description || 'Premium Category'}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Link>
+        )}
+      </Grid>
+    ))
+  ) : (
+    <Box sx={{ textAlign: 'center', width: '100%', padding: '2rem' }}>
+      <Typography variant="h5" color="textSecondary">
+        No catalogues available
+      </Typography>
+    </Box>
+  )}
+</Grid>
+
 
           {totalPages > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>

@@ -8,6 +8,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import FlipBook from './FlipBook';
 import { useFetchCatalogueByIdQuery, useLazyFetchCatalogueListQuery } from '../../rtk-query/catalogueApiSlice';
 import { toast } from 'react-toastify';
+import useAuth from "../../hooks/useAuth";
+
 
 const CatalougePageDetails = () => {
     const flipBookRef = useRef<any>(null);
@@ -17,6 +19,9 @@ const CatalougePageDetails = () => {
     const [totalPage, setTotalPage] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
     const [isPotraitMode, setIsPotraitMode] = useState(false);
+    const isAuthenticated = useAuth()
+    const navigate = useNavigate();
+
 
     const token = JSON.parse(localStorage.getItem('authToken') || 'null');
     const [fetchCatalogues, { data, isLoading: isProductLoading }] = useLazyFetchCatalogueListQuery();
@@ -64,7 +69,6 @@ const CatalougePageDetails = () => {
         window.scrollTo(0, 0);
     }, []);
 
-    const navigate = useNavigate();
 
     const handleNavigation = () => {
         if (catalogueId) {
@@ -72,6 +76,11 @@ const CatalougePageDetails = () => {
         } else {
             toast.error("Catalogue ID is missing!");
         }
+    };
+
+    const handleSignIn = () => {
+        toast.warning("Kindly login first to add RFQ");
+        navigate('/login');
     };
 
 
@@ -123,10 +132,10 @@ const CatalougePageDetails = () => {
 
                     <div className="flex justify-center">
                         <motion.button
-                            className="px-6 py-3 rounded-lg bg-white text-black font-semibold shadow-md focus:outline-none min-w-[10rem]"
+                            className="px-6 py-3 rounded-lg bg-white text-black font-semibold shadow-md focus:outline-none min-w-[10rem] cursor-pointer"
                             whileHover={{ scale: 1.1 }}
                             transition={{ type: 'spring', stiffness: 300 }}
-                            onClick={handleNavigation}
+                            onClick={isAuthenticated ? handleNavigation : handleSignIn}
                         >
                             RFQ
                         </motion.button>
