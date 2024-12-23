@@ -12,37 +12,19 @@ import { useNavigate } from "react-router-dom";
 import { useFetchAllServicesQuery } from "../../rtk-query/serviceApiSlice";
 import SubscriptionPage from "./SubscriptionPage";
 import SubscriptionPriceDetails from "./SubscriptionPriceDetails";
+import RotatingCards from "../../components/RotatingCard";
 
 export enum ServiceButtons {
   ExploreDesigns = "Explore our Designs",
   BookAppointment = "Book an appointment",
-  ContactUs = "Contact us"
+  ContactUs = "Contact us",
 }
-
-const carouselDetails = [
-  {
-    title: "Exclusive Apparel Designs",
-    description: "Discover ready-made, trend-driven apparel for your brand.",
-    buttonName: ServiceButtons.ExploreDesigns,
-  },
-  {
-    title: "Customization Services",
-    description: "Create apparel tailored to your brand’s unique vision.",
-    buttonName: ServiceButtons.BookAppointment,
-  },
-  {
-    title: "Design Consultation",
-    description: "Expert guidance to perfect your design ideas.",
-    buttonName: ServiceButtons.ContactUs,
-  },
-];
 
 const ServicePage = () => {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [currentService, setCurrentService] = useState(0);
   const navigate = useNavigate();
   const [selectedSubscription, setSelectedSubscription] = useState<any>(null);
-
 
   const { data: services = [] } = useFetchAllServicesQuery();
 
@@ -55,9 +37,8 @@ const ServicePage = () => {
   };
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -93,7 +74,7 @@ const ServicePage = () => {
       <motion.div
         className="relative w-full min-h-[70vh] mt-[4rem] sm:mt-[6rem] lg:mt-[10rem] flex justify-center items-center"
         style={{
-          backgroundImage: "url(/images/landingPages/floralPattern4.png)",
+          backgroundImage: "url(/images/landingPages/service.jpg)",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",
           backgroundSize: "cover",
@@ -103,7 +84,8 @@ const ServicePage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        <motion.div
+        <RotatingCards />
+        {/* <motion.div
           className="p-4 sm:p-6 lg:p-8 flex items-center justify-between rounded-xl w-full max-w-[90vw] lg:max-w-[50vw]"
           style={{
             position: "relative",
@@ -149,7 +131,9 @@ const ServicePage = () => {
                     color: "black",
                   },
                 }}
-                onClick={() => handleButtonClick(carouselDetails[currentService]?.buttonName)}
+                onClick={() =>
+                  handleButtonClick(carouselDetails[currentService]?.buttonName)
+                }
               >
                 {carouselDetails[currentService]?.buttonName}
               </Button>
@@ -167,8 +151,9 @@ const ServicePage = () => {
             {carouselDetails.map((_, index) => (
               <motion.div
                 key={index}
-                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer ${index === currentService ? "bg-black" : "bg-gray-400"
-                  }`}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full cursor-pointer ${
+                  index === currentService ? "bg-black" : "bg-gray-400"
+                }`}
                 onClick={() => setCurrentService(index)}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -176,7 +161,7 @@ const ServicePage = () => {
               />
             ))}
           </div>
-        </motion.div>
+        </motion.div> */}
       </motion.div>
 
       <motion.div
@@ -191,7 +176,9 @@ const ServicePage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 lg:gap-16 justify-center">
           {services.map((serviceDetail, index) => {
-            const sanitizedDescription = DOMPurify.sanitize(serviceDetail?.description);
+            const sanitizedDescription = DOMPurify.sanitize(
+              serviceDetail?.description
+            );
             return (
               <motion.div
                 key={index}
@@ -218,14 +205,23 @@ const ServicePage = () => {
                       dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
                     />
                     {expandedCard === index &&
-                      serviceDetail?.featuresList?.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex flex-col gap-2">
-                          <li className="text-xs">
-                            <span className="font-semibold">{feature?.featureName}</span>
-                            <span className="ml-2">{feature?.featureDetail}</span>
-                          </li>
-                        </div>
-                      ))}
+                      serviceDetail?.featuresList?.map(
+                        (feature, featureIndex) => (
+                          <div
+                            key={featureIndex}
+                            className="flex flex-col gap-2"
+                          >
+                            <li className="text-xs">
+                              <span className="font-semibold">
+                                {feature?.featureName}
+                              </span>
+                              <span className="ml-2">
+                                {feature?.featureDetail}
+                              </span>
+                            </li>
+                          </div>
+                        )
+                      )}
                     <Button
                       onClick={() => handleToggleDetails(index)}
                       className="cursor-pointer"
@@ -251,7 +247,11 @@ const ServicePage = () => {
                           color: "white",
                         },
                       }}
-                      onClick={() => handleButtonClick(serviceDetail?.buttonLabel as ServiceButtons)}
+                      onClick={() =>
+                        handleButtonClick(
+                          serviceDetail?.buttonLabel as ServiceButtons
+                        )
+                      }
                     >
                       {serviceDetail?.buttonLabel}
                     </Button>
@@ -264,50 +264,45 @@ const ServicePage = () => {
       </motion.div>
 
       <section className="w-screen h-auto sm:h-[100vh] flex flex-col sm:flex-row bg-gradient-to-b from-white via-gray-100 to-white">
-  {/* Left Section */}
-  <div className="w-full sm:w-1/3 flex flex-col justify-center items-center py-8 sm:py-12 px-6 sm:px-10 bg-gradient-to-br from-white to-gray-100 shadow-md rounded-b-lg sm:rounded-r-none sm:rounded-l-lg">
-    <div className="flex flex-col items-center bg-white shadow-xl rounded-lg p-6 sm:p-10 max-w-lg">
-      <h2 className="text-gray-800 text-2xl sm:text-4xl font-extrabold mb-6 text-center">
-        Why Go Premium?
-      </h2>
-      <ul className="text-gray-700 text-base sm:text-lg space-y-4 list-disc pl-8">
-        <li>
-          <span className="font-medium">24*7 Customer Support</span>
-        </li>
-        <li>
-          <span className="font-medium">Access to Premium Designs</span>
-        </li>
-        <li>
-          <span className="font-medium">High-Resolution Downloads</span>
-        </li>
-        <li>
-          <span className="font-medium">Interactive Catalogues</span>
-        </li>
-      </ul>
-      <div className="mt-8">
-        <img
-          src="/images/DummyImages/contact.png"
-          alt="Illustration"
-          className="object-contain w-[12rem] h-[12rem] sm:w-[16rem] sm:h-[16rem] lg:w-[20rem] lg:h-[20rem] mx-auto"
-        />
-      </div>
-    </div>
-  </div>
+        {/* Left Section */}
+        <div className="w-full sm:w-1/3 flex flex-col justify-center items-center py-8 sm:py-12 px-6 sm:px-10 bg-gradient-to-br from-white to-gray-100 shadow-md rounded-b-lg sm:rounded-r-none sm:rounded-l-lg">
+          <div className="flex flex-col items-center bg-white shadow-xl rounded-lg p-6 sm:p-10 max-w-lg">
+            <h2 className="text-gray-800 text-2xl sm:text-4xl font-extrabold mb-6 text-center">
+              Why Go Premium?
+            </h2>
+            <ul className="text-gray-700 text-base sm:text-lg space-y-4 list-disc pl-8">
+              <li>
+                <span className="font-medium">24*7 Customer Support</span>
+              </li>
+              <li>
+                <span className="font-medium">Access to Premium Designs</span>
+              </li>
+              <li>
+                <span className="font-medium">High-Resolution Downloads</span>
+              </li>
+              <li>
+                <span className="font-medium">Interactive Catalogues</span>
+              </li>
+            </ul>
+            <div className="mt-8">
+              <img
+                src="/images/DummyImages/contact.png"
+                alt="Illustration"
+                className="object-contain w-[12rem] h-[12rem] sm:w-[16rem] sm:h-[16rem] lg:w-[20rem] lg:h-[20rem] mx-auto"
+              />
+            </div>
+          </div>
+        </div>
 
-  {/* Right Section */}
-  <div className="w-full sm:w-2/3 flex justify-center items-start bg-white mt-8 sm:mt-0 p-6 sm:p-12 rounded-t-lg sm:rounded-l-none sm:rounded-r-lg shadow-md">
-    <div className="w-full px-4 sm:px-8 lg:px-12">
-      <SubscriptionPriceDetails />
-    </div>
-  </div>
-</section>
-
-
-
+        {/* Right Section */}
+        <div className="w-full sm:w-2/3 flex justify-center items-start bg-white mt-8 sm:mt-0 p-6 sm:p-12 rounded-t-lg sm:rounded-l-none sm:rounded-r-lg shadow-md">
+          <div className="w-full px-4 sm:px-8 lg:px-12">
+            <SubscriptionPriceDetails />
+          </div>
+        </div>
+      </section>
     </BasicLayout>
   );
 };
 
 export default ServicePage;
-
-
