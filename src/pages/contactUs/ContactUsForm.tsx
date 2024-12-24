@@ -10,6 +10,7 @@ import {
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { styled } from "@mui/material/styles";
 import { SelectChangeEvent } from "@mui/material";
+import { toast } from "react-toastify";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -21,15 +22,18 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
+const initialValues = {
+  name: "",
+  email: "",
+  contactPreference: "",
+  phone: "",  
+  subject: "",
+  message: "",
+};
+
 export const ContactUsForm = () => {
-  const [formValues, setFormValues] = useState({
-    name: "",
-    email: "",
-    contactPreference: "",
-    phone: "",  
-    subject: "",
-    message: "",
-  });
+
+  const [formValues, setFormValues] = useState(initialValues);
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -51,6 +55,8 @@ export const ContactUsForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    toast.success("Successfully Submitted");
+    setFormValues(initialValues);
     
   };
 

@@ -37,11 +37,11 @@ const Home = () => {
         <BasicLayout showFooter={false}>
             <div className="overflow-x-hidden">
                 <section className="relative flex xxs:flex-col lg:flex-row items-center justify-center h-screen">
-                    <div className="xxs:hidden lg:flex w-full sm:w-1/2 h-1/2 sm:h-1/2 justify-center">
+                    <div className="xxs:hidden lg:flex w-full  justify-center">
                         <img
-                            src="/images/landingPages/landingPage_1_1.png"
+                            src="/images/landingPages/landingPage_1_3.jpg"
                             alt="Landing_1"
-                            className="xxs:w-full w-4/5 sm:w-2/5 h-full"
+                            className="xxs:w-full  h-full"
                         />
                     </div>
                     <img
