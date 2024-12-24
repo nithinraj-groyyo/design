@@ -34,8 +34,17 @@ import { useFormik } from "formik";
 import { styled } from "@mui/material/styles";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { useLoadCategoriesWithPaginationQuery, useLoadSubCategoriesWithIdQuery } from "../../../rtk-query/categoriesApiSlice";
-import { useAddProductMutation, useGetAllColorsQuery, useGetAllSizesQuery, useAddNewColorMutation, useAddNewSizeMutation, } from "../../../rtk-query/productApiSlice";
+import {
+  useLoadCategoriesWithPaginationQuery,
+  useLoadSubCategoriesWithIdQuery,
+} from "../../../rtk-query/categoriesApiSlice";
+import {
+  useAddProductMutation,
+  useGetAllColorsQuery,
+  useGetAllSizesQuery,
+  useAddNewColorMutation,
+  useAddNewSizeMutation,
+} from "../../../rtk-query/productApiSlice";
 import { useUploadSingleFileMutation } from "../../../rtk-query/fileUploadApiSlice";
 import MagnifyProductImage from "./MagnifyProductImage";
 import { useNavigate } from "react-router-dom";
@@ -59,8 +68,8 @@ interface PriceListData {
 
 interface InventoryListData {
   id: number;
-  color: { id: number, name: string };
-  size: { id: number, name: string };
+  color: { id: number; name: string };
+  size: { id: number; name: string };
   stockQty: number;
 }
 
@@ -94,37 +103,59 @@ interface ICategory {
 }
 
 const AddProducts = () => {
-
-  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
+    null
+  );
   const [newSize, setNewSize] = useState("");
   const [newColor, setNewColor] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("enabled");
   const [imgList, setImgList] = useState<ImageData[]>([
-    { id: uuidv1(), side: "", file: null, isThumbnail: true, fileName: "", isDeleted: false, imageUrl: "" },
+    {
+      id: uuidv1(),
+      side: "",
+      file: null,
+      isThumbnail: true,
+      fileName: "",
+      isDeleted: false,
+      imageUrl: "",
+    },
   ]);
 
-  const [priceList, setPriceList] = useState<PriceListData[]>([{ id: 1, minQty: "", maxQty: "", pricePerPiece: "" }]);
+  const [priceList, setPriceList] = useState<PriceListData[]>([
+    { id: 1, minQty: "", maxQty: "", pricePerPiece: "" },
+  ]);
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
-  const [inventoryList, setInventoryList] = useState<InventoryListData[]>([{ id: 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
+  const [inventoryList, setInventoryList] = useState<InventoryListData[]>([
+    {
+      id: 1,
+      color: { id: -1, name: "" },
+      size: { id: -1, name: "" },
+      stockQty: 0,
+    },
+  ]);
   // const [userMinQty, setUserMinQty] = useState<number | undefined>(undefined);
 
   const [uploadSingleFile] = useUploadSingleFileMutation();
 
   const [addProduct] = useAddProductMutation();
 
-  const { data: categories, isLoading: isCategoriesLoading } = useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
+  const { data: categories, isLoading: isCategoriesLoading } =
+    useLoadCategoriesWithPaginationQuery({ pageIndex: 0, pageSize: 10 });
   const {
     data: subCategories,
     refetch,
     isLoading: isSubCatLoading,
-  } = useLoadSubCategoriesWithIdQuery({
-    categoryId: selectedCategory?.id!,
-    pageIndex: 0,
-    pageSize: 10,
-  }, {
-    skip: !selectedCategory?.id,
-  });
+  } = useLoadSubCategoriesWithIdQuery(
+    {
+      categoryId: selectedCategory?.id!,
+      pageIndex: 0,
+      pageSize: 10,
+    },
+    {
+      skip: !selectedCategory?.id,
+    }
+  );
 
   const { data: sizes } = useGetAllSizesQuery({});
   const sizeOptions = sizes?.data;
@@ -145,7 +176,10 @@ const AddProducts = () => {
 
   const handleCategoryChange = (e: any) => {
     const selectedCategoryId = e.target.value as number;
-    const selectedCat = (categories && categories?.find((cat: any) => cat.id === selectedCategoryId)) || null;
+    const selectedCat =
+      (categories &&
+        categories?.find((cat: any) => cat.id === selectedCategoryId)) ||
+      null;
     formik.setFieldValue("category", selectedCat?.id);
     setSelectedCategory(selectedCat);
   };
@@ -178,7 +212,9 @@ const AddProducts = () => {
         const response = await addNewColor({ color: newColor });
         const responseBody = response?.data;
         if (responseBody?.status && responseBody?.httpStatusCode === 201) {
-          toast.success(`New Color "${responseBody?.data?.name}" created successfully`);
+          toast.success(
+            `New Color "${responseBody?.data?.name}" created successfully`
+          );
           setNewColor("");
           setIsColorModalOpen(false);
         }
@@ -189,71 +225,85 @@ const AddProducts = () => {
     }
   };
 
-  const handleFileUpload = (id: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event?.target?.files;
-    if (files && files?.length > 0) {
-      const file: any = files[0];
+  const handleFileUpload =
+    (id: string) => async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = event?.target?.files;
+      if (files && files?.length > 0) {
+        const file: any = files[0];
 
-      const fileExtension = file?.name?.split(".").pop().toLowerCase();
-      const acceptedFormats = ["png", "jpeg", "jpg", "webp"];
-      if (!acceptedFormats.includes(fileExtension)) {
-        toast.error("Invalid file format! Please upload .jpeg, .jpg, .png, or .webp files.");
-        return;
-      }
-
-      const fileSizeInKB = file.size / 1024;
-      if (fileSizeInKB > 1024) {
-        toast.error("File size must be between 50 KB and 1MB.");
-        return;
-      }
-
-      const image = new Image();
-      image.src = URL.createObjectURL(file);
-
-      image.onload = async () => {
-        const width = image.width;
-        const height = image.height;
-
-        const aspectRatio = width / height;
-        if (Math.abs(aspectRatio - 1) > 0.01) {
-          toast.error("Image must have a square aspect ratio (1:1).");
+        const fileExtension = file?.name?.split(".").pop().toLowerCase();
+        const acceptedFormats = ["png", "jpeg", "jpg", "webp"];
+        if (!acceptedFormats.includes(fileExtension)) {
+          toast.error(
+            "Invalid file format! Please upload .jpeg, .jpg, .png, or .webp files."
+          );
           return;
         }
 
-        try {
-          const reader = new FileReader();
+        // const fileSizeInKB = file.size / 1024;
+        // if (fileSizeInKB > 1024) {
+        //   toast.error("File size must be between 50 KB and 1MB.");
+        //   return;
+        // }
 
-          reader.onloadend = () => {
-            const previewUrl = reader.result as string;
+        const image = new Image();
+        image.src = URL.createObjectURL(file);
 
-            setImgList((prev) => prev.map((img) => (img.id === id ? { ...img, file: file, imageUrl: previewUrl, fileName: file.name } : img)));
-          };
+        image.onload = async () => {
+          // const width = image.width;
+          // const height = image.height;
 
-          reader.readAsDataURL(file);
+          // const aspectRatio = width / height;
+          // if (Math.abs(aspectRatio - 1) > 0.01) {
+          //   toast.error("Image must have a square aspect ratio (1:1).");
+          //   return;
+          // }
 
-          const response = await uploadSingleFile(file).unwrap();
-          const responseData = response?.data;
-          const fileId = responseData?.id;
+          try {
+            const reader = new FileReader();
 
-          setImgList((prev) =>
-            prev.map((img) =>
-              img.id === id
-                ? {
-                  ...img,
-                  file: file,
-                  fileName: responseData.fileName,
-                  isDeleted: false,
-                  id: fileId,
-                }
-                : img
-            )
-          );
-        } catch (error) {
-          toast.error("Error uploading file");
-        }
-      };
-    }
-  };
+            reader.onloadend = () => {
+              const previewUrl = reader.result as string;
+
+              setImgList((prev) =>
+                prev.map((img) =>
+                  img.id === id
+                    ? {
+                        ...img,
+                        file: file,
+                        imageUrl: previewUrl,
+                        fileName: file.name,
+                      }
+                    : img
+                )
+              );
+            };
+
+            reader.readAsDataURL(file);
+
+            const response = await uploadSingleFile(file).unwrap();
+            const responseData = response?.data;
+            const fileId = responseData?.id;
+
+            setImgList((prev) =>
+              prev.map((img) =>
+                img.id === id
+                  ? {
+                      ...img,
+                      file: file,
+                      fileName: responseData.fileName,
+                      isDeleted: false,
+                      id: fileId,
+                    }
+                  : img
+              )
+            );
+          } catch (error) {
+            toast.error("Error uploading file");
+          }
+        };
+      }
+    };
 
   const handleCheckboxIsThumbnail = (selectedId: string) => {
     setImgList((prevItems) =>
@@ -265,7 +315,18 @@ const AddProducts = () => {
   };
 
   const handleAddImage = () => {
-    setImgList((prev) => [...prev, { id: uuidv1(), side: "", file: null, isThumbnail: false, fileName: "", isDeleted: false, imageUrl: "" }]);
+    setImgList((prev) => [
+      ...prev,
+      {
+        id: uuidv1(),
+        side: "",
+        file: null,
+        isThumbnail: false,
+        fileName: "",
+        isDeleted: false,
+        imageUrl: "",
+      },
+    ]);
   };
 
   const handleRemoveImage = (id: string) => () => {
@@ -273,10 +334,21 @@ const AddProducts = () => {
   };
 
   const handleAddRow = () => {
-    setPriceList((prevRows) => [...prevRows, { id: prevRows.length + 1, minQty: "", maxQty: "", pricePerPiece: "" }]);
+    setPriceList((prevRows) => [
+      ...prevRows,
+      { id: prevRows.length + 1, minQty: "", maxQty: "", pricePerPiece: "" },
+    ]);
   };
   const handleAddInventoryRow = () => {
-    setInventoryList((prevRows) => [...prevRows, { id: prevRows.length + 1, color: { id: -1, name: "" }, size: { id: -1, name: "" }, stockQty: 0 }]);
+    setInventoryList((prevRows) => [
+      ...prevRows,
+      {
+        id: prevRows.length + 1,
+        color: { id: -1, name: "" },
+        size: { id: -1, name: "" },
+        stockQty: 0,
+      },
+    ]);
   };
 
   const handleDeleteRow = (id: number) => {
@@ -286,9 +358,14 @@ const AddProducts = () => {
     setInventoryList((prevRows) => prevRows.filter((row) => row.id !== id));
   };
 
-
-  const handleInputChange = (id: number, field: keyof PriceListData, value: string) => {
-    setPriceList((prevRows) => prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
+  const handleInputChange = (
+    id: number,
+    field: keyof PriceListData,
+    value: string
+  ) => {
+    setPriceList((prevRows) =>
+      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+    );
   };
 
   const handleInventoryData = (
@@ -300,12 +377,12 @@ const AddProducts = () => {
       prevRows.map((row) =>
         row.id === id
           ? {
-            ...row,
-            [field]:
-              typeof value === "object" && value !== null
-                ? { id: value.id, name: value.name }
-                : value,
-          }
+              ...row,
+              [field]:
+                typeof value === "object" && value !== null
+                  ? { id: value.id, name: value.name }
+                  : value,
+            }
           : row
       )
     );
@@ -336,36 +413,45 @@ const AddProducts = () => {
       leftTopContent: Yup.string().required("Field is required"),
       leftBottomHeader: Yup.string().required("Field is required"),
       leftBottomContent: Yup.string().required("Field is required"),
-      minQty: Yup.number().required("Min Quantity is required").positive("Must be a positive number"),
+      minQty: Yup.number()
+        .required("Min Quantity is required")
+        .positive("Must be a positive number"),
     }),
     onSubmit: async (values) => {
-      if (imgList?.filter((x) => x.side.trim() === "" || (x.file == null && x.fileName === "" && x.isDeleted === false)).length > 0) {
+      if (
+        imgList?.filter(
+          (x) =>
+            x.side.trim() === "" ||
+            (x.file == null && x.fileName === "" && x.isDeleted === false)
+        ).length > 0
+      ) {
         toast.error("Please enter product image and it's side!");
       } else {
         if (priceList?.filter((x) => +x.pricePerPiece === 0).length > 0) {
           toast.error("Please enter quantity range and price!");
         } else {
-
           const convertPriceList = priceList?.map((price) => {
             return {
               minQty: +price?.minQty,
               maxQty: isNaN(+price?.maxQty) ? null : +price?.maxQty,
               pricePerPiece: +price?.pricePerPiece,
-            }
-          })
+            };
+          });
 
-          const images = imgList?.map(item => {
-            if (item?.id && !isNaN(+item.id)) {
-              return {
-                fileId: +item?.id,
-                sideName: item?.side,
-                isThumbnail: item?.isThumbnail,
-              };
-            }
-            return undefined;
-          }).filter(Boolean);
+          const images = imgList
+            ?.map((item) => {
+              if (item?.id && !isNaN(+item.id)) {
+                return {
+                  fileId: +item?.id,
+                  sideName: item?.side,
+                  isThumbnail: item?.isThumbnail,
+                };
+              }
+              return undefined;
+            })
+            .filter(Boolean);
 
-          const hasInvalidFileId = imgList?.some(item => isNaN(+item?.id));
+          const hasInvalidFileId = imgList?.some((item) => isNaN(+item?.id));
 
           const finalImages = hasInvalidFileId ? undefined : images;
 
@@ -385,23 +471,25 @@ const AddProducts = () => {
             minQty: values.minQty !== undefined ? +values.minQty : null,
             inventory: inventoryList?.map((inventoryValue) => {
               return {
-                "sizeId": inventoryValue.size.id,
-                "colorId": inventoryValue.color.id,
-                "availableQty": +inventoryValue.stockQty
-              }
-            })
+                sizeId: inventoryValue.size.id,
+                colorId: inventoryValue.color.id,
+                availableQty: +inventoryValue.stockQty,
+              };
+            }),
           };
 
           try {
-            const response = await addProduct({ payload: requestBody }).unwrap();
+            const response = await addProduct({
+              payload: requestBody,
+            }).unwrap();
 
             if (response?.status && response?.httpStatusCode === 201) {
               toast.success(response?.message);
               navigate("/account/product-list", { replace: true });
             }
           } catch (error: any) {
-            console.error(error)
-            toast.error(error?.error ?? "Error while Creating product")
+            console.error(error);
+            toast.error(error?.error ?? "Error while Creating product");
           }
         }
       }
@@ -413,7 +501,10 @@ const AddProducts = () => {
   const colorOptionsArray = colorOptions ? Object.values(colorOptions) : [];
 
   return (
-    <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="flex flex-col gap-4 p-4 bg-white m-4 rounded-lg"
+    >
       <div className="flex flex-col gap-4 p-4 bg-white rounded-lg">
         <div className="flex justify-between">
           <div className="font-bold">Add Product</div>
@@ -429,8 +520,13 @@ const AddProducts = () => {
                 onChange={formik.handleChange}
                 fullWidth
                 onBlur={formik.handleBlur}
-                error={formik.touched.productName && Boolean(formik.errors.productName)}
-                helperText={formik.touched.productName && formik.errors.productName}
+                error={
+                  formik.touched.productName &&
+                  Boolean(formik.errors.productName)
+                }
+                helperText={
+                  formik.touched.productName && formik.errors.productName
+                }
               />
               <div className="flex gap-4">
                 <TextField
@@ -440,8 +536,12 @@ const AddProducts = () => {
                   onChange={formik.handleChange}
                   fullWidth
                   onBlur={formik.handleBlur}
-                  error={formik.touched.styleName && Boolean(formik.errors.styleName)}
-                  helperText={formik.touched.styleName && formik.errors.styleName}
+                  error={
+                    formik.touched.styleName && Boolean(formik.errors.styleName)
+                  }
+                  helperText={
+                    formik.touched.styleName && formik.errors.styleName
+                  }
                 />
                 <FormControl fullWidth>
                   <InputLabel>Category</InputLabel>
@@ -452,7 +552,9 @@ const AddProducts = () => {
                     onChange={handleCategoryChange}
                     onBlur={formik.handleBlur}
                     disabled={isCategoriesLoading}
-                    error={formik.touched.category && Boolean(formik.errors.category)}
+                    error={
+                      formik.touched.category && Boolean(formik.errors.category)
+                    }
                   >
                     {isCategoriesLoading ? (
                       <MenuItem disabled>
@@ -472,7 +574,11 @@ const AddProducts = () => {
                       ]
                     )}
                   </Select>
-                  {formik.touched.category && formik.errors.category && <div className="text-red-600 text-xs">{formik.errors.category}</div>}
+                  {formik.touched.category && formik.errors.category && (
+                    <div className="text-red-600 text-xs">
+                      {formik.errors.category}
+                    </div>
+                  )}
                 </FormControl>
 
                 <FormControl fullWidth>
@@ -483,12 +589,19 @@ const AddProducts = () => {
                     value={formik.values.otherCategory}
                     onChange={handleSubCategoryChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.otherCategory && Boolean(formik.errors.otherCategory)}
+                    error={
+                      formik.touched.otherCategory &&
+                      Boolean(formik.errors.otherCategory)
+                    }
                     disabled={isSubCatLoading && Boolean(!selectedCategory)}
                     renderValue={(selected) => {
                       if (isSubCatLoading) return "Loading...";
-                      const selectedCategory = subCategories?.find((cat) => +cat.id === +selected);
-                      return selectedCategory ? selectedCategory.name : "--Select--";
+                      const selectedCategory = subCategories?.find(
+                        (cat) => +cat.id === +selected
+                      );
+                      return selectedCategory
+                        ? selectedCategory.name
+                        : "--Select--";
                     }}
                   >
                     {isSubCatLoading ? (
@@ -509,9 +622,12 @@ const AddProducts = () => {
                       ]
                     )}
                   </Select>
-                  {formik.touched.otherCategory && formik.errors.otherCategory && (
-                    <div className="text-red-600 text-xs">{formik.errors.otherCategory}</div>
-                  )}
+                  {formik.touched.otherCategory &&
+                    formik.errors.otherCategory && (
+                      <div className="text-red-600 text-xs">
+                        {formik.errors.otherCategory}
+                      </div>
+                    )}
                 </FormControl>
               </div>
               <TextField
@@ -523,8 +639,13 @@ const AddProducts = () => {
                 multiline
                 rows={3}
                 onBlur={formik.handleBlur}
-                error={formik.touched.description && Boolean(formik.errors.description)}
-                helperText={formik.touched.description && formik.errors.description}
+                error={
+                  formik.touched.description &&
+                  Boolean(formik.errors.description)
+                }
+                helperText={
+                  formik.touched.description && formik.errors.description
+                }
               />
             </Card>
             <Card className="p-4 flex flex-col gap-4">
@@ -537,7 +658,13 @@ const AddProducts = () => {
                       name={`sideName-${img.id}`}
                       label="Side Name"
                       value={img.side}
-                      onChange={(e) => setImgList((prev) => prev?.map((i) => (i.id === img.id ? { ...i, side: e.target.value } : i)))}
+                      onChange={(e) =>
+                        setImgList((prev) =>
+                          prev?.map((i) =>
+                            i.id === img.id ? { ...i, side: e.target.value } : i
+                          )
+                        )
+                      }
                       fullWidth
                       sx={{ maxWidth: "12rem", flex: "1 1 300px" }}
                     />
@@ -573,7 +700,11 @@ const AddProducts = () => {
                         },
                       }}
                       sx={{ flex: "6 1 300px" }}
-                      onClick={() => document.getElementById(`upload-file-${img.id}`)?.click()}
+                      onClick={() =>
+                        document
+                          .getElementById(`upload-file-${img.id}`)
+                          ?.click()
+                      }
                     />
                   </div>
 
@@ -581,14 +712,23 @@ const AddProducts = () => {
 
                   <FormGroup>
                     <StyledFormControlLabel
-                      control={<Checkbox checked={img.isThumbnail} onChange={() => handleCheckboxIsThumbnail(img.id)} color="primary" />}
+                      control={
+                        <Checkbox
+                          checked={img.isThumbnail}
+                          onChange={() => handleCheckboxIsThumbnail(img.id)}
+                          color="primary"
+                        />
+                      }
                       label="Is Thumbnail"
                     />
                   </FormGroup>
 
                   {imgList.length > 1 && (
                     <div className="flex gap-2">
-                      <IconButton color="error" onClick={handleRemoveImage(img.id)}>
+                      <IconButton
+                        color="error"
+                        onClick={handleRemoveImage(img.id)}
+                      >
                         <DeleteIcon />
                       </IconButton>
                     </div>
@@ -602,8 +742,6 @@ const AddProducts = () => {
               </div>
             </Card>
 
-
-
             <Card className="p-4 flex flex-col gap-4">
               <div className="font-bold">Attributes</div>
               <div className="flex ">
@@ -615,20 +753,29 @@ const AddProducts = () => {
                         <TableHead>
                           <TableRow>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">Color</Typography>
+                              <Typography className="!font-bold !text-sm">
+                                Color
+                              </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">Size</Typography>
+                              <Typography className="!font-bold !text-sm">
+                                Size
+                              </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">Stock Quantity</Typography>
+                              <Typography className="!font-bold !text-sm">
+                                Stock Quantity
+                              </Typography>
                             </TableCell>
                             <TableCell></TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {inventoryList.map((row, index) => (
-                            <TableRow key={row?.id} sx={{ borderBottom: "none" }}>
+                            <TableRow
+                              key={row?.id}
+                              sx={{ borderBottom: "none" }}
+                            >
                               <TableCell>
                                 <Select
                                   value={row?.color?.id || ""}
@@ -637,11 +784,17 @@ const AddProducts = () => {
                                       setIsColorModalOpen(true);
                                     } else {
                                       // handleInputQuantityChange(row?.id, "color", e.target.value);
-                                      const selectedColor: any = colorOptionsArray.find(
-                                        (color: any) => color.id === Number(e.target.value)
-                                      );
+                                      const selectedColor: any =
+                                        colorOptionsArray.find(
+                                          (color: any) =>
+                                            color.id === Number(e.target.value)
+                                        );
                                       if (selectedColor) {
-                                        handleInventoryData(row.id, "color", selectedColor);
+                                        handleInventoryData(
+                                          row.id,
+                                          "color",
+                                          selectedColor
+                                        );
                                       }
                                     }
                                   }}
@@ -658,7 +811,10 @@ const AddProducts = () => {
                                       {color.name}
                                     </MenuItem>
                                   ))}
-                                  <MenuItem value="addColor" className="!font-bold">
+                                  <MenuItem
+                                    value="addColor"
+                                    className="!font-bold"
+                                  >
                                     Add more color...
                                   </MenuItem>
                                 </Select>
@@ -671,11 +827,17 @@ const AddProducts = () => {
                                     if (e.target.value === "addSize") {
                                       setIsSizeModalOpen(true);
                                     } else {
-                                      const selectedSize: any = sizeOptionsArray.find(
-                                        (size: any) => size.id === Number(e.target.value)
-                                      );
+                                      const selectedSize: any =
+                                        sizeOptionsArray.find(
+                                          (size: any) =>
+                                            size.id === Number(e.target.value)
+                                        );
                                       if (selectedSize) {
-                                        handleInventoryData(row.id, "size", selectedSize);
+                                        handleInventoryData(
+                                          row.id,
+                                          "size",
+                                          selectedSize
+                                        );
                                       }
                                     }
                                   }}
@@ -692,12 +854,14 @@ const AddProducts = () => {
                                       {size.name}
                                     </MenuItem>
                                   ))}
-                                  <MenuItem value="addSize" className="!font-bold">
+                                  <MenuItem
+                                    value="addSize"
+                                    className="!font-bold"
+                                  >
                                     Add New Size...
                                   </MenuItem>
                                 </Select>
                               </TableCell>
-
 
                               <TableCell>
                                 <TextField
@@ -706,19 +870,33 @@ const AddProducts = () => {
                                   variant="outlined"
                                   placeholder="0"
                                   value={row?.stockQty}
-                                  onChange={(e) => handleInventoryData(row?.id, "stockQty", e.target.value)}
+                                  onChange={(e) =>
+                                    handleInventoryData(
+                                      row?.id,
+                                      "stockQty",
+                                      e.target.value
+                                    )
+                                  }
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-4">
                                   {inventoryList?.length > 1 && (
-                                    <IconButton color="error" onClick={() => handleDeleteInvenetoryRow(row?.id)}>
+                                    <IconButton
+                                      color="error"
+                                      onClick={() =>
+                                        handleDeleteInvenetoryRow(row?.id)
+                                      }
+                                    >
                                       <DeleteIcon />
                                     </IconButton>
                                   )}
                                   {index === inventoryList?.length - 1 && (
-                                    <IconButton color="primary" onClick={handleAddInventoryRow}>
+                                    <IconButton
+                                      color="primary"
+                                      onClick={handleAddInventoryRow}
+                                    >
                                       <AddBoxIcon />
                                     </IconButton>
                                   )}
@@ -748,20 +926,29 @@ const AddProducts = () => {
                         <TableHead>
                           <TableRow>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">Min Quantity</Typography>
+                              <Typography className="!font-bold !text-sm">
+                                Min Quantity
+                              </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">Max Quantity</Typography>
+                              <Typography className="!font-bold !text-sm">
+                                Max Quantity
+                              </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography className="!font-bold !text-sm">Price</Typography>
+                              <Typography className="!font-bold !text-sm">
+                                Price
+                              </Typography>
                             </TableCell>
                             <TableCell></TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {priceList.map((row, index) => (
-                            <TableRow key={row?.id} sx={{ borderBottom: "none" }}>
+                            <TableRow
+                              key={row?.id}
+                              sx={{ borderBottom: "none" }}
+                            >
                               <TableCell>
                                 <TextField
                                   type="number"
@@ -769,7 +956,13 @@ const AddProducts = () => {
                                   variant="outlined"
                                   value={row?.minQty}
                                   placeholder="0"
-                                  onChange={(e) => handleInputChange(row?.id, "minQty", e.target.value)}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      row?.id,
+                                      "minQty",
+                                      e.target.value
+                                    )
+                                  }
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
@@ -780,7 +973,13 @@ const AddProducts = () => {
                                   variant="outlined"
                                   placeholder="0"
                                   value={row?.maxQty}
-                                  onChange={(e) => handleInputChange(row?.id, "maxQty", e.target.value)}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      row?.id,
+                                      "maxQty",
+                                      e.target.value
+                                    )
+                                  }
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
@@ -791,19 +990,31 @@ const AddProducts = () => {
                                   variant="outlined"
                                   placeholder="0"
                                   value={row?.pricePerPiece}
-                                  onChange={(e) => handleInputChange(row?.id, "pricePerPiece", e.target.value)}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      row?.id,
+                                      "pricePerPiece",
+                                      e.target.value
+                                    )
+                                  }
                                   inputProps={{ min: 0 }}
                                 />
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-4">
                                   {priceList?.length > 1 && (
-                                    <IconButton color="error" onClick={() => handleDeleteRow(row?.id)}>
+                                    <IconButton
+                                      color="error"
+                                      onClick={() => handleDeleteRow(row?.id)}
+                                    >
                                       <DeleteIcon />
                                     </IconButton>
                                   )}
                                   {index === priceList?.length - 1 && (
-                                    <IconButton color="primary" onClick={handleAddRow}>
+                                    <IconButton
+                                      color="primary"
+                                      onClick={handleAddRow}
+                                    >
                                       <AddBoxIcon />
                                     </IconButton>
                                   )}
@@ -819,13 +1030,20 @@ const AddProducts = () => {
               </div>
             </Card>
 
-
-
             <div className="flex justify-between mt-4">
-              <Button variant="outlined" className="!text-red-500 !border-red-500 w-32">
+              <Button
+                variant="outlined"
+                className="!text-red-500 !border-red-500 w-32"
+              >
                 Cancel
               </Button>
-              <Button type="submit" variant="outlined" color="primary" className=" !rounded-lg w-32" disabled={formik.isSubmitting}>
+              <Button
+                type="submit"
+                variant="outlined"
+                color="primary"
+                className=" !rounded-lg w-32"
+                disabled={formik.isSubmitting}
+              >
                 Submit
               </Button>
             </div>
@@ -840,8 +1058,13 @@ const AddProducts = () => {
                 value={formik.values.leftTopHeader}
                 onChange={formik.handleChange}
                 fullWidth
-                error={formik.touched.leftTopHeader && Boolean(formik.errors.leftTopHeader)}
-                helperText={formik.touched.leftTopHeader && formik.errors.leftTopHeader}
+                error={
+                  formik.touched.leftTopHeader &&
+                  Boolean(formik.errors.leftTopHeader)
+                }
+                helperText={
+                  formik.touched.leftTopHeader && formik.errors.leftTopHeader
+                }
               />
               <TextField
                 label="Content"
@@ -851,8 +1074,13 @@ const AddProducts = () => {
                 fullWidth
                 multiline
                 rows={2}
-                error={formik.touched.leftTopContent && Boolean(formik.errors.leftTopContent)}
-                helperText={formik.touched.leftTopContent && formik.errors.leftTopContent}
+                error={
+                  formik.touched.leftTopContent &&
+                  Boolean(formik.errors.leftTopContent)
+                }
+                helperText={
+                  formik.touched.leftTopContent && formik.errors.leftTopContent
+                }
               />
               <Divider />
               <div className="font-bold">Left Toggle Section</div>
@@ -862,8 +1090,14 @@ const AddProducts = () => {
                 value={formik.values.leftBottomHeader}
                 onChange={formik.handleChange}
                 fullWidth
-                error={formik.touched.leftBottomHeader && Boolean(formik.errors.leftBottomHeader)}
-                helperText={formik.touched.leftBottomHeader && formik.errors.leftBottomHeader}
+                error={
+                  formik.touched.leftBottomHeader &&
+                  Boolean(formik.errors.leftBottomHeader)
+                }
+                helperText={
+                  formik.touched.leftBottomHeader &&
+                  formik.errors.leftBottomHeader
+                }
               />
               <TextField
                 label="Content"
@@ -873,12 +1107,16 @@ const AddProducts = () => {
                 fullWidth
                 multiline
                 rows={2}
-                error={formik.touched.leftBottomContent && Boolean(formik.errors.leftBottomContent)}
-                helperText={formik.touched.leftBottomContent && formik.errors.leftBottomContent}
+                error={
+                  formik.touched.leftBottomContent &&
+                  Boolean(formik.errors.leftBottomContent)
+                }
+                helperText={
+                  formik.touched.leftBottomContent &&
+                  formik.errors.leftBottomContent
+                }
               />
               <Divider />
-
-
             </Card>
           </div>
         </div>
@@ -913,8 +1151,10 @@ const AddProducts = () => {
         </DialogActions>
       </Dialog>
 
-
-      <Dialog open={isColorModalOpen} onClose={() => setIsColorModalOpen(false)}>
+      <Dialog
+        open={isColorModalOpen}
+        onClose={() => setIsColorModalOpen(false)}
+      >
         <DialogTitle>Add New Color</DialogTitle>
         <DialogContent>
           <TextField
@@ -942,7 +1182,6 @@ const AddProducts = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
     </form>
   );
 };
