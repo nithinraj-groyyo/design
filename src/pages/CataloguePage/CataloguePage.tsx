@@ -20,6 +20,7 @@ import {
   useLazyFetchCatalogueListQuery
 } from '../../rtk-query/catalogueApiSlice';
 import CataloguePageMobile from './CataloguePageMobile';
+import { useGetSubscriptionInfoQuery } from '../../rtk-query/subscriptonApiSlice';
 
 interface ICategory {
   id: number;
@@ -52,6 +53,7 @@ const CataloguePage = () => {
   const itemsPerPage = 8;
   const token = JSON.parse(localStorage.getItem("authToken") || 'null');
   const [isMobile, setIsMobile] = useState(false);
+  const [isButtonVisible, setIsButtonVisible] = useState(false);
 
   const navigate = useNavigate();
 
@@ -113,18 +115,41 @@ const CataloguePage = () => {
     currentPage * itemsPerPage
   );
 
+  const [premiumUser, setPremiumUser] = useState<boolean>(true);  
+  const { data: subscriptionData = [], error } = useGetSubscriptionInfoQuery({
+    token: JSON.parse(localStorage.getItem("authToken") as string),
+  });
+
+
+  useEffect(()=>{
+    if(subscriptionData.length===0){
+      setPremiumUser(false);
+    }else{
+      setPremiumUser(true);
+    }
+  },[subscriptionData])
+
+
   const handleRedirectButton = () => {
     navigate("/account/rfq/list");
   };
 
+  const handleOnMouseEnter = () => {
+    setIsButtonVisible(true);
+  }
+
+  const handleOnMouseLeave = () => {
+    setIsButtonVisible(false);
+  }
+
   return (
     isMobile ? (
-      <CataloguePageMobile />
+      <CataloguePageMobile premiumUser={premiumUser}/>
     ) : (
       <BasicLayout>
-        <div className='flex'>
-          <div className='flex-1 p-4 max-w-fit bg-[#f9f9f9] border-r-2 shadow-md mt-[10rem]'>
-            <Typography variant="h6" className='!mt-10 !font-semibold'>Categories</Typography>
+        <div className="flex">
+          <div className="flex-1 p-4 max-w-fit bg-[#f9f9f9] border-r-2 shadow-md mt-[10rem]">
+            <Typography variant="h6" className="!mt-10 !font-semibold">Categories</Typography>
             <RadioGroup
               value={selectedCategory}
               onChange={(e) => {
@@ -143,7 +168,7 @@ const CataloguePage = () => {
               ))}
             </RadioGroup>
 
-            <Typography variant="h6" sx={{ marginTop: '1rem' }} className=' !font-semibold'>Subcategories</Typography>
+            <Typography variant="h6" sx={{ marginTop: '1rem' }} className="!font-semibold">Subcategories</Typography>
             <RadioGroup
               value={selectedSubcategory}
               onChange={(e) => setSelectedSubcategory(e.target.value)}
@@ -160,40 +185,73 @@ const CataloguePage = () => {
             </RadioGroup>
           </div>
 
-          <div className='flex flex-col w-full'>
-            <div className='flex flex-col p-8 w-full mt-[10rem]'>
+          <div className="flex flex-col w-full">
+            <div className="flex flex-col p-8 w-full mt-[10rem]">
               <Grid container spacing={3} sx={{ padding: '2rem' }}>
                 {paginatedCatalogues.length > 0 ? (
-                  paginatedCatalogues?.filter((cat: any) => cat.isActive)?.map((catalogue) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
-                      <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          whileHover={{ scale: 1.02 }}
-                          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                        >
-                          <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden">
-                            <CardMedia
-                              component="img"
-                              height="200"
-                              image={catalogue.catalogueImages[0]?.signedUrl || ''}
-                              alt={catalogue?.name}
-                              className="object-cover h-36 w-48"
-                            />
-                            <CardContent>
-                              <Typography variant="h6" className="text-gray-800 font-semibold">
-                                {catalogue?.name}
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                {catalogue.description || 'No description available'}
-                              </Typography>
-                            </CardContent>
-                          </Card>
-                        </motion.div>
-                      </Link>
-                    </Grid>
-                  ))
+                  <>
+                    {paginatedCatalogues.filter((cat) => cat.isActive).map((catalogue) => (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={catalogue.id}>
+                        <Link to={`/catalogue/${catalogue.id}`} style={{ textDecoration: 'none' }}>
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                          >
+                            <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden">
+                              <CardMedia
+                                component="img"
+                                height="200"
+                                image={catalogue.catalogueImages[0]?.signedUrl || ''}
+                                alt={catalogue.name}
+                                className="object-cover h-36 w-48"
+                              />
+                              <CardContent>
+                                <Typography variant="h6" className="text-gray-800 font-semibold">
+                                  {catalogue.name}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                  {catalogue.description || 'No description available'}
+                                </Typography>
+                              </CardContent>
+                            </Card>
+                          </motion.div>
+                        </Link>
+                      </Grid>
+                    ))}
+
+                    { !premiumUser && <Grid item xs={12} sm={6} md={4} lg={3} className="relative" onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
+                      {isButtonVisible && <Link to="/services">
+                        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10 ml-3 mt-3 animate-fadeIn">
+                          <div className="text-white font-bold bg-black hover:animate-pulse bg-opacity-70 px-4 py-2 rounded-lg text-lg">
+                            Upgrade to Premium
+                          </div>
+                        </div>
+                      </Link>}
+
+                      <Card className="shadow-lg hover:shadow-2xl rounded-xl overflow-hidden blur-sm z-0 relative !bg-orange-200 border">
+                        <CardMedia
+                          component="img"
+                          height="200"
+                          image="/images/landingPages/landingPage_1_2.png"
+                          alt="Premium Content"
+                          className="object-cover h-36 w-48"
+                        />
+                        <CardContent>
+                          <Typography variant="h6" className="text-gray-800 font-semibold">
+                            Kids Wear Catalogue
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            Kids Category
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>}
+
+
+
+                  </>
                 ) : (
                   <Box sx={{ textAlign: 'center', width: '100%', padding: '2rem' }}>
                     <Typography variant="h5" color="textSecondary">
@@ -217,7 +275,6 @@ const CataloguePage = () => {
               )}
             </div>
           </div>
-
         </div>
       </BasicLayout>
     )

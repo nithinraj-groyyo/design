@@ -6,7 +6,7 @@ const rfqUrl = "rfq";
 const rfqApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     addRFQ: builder.mutation({
-      query: ({ formData, token, catalogueId }: { formData: FormData; token: string; catalogueId: string }) => ({
+      query: ({ formData, token, catalogueId }: { formData: any; token: string; catalogueId: string }) => ({
         url: `${rfqUrl}/add/${catalogueId}`, 
         method: "POST",
         body: formData,

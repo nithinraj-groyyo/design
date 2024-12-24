@@ -32,7 +32,7 @@ interface HeaderIconsProps {
 const iconButtons: IconButtonConfig[] = [
     { icon: <SignInIcon />, label: "sign in", redirect: "/login", id: "login" },
     { icon: <CustomizedWishlist />, label: "wishlist", redirect: "/wishlist", id: "wishlist" },
-    { icon: <CustomizedShoppingBadges />, label: "shopping bag", redirect: "/bag", id: "bag" },
+    { icon: <CustomizedShoppingBadges />, label: "bag", redirect: "/bag", id: "bag" },
 ];
 
 const IconsButton: React.FC<IconsButtonProps> = ({ icon, label, onMouseEnter, onMouseLeave }) => {
@@ -103,7 +103,7 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
     return (
         <div className="xxs:hidden lg:flex gap-[3rem] items-center">
             {filteredIconButtons.map((button, index) => (
-                <Link to={button.redirect} key={index}>
+                <Link to={button.redirect} key={index} >
                     <IconsButton
                         icon={button.icon}
                         label={button.label}
@@ -116,15 +116,15 @@ const HeaderIcons: React.FC<HeaderIconsProps> = ({ handleMouseLeaveButton, handl
             {isAuthenticated && (
                 <div className="flex flex-col items-center justify-between my-auto whitespace-nowrap">
                     <div
-                        className={`!p-1 rounded-full ${
+                        className={`p-1 rounded-full ${
                             subscriptionData?.data && subscriptionData?.data.length > 0 ? "!bg-yellow-500" : ""
                         }`}
                     >
                         <IconButton
-                            className="!w-9 !h-9"
+                            className="!w-5 !h-5"
                             onClick={handleMenuClick}
                         >
-                            <PersonIcon fontSize="large" />
+                            <PersonIcon fontSize="medium" />
                         </IconButton>
                     </div>
                     <Typography>accounts</Typography>

@@ -13,7 +13,7 @@ const AboutPage = () => {
   return (
     <BasicLayout>
       <div className="mt-[5rem] lg:mt-[10rem] font-poppins">
-        <div className="flex flex-col gap-8 py-4 bg-gradient-to-b from-[#f9f9f9] to-transparent">          
+        <div className="flex flex-col gap-8 py-4 bg-gradient-to-b from-[#f9f9f9] to-transparent py-8">          
           <div className="text-center font-bold tracking-wide text-2xl md:text-4xl">
             {MISC.ABOUT_US}
           </div>
@@ -58,7 +58,7 @@ const AboutPage = () => {
           </div>
         </div>
         
-        <ClientsLogosSlider />
+        {/* <ClientsLogosSlider /> */}
       </div>
     </BasicLayout>
   );
