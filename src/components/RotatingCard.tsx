@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  IconButton,
-} from "@mui/material";
+import { Card, CardContent, Button, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
-import { styled } from "@mui/material/styles";
+import { styled } from "@mui/system";
 
-// Enums and Interfaces
-enum ServiceButtons {
-  ExploreDesigns = "Explore Designs",
-  BookAppointment = "Book Appointment",
-  ContactUs = "Contact Us",
+// Types
+interface RotatingCardsProps {
+  autoRotateInterval?: number;
 }
 
 interface CarouselItem {
   title: string;
   description: string;
   buttonName: ServiceButtons;
+}
+
+enum ServiceButtons {
+  ExploreDesigns = "Explore Designs",
+  BookAppointment = "Book Appointment",
+  ContactUs = "Contact Us",
 }
 
 type CardPosition = "center" | "left" | "right" | "hidden";
@@ -36,6 +34,9 @@ const Container = styled("div")({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  "@media (max-width: 768px)": {
+    height: "300px",
+  },
 });
 
 const NavigationButton = styled(IconButton)(({ theme }) => ({
@@ -45,16 +46,20 @@ const NavigationButton = styled(IconButton)(({ theme }) => ({
   "&:hover": {
     backgroundColor: "rgba(255, 255, 255, 1)",
   },
-  boxShadow: theme.shadows[3],
 }));
 
 const StyledCard = styled(Card)<StyledCardProps>(({ position }) => {
   const baseStyles = {
     position: "absolute",
-    width: "300px",
-    height: "360px",
+    width: "37vw",
+    height: "15rem",
     transition: "all 500ms ease-in-out",
   } as const;
+
+  const mobileStyles = {
+    width: "70vw",
+    height: "15rem",
+  };
 
   switch (position) {
     case "center":
@@ -64,28 +69,41 @@ const StyledCard = styled(Card)<StyledCardProps>(({ position }) => {
         transform: "scale(1)",
         opacity: 1,
         filter: "blur(0)",
+        "@media (max-width: 768px)": mobileStyles,
       };
     case "right":
       return {
         ...baseStyles,
         zIndex: 10,
-        transform: "translateX(160px) rotate(12deg) scale(0.9)",
+        transform: "translateX(120px) rotate(8deg) scale(0.9)",
         opacity: 0.7,
         filter: "blur(2px)",
+        "@media (max-width: 768px)": {
+          ...mobileStyles,
+          transform: "translateX(60px) rotate(8deg) scale(0.9)",
+        },
       };
     case "left":
       return {
         ...baseStyles,
         zIndex: 10,
-        transform: "translateX(-160px) rotate(-12deg) scale(0.9)",
+        transform: "translateX(-120px) rotate(-8deg) scale(0.9)",
         opacity: 0.7,
         filter: "blur(2px)",
+        "@media (max-width: 768px)": {
+          ...mobileStyles,
+          transform: "translateX(-60px) rotate(-8deg) scale(0.9)",
+        },
       };
     default:
       return {
         ...baseStyles,
         transform: "scale(0.75)",
         opacity: 0,
+        "@media (max-width: 768px)": {
+          ...mobileStyles,
+          transform: "scale(0.6)",
+        },
       };
   }
 });
@@ -93,16 +111,45 @@ const StyledCard = styled(Card)<StyledCardProps>(({ position }) => {
 const StyledButton = styled(Button)(({ theme }) => ({
   marginTop: "auto",
   padding: "10px 20px",
-  borderRadius: "25px",
+  borderRadius: "10px",
   textTransform: "none",
   fontWeight: 600,
+  backgroundColor: "black",
+  border: "1px solid black",
+  color:"white",
+  "&:hover": {
+    backgroundColor: "white",
+    color: "black",
+    border: "1px solid black",
+  },
+  "@media (max-width: 768px)": {
+    padding: "8px 16px",
+    fontSize: "0.875rem",
+  },
 }));
 
-// Component Props Interface
-interface RotatingCardsProps {
-  autoRotateInterval?: number;
-}
+const Title = styled("div")({
+  fontWeight: 900,
+  color: "#333",
+  fontSize: "1.5rem",
+  textAlign: "center",
+  "@media (max-width: 768px)": {
+    fontSize: "1.2rem",
+  },
+});
 
+const Description = styled("div")({
+  color: "var(--text-secondary, #6b7280)",
+  marginBottom: "1.5rem",
+  fontFamily: "Poppins, sans-serif",
+  textAlign: "center",
+  fontSize: "1rem",
+  "@media (max-width: 768px)": {
+    fontSize: "0.875rem",
+  },
+});
+
+// Main Component
 const RotatingCards: React.FC<RotatingCardsProps> = ({
   autoRotateInterval = 5000,
 }) => {
@@ -155,18 +202,7 @@ const RotatingCards: React.FC<RotatingCardsProps> = ({
   };
 
   const handleButtonClick = (buttonName: ServiceButtons): void => {
-    // Handle button click based on button type
-    switch (buttonName) {
-      case ServiceButtons.ExploreDesigns:
-        console.log("Navigate to designs page");
-        break;
-      case ServiceButtons.BookAppointment:
-        console.log("Open appointment booking modal");
-        break;
-      case ServiceButtons.ContactUs:
-        console.log("Open contact form");
-        break;
-    }
+    console.log(`Button clicked: ${buttonName}`);
   };
 
   return (
@@ -188,37 +224,19 @@ const RotatingCards: React.FC<RotatingCardsProps> = ({
       </NavigationButton>
 
       {carouselDetails.map((card, index) => (
-        <StyledCard key={index} position={getCardPosition(index)} elevation={4}>
+        <StyledCard key={index} position={getCardPosition(index)} elevation={10}>
           <CardContent
             sx={{
               height: "100%",
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              padding: "24px",
+              padding: "2rem",
             }}
           >
-            <div>
-              <Typography
-                variant="h5"
-                component="h3"
-                gutterBottom
-                sx={{ fontWeight: 600 }}
-              >
-                {card.title}
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ color: "text.secondary", mb: 3 }}
-              >
-                {card.description}
-              </Typography>
-            </div>
-            <StyledButton
-              variant="contained"
-              color="primary"
-              onClick={() => handleButtonClick(card.buttonName)}
-            >
+            <Title>{card.title}</Title>
+            <Description className="mt-2">{card.description}</Description>
+            <StyledButton className="!mb-2" onClick={() => handleButtonClick(card.buttonName)}>
               {card.buttonName}
             </StyledButton>
           </CardContent>
